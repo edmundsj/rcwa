@@ -35,10 +35,11 @@ def redhefferProduct(SA, SB):
     SAB = np.zeros(mat_shape, dtype = np.cdouble);
     D = SA[0,1] @ inv(ident_block - SB[0,0] @ SA[1,1]);
     F = SB[1,0] @ inv(ident_block - SA[1,1] @ SB[0,0]);
-    SAB[0,0] = SA[0,0] + SA[0,1] @ inv(ident_block - SB[0,0]@SA[1,1]) @ SB[0,0] @ SA[1,0];
-    SAB[0,1] = SA[0,1] @ inv(ident_block - SB[0,0] @ SA[1,1]) @ SB[0,1];
-    SAB[1,0] = SB[1,0] @ inv(ident_block - SA[1,1] @ SB[0,0]) @ SA[1,0];
-    SAB[1,1] = SB[1,1] + SB[1,0] @ inv(ident_block - SA[1,1] @ SB[0,0]) @ SA[1,1] @ SB[0,1];
+
+    SAB[0,0] = SA[0,0] + D @ SB[0,0] @ SA[1,0];
+    SAB[0,1] = D @ SB[0,1];
+    SAB[1,0] = F @ SA[1,0];
+    SAB[1,1] = SB[1,1] + SB[1,0] @ F @ SA[1,1] @ SB[0,1];
 
     return SAB;
 
