@@ -1,0 +1,15 @@
+# This is a test sample netlist which I will attempt to keep consistent with
+# our other netlists and SPICE.
+
+# This is a plane-wave source of infinite extent, with angle theta and phi specified in degrees.
+# The last two numbers are the TE / TM polarization numbers. They will be normalized internally, only
+# their ratio matters.
+W0 500nm 44deg 30deg 1 2
+
+L0 1.0 1.0 # This is layer 0. There must always be a layer zero (the semi-infinite media from which
+            # we are sending our excitation
+# This is layer 1. It has relative permittivity 9.0 and relative permeability 1.0. All
+# intermediate layers must have a thickness, which can be specified in real units (nm, um, mm)
+# or left as the default (if no units, microns are assumed)
+L1 1.0 1.0 0um
+Lf 1.0 1.0 # This is the final layer. 
