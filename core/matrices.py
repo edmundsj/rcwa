@@ -9,6 +9,8 @@ sqrt = np.lib.scimath.sqrt; # Takes sqrt of complex numbers
 sq = np.square;
 eig = sp.linalg.eig # Performs eigendecomposition of identity intuitively (vectors are unit vectors)
 norm = np.linalg.norm;
+sin = np.sin;
+cos = np.cos;
 
 OUTER_BLOCK_SHAPE = (2,2);
 PQ_SHAPE = (2,2); # The shape of our core PQ matrices.
@@ -55,7 +57,7 @@ def Pi_gen(kx_n, ky_n, eri, uri):
     P = np.zeros(PQ_SHAPE, dtype=np.cdouble)
     P[0,0] = kx_n*ky_n;
     P[0,1] = uri*eri - np.square(kx_n);
-    P[1,0] = np.square(ky_n) - uri*eri;
+    P[1,0] = sq(ky_n) - uri*eri;
     P[1,1] = - kx_n*ky_n;
 
     P /= eri;
@@ -152,7 +154,6 @@ def SWref_gen(kx_n, ky_n, er_ref, ur_ref, Wg, Vg):
     Aref = Aij_gen(Wg, Wref, Vg, Vref);
     Bref = Bij_gen(Wg, Wref, Vg, Vref);
 
-    # I am trying now with notation consistent with his other notation.
     Aref_inv = inv(Aref);
 
     S[0,0] = - Aref_inv @ Bref;
@@ -206,7 +207,7 @@ def calcReflectanceTransmittance(kx_n, ky_n, kz_n, ntrn, ur_ref, ur_trn, Exy_i, 
     '''
     Calculate the reflectance and transmittance given an input electric field vector
     (assumed to be a column array in the form [[Ex],[Ey]]), the incident kz, and the transmitted
-    kz.
+    kz. 
     '''
     # By default, power conservation is violated.
     R = 0;

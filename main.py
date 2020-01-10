@@ -126,10 +126,10 @@ for i in range(num_internal_layers):
 
 # Finally, find the total scattering matrix.
 Sglobal = redhefferProduct(Sref, Sdevice);
-Sglobal = redhefferProduct(Sdevice, Strn);
+Sglobal = redhefferProduct(Sglobal, Strn);
 
 # And at long last, calculate the reflectance and transmittance of our device.
-[R, T] = calcReflectanceTransmittance(kx_n, ky_n, nref, ntrn, ur_ref, ur_trn, Exy_i, Wref, Wtrn, \
+[R, T] = calcReflectanceTransmittance(kx_n, ky_n, kz_n, ntrn, ur_ref, ur_trn, Exy_i, Wref, Wtrn, \
         Sglobal[0,0], Sglobal[1,0]);
 print("Done with all layers");
 print(f"R: {R}, T: {T}, R+T={R+T}");
