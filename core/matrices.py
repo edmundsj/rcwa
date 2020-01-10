@@ -12,7 +12,7 @@ norm = np.linalg.norm;
 
 OUTER_BLOCK_SHAPE = (2,2);
 PQ_SHAPE = (2,2); # The shape of our core PQ matrices.
-DBGLVL = 1;
+DBGLVL = 2;
 
 def redhefferProduct(SA, SB):
     """ Computes the redheffer star product of
@@ -151,6 +151,8 @@ def SWref_gen(kx_n, ky_n, er_ref, ur_ref, Wg, Vg):
     # This is inconsistent with prior notation of Aij and Bij, but I'm going to write it down as-is
     Aref = Aij_gen(Wg, Wref, Vg, Vref);
     Bref = Bij_gen(Wg, Wref, Vg, Vref);
+
+    # I am trying now with notation consistent with his other notation.
     Aref_inv = inv(Aref);
 
     S[0,0] = - Aref_inv @ Bref;
@@ -200,7 +202,7 @@ def calcEz(kx_n, ky_n, kz_n, Ex, Ey):
     Ez = (kx_n*Ex + ky_n*Ey) / kz_n
     return Ez;
 
-def calcReflectanceTransmittance(kx_n, ky_n, nref, ntrn, ur_ref, ur_trn, Exy_i, Wref, Wtrn, S11, S21):
+def calcReflectanceTransmittance(kx_n, ky_n, kz_n, ntrn, ur_ref, ur_trn, Exy_i, Wref, Wtrn, S11, S21):
     '''
     Calculate the reflectance and transmittance given an input electric field vector
     (assumed to be a column array in the form [[Ex],[Ey]]), the incident kz, and the transmitted
@@ -211,16 +213,15 @@ def calcReflectanceTransmittance(kx_n, ky_n, nref, ntrn, ur_ref, ur_trn, Exy_i, 
     T = 0;
 
     # First, calculate kz_n given an assumed LHI dispersion relation for the incident and outgoing media.
-    kz_nref = sqrt(sq(nref) - sq(kx_n) - sq(ky_n));
-    kz_ntrn = sqrt(sq(nref) - sq(kx_n) - sq(ky_n));
+    kz_ntrn = sqrt(sq(ntrn) - sq(kx_n) - sq(ky_n));
 
     # Next, calculate the transmitted and reflected fields given the incident fields
     Exy_ref = Wref @ S11 @ inv(Wref) @ Exy_i;
     Exy_trn = Wtrn @ S21 @ inv(Wtrn) @ Exy_i;
 
     # Now that we have the x and y fields for each region, we can calculate the z-component.
-    Ez_i = calcEz(kx_n, ky_n, kz_nref, Exy_i[0,0], Exy_i[1,0]);
-    Ez_ref = calcEz(kx_n, ky_n, kz_nref, Exy_ref[0,0], Exy_ref[1,0]);
+    Ez_i = calcEz(kx_n, ky_n, kz_n, Exy_i[0,0], Exy_i[1,0]);
+    Ez_ref = calcEz(kx_n, ky_n, kz_n, Exy_ref[0,0], Exy_ref[1,0]);
     Ez_trn = calcEz(kx_n, ky_n, kz_ntrn, Exy_trn[0,0], Exy_trn[1,0]);
 
     # Now compose everything into a total 3-dimensional E-field vector.
@@ -230,7 +231,7 @@ def calcReflectanceTransmittance(kx_n, ky_n, nref, ntrn, ur_ref, ur_trn, Exy_i, 
 
     # Finally, we can compute the ratio of the E-fields and the real part of kz.
     R = sq(norm(Etot_ref)) / sq(norm(Etot_i));
-    T = sq(norm(Etot_trn)) / sq(norm(Etot_i)) * np.real(ur_ref * kz_ntrn / (ur_trn * kz_nref));
+    T = sq(norm(Etot_trn)) / sq(norm(Etot_i)) * np.real(ur_ref * kz_ntrn / (ur_trn * kz_n));
 
     if(R + T < 1 - 1e-10):
         print(f"R + T = {R + T}. Do you have an absorbing medium? Power conservation appears to be violated.");
