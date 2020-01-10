@@ -3,6 +3,9 @@
 # Creation Date: 11/01/2019
 #
 # TODO:
+# Fix netlist parser so it can handle zero layers and assume the input and output layers are free space
+# (Eventually, maybe never):
+# - relax the constraint that the transmitting and incident medium must be LHI materials.
 
 import numpy as np
 import scipy as sp
@@ -11,8 +14,6 @@ import sys
 from core.matrices import *
 from netlist.netlist_parser import *
 import matplotlib.pyplot as plt
-
-DBGLVL = 2;
 
 # 1. The class NetlistParser parses a netlist and turns everything into a "Mask" or "Field" object.
 # The masks and field are returned so that they are sorted in ascending order with
@@ -49,15 +50,37 @@ if(len(ur) != num_internal_layers + 2):
 
 # Now, figure out from phi and theta what our incident wavevector is, normalized to the wavevector of free
 # space
-nrefl = sqrt(er[0]); # Get the refractive index for our first semi-infinite layer.
+ur_ref = ur[0];
+ur_trn = ur[-1];
+er_ref = er[0];
+er_trn = er[-1];
+nref = sqrt(er_ref * ur_ref); # Get the refractive index for our first semi-infinite layer.
+ntrn = sqrt(er_trn * ur_trn); # Refractive index for our final semi-infinite layer
+
 wavelength = sources[0][0]; # The wavelength of our simulation
 k0 = 2*np.pi / wavelength;
 theta = sources[0][1]; # For now, we will only have one source.
 phi = sources[0][2];
 
 # The normalized directional cosines multipled by the refractive index of the incident material
-kx_n = nrefl * np.sin(theta)*np.cos(phi);
-ky_n = nrefl * np.sin(theta)*np.sin(phi);
+kx_n = nref * np.sin(theta)*np.cos(phi);
+ky_n = nref * np.sin(theta)*np.sin(phi);
+kz_n = nref * np.cos(theta);
+kn = np.array([kx_n, ky_n, kz_n]);
+z_vec = np.array([0,0,1]);
+
+# Calculate the TE / TM vectors, our polarization state, and the xy electric field.
+if(theta == 0):
+    aTE = np.array([0,1,0]);
+else:
+    aTE = np.cross(kn, z_vec) / norm(np.cross(kn, z_vec)); # the TE field vector (normalized)
+
+aTM = np.cross(aTE, kn) / norm(np.cross(aTE, kn)); # the TM field vector (normalized)
+pTE = sources[0][3];
+pTM = sources[0][4];
+Exy_i = pTE*aTE + pTM*aTM;
+Exy_i = Exy_i[0:2];
+Exy_i = Exy_i.reshape(2,1);
 
 # Generate our gap matrices once so we don't have to keep re-generating them.
 print("Initializing Simulation... Generating gap, transmission, reflection, system scattering matrices...");
@@ -73,8 +96,8 @@ lambda_g = np.diag(sqrt(l2g));
 Vg = Qg @ Wg @ inv(lambda_g);
 
 # Generate our reference and transmission scattering matrices 
-Sref = Sref_gen(kx_n, ky_n, er[0], ur[0], Wg, Vg);
-Strn = Sref_gen(kx_n, ky_n, er[-1], ur[-1], Wg, Vg);
+(Sref, Wref) = SWref_gen(kx_n, ky_n, er_ref, ur_ref, Wg, Vg);
+(Strn, Wtrn) = SWtrn_gen(kx_n, ky_n, er_trn, ur_trn, Wg, Vg);
 
 # Initialize our system's scattering matrix. We should have no reflection in either way and total transmission
 total_shape = OUTER_BLOCK_SHAPE + PQ_SHAPE
@@ -104,6 +127,11 @@ for i in range(num_internal_layers):
 # Finally, find the total scattering matrix.
 Sglobal = redhefferProduct(Sref, Sdevice);
 Sglobal = redhefferProduct(Sdevice, Strn);
+
+# And at long last, calculate the reflectance and transmittance of our device.
+[R, T] = calcReflectanceTransmittance(kx_n, ky_n, nref, ntrn, ur_ref, ur_trn, Exy_i, Wref, Wtrn, \
+        Sglobal[0,0], Sglobal[1,0]);
 print("Done with all layers");
+print(f"R: {R}, T: {T}, R+T={R+T}");
 if(DBGLVL >= 2):
     print(f"Sdevice:\n{Sdevice}\n\nSglobal:\n{Sglobal}\n");

@@ -6,11 +6,13 @@ inv = np.linalg.inv;
 expm = sp.linalg.expm;
 sqrtm = sp.linalg.sqrtm;
 sqrt = np.lib.scimath.sqrt; # Takes sqrt of complex numbers
+sq = np.square;
 eig = sp.linalg.eig # Performs eigendecomposition of identity intuitively (vectors are unit vectors)
+norm = np.linalg.norm;
 
 OUTER_BLOCK_SHAPE = (2,2);
 PQ_SHAPE = (2,2); # The shape of our core PQ matrices.
-DBGLVL = 2;
+DBGLVL = 1;
 
 def redhefferProduct(SA, SB):
     """ Computes the redheffer star product of
@@ -126,7 +128,7 @@ def Si_gen(k0, Li, kx_n, ky_n, eri, uri, Wg, Vg):
 
     return S;
 
-def Sref_gen(kx_n, ky_n, er_ref, ur_ref, Wg, Vg):
+def SWref_gen(kx_n, ky_n, er_ref, ur_ref, Wg, Vg):
     """
     Compute the reflection scattering matrix (the one where we are injecting our excitation wave).
     This matrix is only computed once at the beginning of the simulation.
@@ -156,18 +158,20 @@ def Sref_gen(kx_n, ky_n, er_ref, ur_ref, Wg, Vg):
     S[1,0] = 0.5*(Aref - Bref @ Aref_inv @ Bref)
     S[1,1] = Bref @ Aref_inv;
 
-    return S;
+    return (S, Wref);
 
-def Strn_gen(kx_n, ky_n, er_trn, ur_trn, Wg, Vg):
+def SWtrn_gen(kx_n, ky_n, er_trn, ur_trn, Wg, Vg):
     """
     Computes the transmission scattering matrix (the one at the 'output' of our device.)
     """
-    Ptrn = Pi_gen(kx_n, ky_n, er_ref, ur_ref);
-    Qtrn = Qi_gen(kx_n, ky_n, er_ref, ur_ref);
+    Ptrn = Pi_gen(kx_n, ky_n, er_trn, ur_trn);
+    Qtrn = Qi_gen(kx_n, ky_n, er_trn, ur_trn);
     O2trn = Ptrn @ Qtrn;
     l2trn, Wtrn = eig(O2trn);
 
-    lambda_trn = np.diag.sqrt(l2trn);
+    lambda_trn = np.diag(sqrt(l2trn));
+
+    Vtrn = Qtrn @ Wtrn @ inv(lambda_trn);
 
     inner_shape = Wtrn.shape;
     total_shape = OUTER_BLOCK_SHAPE + inner_shape;
@@ -182,9 +186,56 @@ def Strn_gen(kx_n, ky_n, er_trn, ur_trn, Wg, Vg):
     S[1,0] = 2* Atrn_inv;
     S[1,1] = - Atrn_inv @ Btrn;
 
-    return S;
+    return (S, Wtrn);
 
-def ABXi_gen(kx_n, ky_n, eri, uri):
-    """
-    Generates the ith A, B, and X matrices for creating the scattering matrices.
-    """
+def calcEz(kx_n, ky_n, kz_n, Ex, Ey):
+    '''
+    Calculate the z-component of the electromagnetic field from the x- and y-components using the divergence
+    theorem. We are assuming that the material in which we are calculating the z-component is LHI. The Ex
+    and Ey components are assumed to be scalars, eri and uri, the relative permittivities and permeabilities,
+    are also assumed to be scalars.
+    '''
+    # First, we calculate kz in our medium from the refractive index and the (ASSUMED) dispersion
+    # relation of the medium.
+    Ez = (kx_n*Ex + ky_n*Ey) / kz_n
+    return Ez;
+
+def calcReflectanceTransmittance(kx_n, ky_n, nref, ntrn, ur_ref, ur_trn, Exy_i, Wref, Wtrn, S11, S21):
+    '''
+    Calculate the reflectance and transmittance given an input electric field vector
+    (assumed to be a column array in the form [[Ex],[Ey]]), the incident kz, and the transmitted
+    kz.
+    '''
+    # By default, power conservation is violated.
+    R = 0;
+    T = 0;
+
+    # First, calculate kz_n given an assumed LHI dispersion relation for the incident and outgoing media.
+    kz_nref = sqrt(sq(nref) - sq(kx_n) - sq(ky_n));
+    kz_ntrn = sqrt(sq(nref) - sq(kx_n) - sq(ky_n));
+
+    # Next, calculate the transmitted and reflected fields given the incident fields
+    Exy_ref = Wref @ S11 @ inv(Wref) @ Exy_i;
+    Exy_trn = Wtrn @ S21 @ inv(Wtrn) @ Exy_i;
+
+    # Now that we have the x and y fields for each region, we can calculate the z-component.
+    Ez_i = calcEz(kx_n, ky_n, kz_nref, Exy_i[0,0], Exy_i[1,0]);
+    Ez_ref = calcEz(kx_n, ky_n, kz_nref, Exy_ref[0,0], Exy_ref[1,0]);
+    Ez_trn = calcEz(kx_n, ky_n, kz_ntrn, Exy_trn[0,0], Exy_trn[1,0]);
+
+    # Now compose everything into a total 3-dimensional E-field vector.
+    Etot_i = np.append(Exy_i, Ez_i);
+    Etot_ref = np.append(Exy_ref, Ez_ref);
+    Etot_trn = np.append(Exy_trn, Ez_trn);
+
+    # Finally, we can compute the ratio of the E-fields and the real part of kz.
+    R = sq(norm(Etot_ref)) / sq(norm(Etot_i));
+    T = sq(norm(Etot_trn)) / sq(norm(Etot_i)) * np.real(ur_ref * kz_ntrn / (ur_trn * kz_nref));
+
+    if(R + T < 1 - 1e-10):
+        print(f"R + T = {R + T}. Do you have an absorbing medium? Power conservation appears to be violated.");
+    elif(R + T > 1 + 1e-10):
+        print(f"R + T = {R + T}. Do you have a gain medium? Power conservation appears to be violated.");
+
+    return (R, T);
+

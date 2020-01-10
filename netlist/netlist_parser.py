@@ -111,7 +111,11 @@ class NetlistParser:
                     pTE = self.stripUnits(line_chunks[TE_POSITION]);
                     pTM = self.stripUnits(line_chunks[TM_POSITION]);
 
-                sources.append((wavelength, theta, phi, pTE, pTM)); # Appends the wavelength, in microns.
+                # Normalize pTE and pTM so the sum of their squares is one.
+                pTEM = np.array([pTE, pTM]);
+                pTEM = pTEM / np.linalg.norm(pTEM);
+
+                sources.append((wavelength, theta, phi, pTEM[0], pTEM[1])); # Appends the wavelength, in microns.
 
 
             # This needs to be modified to include the Gaussian phase.
