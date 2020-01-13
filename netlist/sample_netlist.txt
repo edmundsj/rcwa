@@ -6,13 +6,10 @@
 # their ratio matters.
 W0 500nm 0deg 0deg 1 0
 
-L0 2 5
+L0 1.5 1
 # This is layer 1. It has relative permittivity 9.0 and relative permeability 1.0. All
 # intermediate layers must have a thickness, which can be specified in real units (nm, um, mm)
 # or left as the default (if no units, microns are assumed)
-
-L1 1.1 1 1um
-L1 1.1 1 1um
 
 
 Lf 1 1 # This is the final layer, the layer at the 'output' of our system.

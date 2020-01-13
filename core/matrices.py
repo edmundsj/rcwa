@@ -14,7 +14,37 @@ cos = np.cos;
 
 OUTER_BLOCK_SHAPE = (2,2);
 PQ_SHAPE = (2,2); # The shape of our core PQ matrices.
+TOTAL_SHAPE = OUTER_BLOCK_SHAPE + PQ_SHAPE;
 DBGLVL = 2;
+
+# This function makes a couple really subtle assumptions. First, we have to define what TE should be
+# when theta = 0. By convention, of how we define theta and phi, this should point along the y-axis.
+def aTEM_gen(kx_n, ky_n, kz_n):
+    """
+    Generates the aTE and aTM vectors from the known kx, ky, kz incident vectors, assuming that
+    our device is planar in the x/y direction.
+    """
+    z_vec_norm = np.array([0,0,-1]); # The z-normal vector (plane wave opposite direction as surface)
+    kn_vec = np.array([kx_n, ky_n, kz_n]);
+    epsilon = 1e-5; # a small number.
+
+    if(kx_n == 0 and ky_n == 0):
+        aTE = np.array([0,1,0]); # This is assuming W is the identity matrix.
+    else:
+        # HACK. I DO NOT KNOW WHY THE MINUS SIGN IS NEEDED.
+        aTE = - np.cross(z_vec_norm, kn_vec);
+        aTE = aTE / norm(aTE);
+
+    # I'm pretty sure Rumpf is wrong on this formula. For theta=0, phi=0, aTE should be pointing in
+    # the +y direction. If we want aTM to point in the +x direction, and the k-vector is pointing along
+    # z, we need to cross aTE with kn, not the other way around.
+    aTM = np.cross(aTE, kn_vec);
+    aTM = aTM / norm(aTM);
+
+    # Now, we want to shrink down these vectors so that they only contain the x/y polarization
+    # information, because we don't use the rest.
+
+    return (aTE[0:2], aTM[0:2]);
 
 def redhefferProduct(SA, SB):
     """ Computes the redheffer star product of
@@ -63,6 +93,7 @@ def Pi_gen(kx_n, ky_n, eri, uri):
     P /= eri;
     return P
 
+## FUNCTION PASSING UNIT TESTS.
 def Qi_gen(kx_n, ky_n, eri, uri):
     """
     Computes the Q-matrix for the ith layer, given a known relative permeability ui and relative
@@ -76,20 +107,57 @@ def Qi_gen(kx_n, ky_n, eri, uri):
     Q[1,0] = np.square(ky_n) - uri*eri;
     Q[1,1] = - kx_n * ky_n;
 
-    Q /= uri;
+    Q = Q / uri;
     return Q;
 
-# Computes the matrix Aij for two sets of eigenvector matrices Wi, Wj, Vi, Vj
+# FUNCTION DOES NOT HAVE UNIT TESTS
 def Aij_gen(Wi, Wj, Vi, Vj):
+    """
+    Computes the matrix Aij for two sets of eigenvector matrices Wi, Wj, Vi, Vj
+    """
     return inv(Wi) @ Wj + inv(Vi) @ Vj;
 
+# FUNCTION DOES NOT HAVE UNIT TESTS
 def Bij_gen(Wi, Wj, Vi, Vj):
     return inv(Wi) @ Wj - inv(Vi) @ Vj;
 
-def Xi_gen(lambda_i, k0, Li):
-    return expm(lambda_i*k0*Li);
+# FUNCTION DOES NOT HAVE UNIT TESTS. THIS FUNCTION ALSO WILL ONLY WORK FOR LHI MEDIA.
+def VWX_gen(kx_n, ky_n, er, ur, k0=0, Li=0):
+    """
+    FUNCTION DOES NOT CURRENTLY WORK. NEEDS TO BE FIXED.
+    Generates the V/W matrices (and the X matrix if k0 is nonzero)
+    """
+    # Unfortunately, for now we have to ignore P and Q, because they are causing numerical
+    # instability and severe annoyance. We will instead generate the O2 matrix directly,
+    # since it is just a multiple of the identity.
+    # Also, eigendecomposition of the identity matrix is an unstable procedure. It will basically
+    # give us unit vectors all over the place. For the identity matrix, I will say that we have
+    # a single eigenvalue eigval, which is the square root of the multiplier in front of omega squared.
+    #P = Pi_gen(kx_n, ky_n, er, ur);
+    Q = Qi_gen(kx_n, ky_n, er, ur);
 
-def Si_gen(k0, Li, kx_n, ky_n, eri, uri, Wg, Vg):
+    #O2 = np.ientity(PQ_SHAPE); # Compute the omega squared matrix from the PQ matrix product
+    # Unfortunately, eigendecomposition on LH media actually leads to a spread of eigenvectors,
+    # because by definition, all possible vectors are vectors of the identity matrix.
+    #l2, W = eig(O2); # Eigendecompose this into a diagonal matrix and the basis vectors
+
+    eigval_sq = sq(kx_n) + sq(ky_n) - er*ur
+    eigval = sqrt(eigval_sq); # this is just kz. It is probably real but possibly not.
+    lambda_i = (0+1j)*eigval*np.identity(PQ_SHAPE[0]); # Lec 2c slide 30
+
+    W = np.identity(PQ_SHAPE[0]); # WRONG WRONG WRONG. THIS IS SUPPOSED TO RELATE X AND Y AND TE/TM MODES.
+
+    lambda_i_inv = (0-1j)/eigval * np.identity(PQ_SHAPE[0]);# WILL ONLY WORK FOR LHI MEDIA.
+    X = expm(lambda_i * k0 * Li)
+
+    V = Q @ W @ lambda_i_inv;
+
+    if(k0 > 0):
+        return (V, W, X);
+    else:
+        return (V, W);
+
+def Si_gen(kx_n, ky_n, eri, uri, Wg, Vg, k0, Li):
     """
     Compute the symmetric scattering matrix using free space (gap layer, Wg)
     The goal is to minimize computation. For each layer, we only want to compute the P/Q/W matrices
@@ -98,30 +166,20 @@ def Si_gen(k0, Li, kx_n, ky_n, eri, uri, Wg, Vg):
     of the gap matrices, which we only want to generate once, because they are re-used throughout
     the program
     """
-    Pi = Pi_gen(kx_n, ky_n, eri, uri);
-    Qi = Qi_gen(kx_n, ky_n, eri, uri);
-
-    O2i = Pi @ Qi; # Omega-squared matrix that we want to take the matrix exponential of
-    l2i, Wi = eig(O2i); # Get W- and lambda-squared matrices from the eigendecomposition
-    lambda_i = np.diag(sqrt(l2i));
-    Vi = Qi @ Wi @ inv(lambda_i); #Compute magnetic field eigenvectors from definition
-
-    inner_shape = Pi.shape;
-    total_shape = OUTER_BLOCK_SHAPE + inner_shape;
+    Vi, Wi, Xi = VWX_gen(kx_n, ky_n, eri, uri, k0, Li);
 
     # The shape of our overall scattering matrix. Will be a matrix of matrices.
-    S = np.zeros(total_shape, dtype=np.cdouble);
+    S = np.zeros(TOTAL_SHAPE, dtype=np.cdouble);
 
     # First, compute all the auxiliary matrices we need to compute our scattering matrix
     Ai = Aij_gen(Wi, Wg, Vi, Vg);
     Bi = Bij_gen(Wi, Wg, Vi, Vg);
-    Xi = Xi_gen(lambda_i, k0, Li);
     Ai_inv = inv(Ai);
     block_1 = inv(Ai - Xi @ Bi @ Ai_inv @ Xi @ Bi);
 
     if(DBGLVL >= 2):
         print("Calling Si_gen():")
-        print(f"Pi:\n{Pi}\nQi:\n{Qi}\nlambda_i:\n{lambda_i}\nVi:\n{Vi}\nAi:{Ai}\n\nBi:\n{Bi}\n\nXi:\n{Xi}")
+        print(f"Qi:\nVi:\n{Vi}\nAi:{Ai}\n\nBi:\n{Bi}\n\nXi:\n{Xi}")
 
     S[0,0] = block_1 @ (Xi @ Bi @ Ai_inv @ Xi @ Ai - Bi)
     S[0,1] = block_1 @ Xi @ (Ai - Bi @ Ai_inv @ Bi);
@@ -135,26 +193,17 @@ def SWref_gen(kx_n, ky_n, er_ref, ur_ref, Wg, Vg):
     Compute the reflection scattering matrix (the one where we are injecting our excitation wave).
     This matrix is only computed once at the beginning of the simulation.
     """
-    inner_shape = PQ_SHAPE;
-    total_shape = OUTER_BLOCK_SHAPE + inner_shape;
 
-    Pref = Pi_gen(kx_n, ky_n, er_ref, ur_ref);
-    Qref = Qi_gen(kx_n, ky_n, er_ref, ur_ref);
-    O2ref = Pref @ Qref;
-    l2ref, Wref = eig(O2ref);
+    Vref, Wref= VWX_gen(kx_n, ky_n, er_ref, ur_ref);
 
-    lambda_ref = np.diag(sqrt(l2ref));
-
-    Vref = Qref @ Wref @ inv(lambda_ref);
-
-    S = np.zeros(total_shape, dtype=np.cdouble);
+    S = np.zeros(TOTAL_SHAPE, dtype=np.cdouble);
 
     # I don't trust this line of code (from slide 7 secture 2c of CEM lecture notes)
     # This is inconsistent with prior notation of Aij and Bij, but I'm going to write it down as-is
     Aref = Aij_gen(Wg, Wref, Vg, Vref);
     Bref = Bij_gen(Wg, Wref, Vg, Vref);
-
     Aref_inv = inv(Aref);
+    #print(f"Wg: {Wg}\nVg: {Vg}\nWref: {Wref}\nVref:{Vref}");
 
     S[0,0] = - Aref_inv @ Bref;
     S[0,1] = 2*Aref_inv;
@@ -167,23 +216,13 @@ def SWtrn_gen(kx_n, ky_n, er_trn, ur_trn, Wg, Vg):
     """
     Computes the transmission scattering matrix (the one at the 'output' of our device.)
     """
-    Ptrn = Pi_gen(kx_n, ky_n, er_trn, ur_trn);
-    Qtrn = Qi_gen(kx_n, ky_n, er_trn, ur_trn);
-    O2trn = Ptrn @ Qtrn;
-    l2trn, Wtrn = eig(O2trn);
-
-    lambda_trn = np.diag(sqrt(l2trn));
-
-    Vtrn = Qtrn @ Wtrn @ inv(lambda_trn);
-
-    inner_shape = Wtrn.shape;
-    total_shape = OUTER_BLOCK_SHAPE + inner_shape;
+    Vtrn, Wtrn = VWX_gen(kx_n, ky_n, er_trn, ur_trn);
 
     Atrn = Aij_gen(Wg, Wtrn, Vg, Vtrn);
     Btrn = Bij_gen(Wg, Wtrn, Vg, Vtrn);
     Atrn_inv = inv(Atrn);
 
-    S = np.zeros(total_shape, dtype=np.cdouble);
+    S = np.zeros(TOTAL_SHAPE, dtype=np.cdouble);
     S[0,0] = Btrn @ Atrn_inv;
     S[0,1] = 0.5* (Atrn - Btrn @ Atrn_inv @ Btrn)
     S[1,0] = 2* Atrn_inv;
@@ -207,7 +246,7 @@ def calcReflectanceTransmittance(kx_n, ky_n, kz_n, ntrn, ur_ref, ur_trn, Exy_i, 
     '''
     Calculate the reflectance and transmittance given an input electric field vector
     (assumed to be a column array in the form [[Ex],[Ey]]), the incident kz, and the transmitted
-    kz. 
+    kz.
     '''
     # By default, power conservation is violated.
     R = 0;

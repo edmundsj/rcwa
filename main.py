@@ -63,23 +63,15 @@ theta = sources[0][1]; # For now, we will only have one source.
 phi = sources[0][2];
 
 # The normalized directional cosines multipled by the refractive index of the incident material
-kx_n = nref * np.sin(theta)*np.cos(phi);
-ky_n = nref * np.sin(theta)*np.sin(phi);
-kz_n = nref * np.cos(theta);
-kn = np.array([kx_n, ky_n, kz_n]);
-z_vec = np.array([0,0,1]);
+kx_n = nref * sin(theta)*cos(phi);
+ky_n = nref * sin(theta)*sin(phi);
+kz_n = nref * cos(theta);
+aTE, aTM = aTEM_gen(kx_n, ky_n, kz_n);
 
 # Calculate the TE / TM vectors, our polarization state, and the xy electric field.
-if(theta == 0):
-    aTE = np.array([0,1,0]);
-else:
-    aTE = np.cross(kn, z_vec) / norm(np.cross(kn, z_vec)); # the TE field vector (normalized)
-
-aTM = np.cross(aTE, kn) / norm(np.cross(aTE, kn)); # the TM field vector (normalized)
 pTE = sources[0][3];
 pTM = sources[0][4];
 Exy_i = pTE*aTE + pTM*aTM;
-Exy_i = Exy_i[0:2];
 Exy_i = Exy_i.reshape(2,1);
 
 # Generate our gap matrices once so we don't have to keep re-generating them.
@@ -87,13 +79,7 @@ print("Initializing Simulation... Generating gap, transmission, reflection, syst
 erg = 1; # Our gap permittivity (just the permittivity of free space)
 urg = 1; # Our gap permeability (just the permeability of free space)
 
-Pg = Pi_gen(kx_n, ky_n, erg, urg);
-Qg = Qi_gen(kx_n, ky_n, erg, urg);
-O2g = Pg @ Qg;
-l2g, Wg = eig(O2g);
-
-lambda_g = np.diag(sqrt(l2g));
-Vg = Qg @ Wg @ inv(lambda_g);
+Vg, Wg = VWX_gen(kx_n, ky_n, erg, urg);
 
 # Generate our reference and transmission scattering matrices 
 (Sref, Wref) = SWref_gen(kx_n, ky_n, er_ref, ur_ref, Wg, Vg);
@@ -115,7 +101,7 @@ if(DBGLVL >= 2):
 print("Generating scattering matrices for internal layers, updating system matrix...");
 for i in range(num_internal_layers):
     # Generate the ith scattering matrix for layer i
-    Si = Si_gen(k0, t[i], kx_n, ky_n, er[i+1], ur[i+1], Wg, Vg);
+    Si = Si_gen(kx_n, ky_n, er[i+1], ur[i+1], Wg, Vg, k0, t[i]);
 
     if(DBGLVL >= 2):
         print(f"LAYER {i} ---\nS{i}:\n{Si}\n\n");
