@@ -67,13 +67,13 @@ def redhefferProduct(SA, SB):
     ident_block = np.identity(block_shape[0], dtype=np.cdouble);
 
     SAB = np.zeros(mat_shape, dtype = np.cdouble);
-    D = SA[0,1] @ inv(ident_block - SB[0,0] @ SA[1,1]);
-    F = SB[1,0] @ inv(ident_block - SA[1,1] @ SB[0,0]);
+    D = DredGen(SA[0,1], SA[1,1], SB[0,0]);
+    F = FredGen(SA[1,1], SB[0,0], SB[1,0]);
 
     SAB[0,0] = SA[0,0] + D @ SB[0,0] @ SA[1,0];
     SAB[0,1] = D @ SB[0,1];
     SAB[1,0] = F @ SA[1,0];
-    SAB[1,1] = SB[1,1] + SB[1,0] @ F @ SA[1,1] @ SB[0,1];
+    SAB[1,1] = SB[1,1] +  F @ SA[1,1] @ SB[0,1];
 
     return SAB;
 
@@ -120,6 +120,22 @@ def Aij_gen(Wi, Wj, Vi, Vj):
 def Bij_gen(Wi, Wj, Vi, Vj):
     return inv(Wi) @ Wj - inv(Vi) @ Vj;
 
+def DiGen(Ai, Bi, Xi):
+    Ai_inv = inv(Ai);
+    return Ai - Xi @ Bi @ Ai_inv @ Xi @ Bi;
+
+def DredGen(S12A, S22A, S11B):
+    """
+    Generates the D-matrix for the Redheffer star product. NOT the same as the Di matrix.
+    """
+    return S12A @ inv(np.identity(PQ_SHAPE[0], dtype=np.cdouble) - S11B @ S22A)
+
+def FredGen(S22A, S11B, S21B):
+    """
+    Generates the F-matrix for computing the Redheffer star product.
+    """
+    return S21B @ inv(np.identity(PQ_SHAPE[0], dtype=np.cdouble) - S11B @ S22A)
+
 def kzGen(kx_n, ky_n, er, ur):
     return sqrt(er*ur - sq(kx_n) - sq(ky_n));
 
@@ -160,7 +176,7 @@ def VWX_gen(kx_n, ky_n, kz_n, er, ur, k0=0, Li=0):
     else:
         return (V, W);
 
-def Si_gen(kx_n, ky_n, eri, uri, Wg, Vg, k0, Li):
+def Si_gen(Ai, Bi, Xi, Di):
     """
     Compute the symmetric scattering matrix using free space (gap layer, Wg)
     The goal is to minimize computation. For each layer, we only want to compute the P/Q/W matrices
@@ -169,23 +185,15 @@ def Si_gen(kx_n, ky_n, eri, uri, Wg, Vg, k0, Li):
     of the gap matrices, which we only want to generate once, because they are re-used throughout
     the program
     """
-    Vi, Wi, Xi = VWX_gen(kx_n, ky_n, eri, uri, k0, Li);
-
     # The shape of our overall scattering matrix. Will be a matrix of matrices.
     S = np.zeros(TOTAL_SHAPE, dtype=np.cdouble);
 
     # First, compute all the auxiliary matrices we need to compute our scattering matrix
-    Ai = Aij_gen(Wi, Wg, Vi, Vg);
-    Bi = Bij_gen(Wi, Wg, Vi, Vg);
     Ai_inv = inv(Ai);
-    block_1 = inv(Ai - Xi @ Bi @ Ai_inv @ Xi @ Bi);
+    Di_inv = inv(Di);
 
-    if(DBGLVL >= 2):
-        print("Calling Si_gen():")
-        print(f"Qi:\nVi:\n{Vi}\nAi:{Ai}\n\nBi:\n{Bi}\n\nXi:\n{Xi}")
-
-    S[0,0] = block_1 @ (Xi @ Bi @ Ai_inv @ Xi @ Ai - Bi)
-    S[0,1] = block_1 @ Xi @ (Ai - Bi @ Ai_inv @ Bi);
+    S[0,0] = Di_inv @ ((Xi @ Bi @ Ai_inv @ Xi @ Ai) - Bi)
+    S[0,1] = Di_inv @ Xi @ (Ai - (Bi @ Ai_inv @ Bi));
     S[1,0] = S[0,1];
     S[1,1] = S[0,0];
 
