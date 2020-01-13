@@ -4,22 +4,29 @@ sys.path.append('core');
 
 from matrices import *
 
+# This appears to be correct as well
 def rTE(kz1, kz2, er1, er2, ur1, ur2):
     return (ur2 * kz1 - ur1 * kz2) / (ur2 * kz1 + ur1 * kz2);
 
+# This appears to be correct
 def rTM(kz1, kz2, er1, er2, ur1, ur2):
     return (er1 * kz2 - er2 * kz1) / (er1 * kz2 + er2 * kz1);
 
+# This appears to be correct
 def tTE(kz1, kz2, er1, er2, ur1, ur2):
     return 1 + rTE(kz1, kz2, er1, er2, ur1, ur2);
 
+# This appears to be wrong and I have no clue as to why.
+# Either something is wrong with this (more likely) or something
+# is wrong with my matrix formalism. Let's try substituting something different.
 def tTM(kz1, kz2, er1, er2, ur1, ur2):
     eta_1 = sqrt(ur1 / er1);
     eta_2 = sqrt(ur2 / er2);
-    #n1 = sqrt(ur1 * er1);
-    #n2 = sqrt(ur2 * er2);
+    n1 = sqrt(ur1 * er1);
+    n2 = sqrt(ur2 * er2);
     return eta_2 / eta_1 * (1 - rTM(kz1, kz2, er1, er2, ur1, ur2));
     #return kz1 / kz2 * n2 / n1 * (1 + rTM(kz1, kz2, er1, er2, ur1, ur2));
+    # return n1 / n2 * (1 + rTM(kz1, kz2, er1, er2, ur1, ur2));
 
 def fresnelSMatrixInterface(kx_n, ky_n, er1, er2, ur1, ur2):
     """

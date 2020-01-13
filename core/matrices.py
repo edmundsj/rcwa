@@ -93,7 +93,6 @@ def Pi_gen(kx_n, ky_n, eri, uri):
     P /= eri;
     return P
 
-## FUNCTION PASSING UNIT TESTS.
 def Qi_gen(kx_n, ky_n, eri, uri):
     """
     Computes the Q-matrix for the ith layer, given a known relative permeability ui and relative
@@ -103,8 +102,8 @@ def Qi_gen(kx_n, ky_n, eri, uri):
 
     Q = np.zeros(PQ_SHAPE, dtype=np.cdouble)
     Q[0,0] = kx_n * ky_n;
-    Q[0,1] = uri*eri - np.square(kx_n);
-    Q[1,0] = np.square(ky_n) - uri*eri;
+    Q[0,1] = uri*eri - sq(kx_n);
+    Q[1,0] = sq(ky_n) - uri*eri;
     Q[1,1] = - kx_n * ky_n;
 
     Q = Q / uri;
@@ -121,8 +120,14 @@ def Aij_gen(Wi, Wj, Vi, Vj):
 def Bij_gen(Wi, Wj, Vi, Vj):
     return inv(Wi) @ Wj - inv(Vi) @ Vj;
 
+def kzGen(kx_n, ky_n, er, ur):
+    return sqrt(er*ur - sq(kx_n) - sq(ky_n));
+
+def Omega_gen(kz_n):
+    return np.identity(PQ_SHAPE[0],dtype=np.cdouble) * (0 + 1j)*kz_n;
+
 # FUNCTION DOES NOT HAVE UNIT TESTS. THIS FUNCTION ALSO WILL ONLY WORK FOR LHI MEDIA.
-def VWX_gen(kx_n, ky_n, er, ur, k0=0, Li=0):
+def VWX_gen(kx_n, ky_n, kz_n, er, ur, k0=0, Li=0):
     """
     FUNCTION DOES NOT CURRENTLY WORK. NEEDS TO BE FIXED.
     Generates the V/W matrices (and the X matrix if k0 is nonzero)
@@ -141,16 +146,14 @@ def VWX_gen(kx_n, ky_n, er, ur, k0=0, Li=0):
     # because by definition, all possible vectors are vectors of the identity matrix.
     #l2, W = eig(O2); # Eigendecompose this into a diagonal matrix and the basis vectors
 
-    eigval_sq = sq(kx_n) + sq(ky_n) - er*ur
-    eigval = sqrt(eigval_sq); # this is just kz. It is probably real but possibly not.
-    lambda_i = (0+1j)*eigval*np.identity(PQ_SHAPE[0]); # Lec 2c slide 30
+    O = Omega_gen(kz_n)
 
     W = np.identity(PQ_SHAPE[0]); # WRONG WRONG WRONG. THIS IS SUPPOSED TO RELATE X AND Y AND TE/TM MODES.
 
-    lambda_i_inv = (0-1j)/eigval * np.identity(PQ_SHAPE[0]);# WILL ONLY WORK FOR LHI MEDIA.
-    X = expm(lambda_i * k0 * Li)
+    O_inv = inv(O);
+    X = expm(O * k0 * Li)
 
-    V = Q @ W @ lambda_i_inv;
+    V = Q @ W @ O_inv;
 
     if(k0 > 0):
         return (V, W, X);
