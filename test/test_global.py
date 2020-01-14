@@ -67,10 +67,14 @@ class TestClass:
         self.testCaller(self.testRedhefferProductS12);
         self.testCaller(self.testRedhefferProductS21);
         self.testCaller(self.testRedhefferProductS22);
+        self.testCaller(self.testSrefFull);
+        self.testCaller(self.testStrnFull);
 
     def runIntegrationTests(self):
         """
-        Runs integration tests (to test s parameters and reflectance and their composition and stuff)
+        Runs integration tests to verify s-parameters for composite code, to verify the output field
+        for a given input field, and to verify the reflectance/transmittance and enforce power 
+        conservation.
         """
         theta = 0.3;
         phi = 0.0;
@@ -85,13 +89,7 @@ class TestClass:
         aTE, aTM = aTEM_gen(kx_n, ky_n, kz1_n);
         ATEM = np.transpose(np.array([aTM, aTE]));
 
-        testCaller(testS11Ref, kx_n, ky_n, er, ur, ATEM);
-        testCaller(testS22Ref, kx_n, ky_n, er, ur, ATEM);
-        testCaller(testS11Trn, kx_n, ky_n, er, ur, ATEM);
-        testCaller(testS22Trn, kx_n, ky_n, er, ur, ATEM);
-        testCaller(testS21Ref, kx_n, ky_n, er, ur, ATEM);
-        testCaller(testS21Trn, kx_n, ky_n, er, ur, ATEM);
-
+        # First, test the s-parameters
 
     # BEGIN UNIT TESTS SECTION OF THE CLASS
     def testKz(self):
@@ -207,6 +205,7 @@ class TestClass:
         V_actual = np.array([[0-0.4698j,0-1.1040j],[0+2.0114j,0+0.4698j]], dtype=np.cdouble);
         np.testing.assert_allclose(V_actual, V_calc, rtol=reltol, atol=abstol);
 
+
         # LAYER 2 DATA
         er = 1.0;
         ur = 3.0;
@@ -214,6 +213,16 @@ class TestClass:
 
         (V_calc, W) = VWX_gen(kx, ky, kz, er, ur);
         V_actual = np.array([[0-0.1051j,0-0.4941j],[0+0.6970j,0+0.1051j]], dtype=np.cdouble);
+        np.testing.assert_allclose(V_actual, V_calc, rtol=reltol, atol=abstol);
+
+        # REFERENCE REGION DATA
+        er = 1.4;
+        ur = 1.2;
+        kz = 0.705995; # Calculated manually using er and ur above.
+        (V_calc, W_ref) = VWX_gen(kx, ky, kz, er, ur);
+        V_actual = np.array([
+            [0 - 0.5017j, 0 - 0.8012j],
+            [0 + 1.7702j, 0 + 0.5017j]], dtype=np.cdouble);
         np.testing.assert_allclose(V_actual, V_calc, rtol=reltol, atol=abstol);
 
     def testXMatrix(self):
@@ -1080,6 +1089,112 @@ class TestClass:
             [0.0672 - 0.0211j, 0.5673 - 0.1808j]], dtype=np.cdouble);
 
         np.testing.assert_allclose(SAB_actual[1,1], SAB_calc[1,1], rtol=reltol, atol=abstol);
+
+    def testSrefFull(self):
+        # I generated this Aref myself.
+        # Tolerances relaxed due to small elements in the matrix
+        abstol = 0.007;
+        reltol = 0.03;
+        Aref = np.array([
+            [1.86002, 0.113614],
+            [0.115376, 1.64547]], dtype=np.cdouble);
+        Bref = np.array([
+            [0.139976, -0.113614],
+            [-0.115376, 0.354529]], dtype=np.cdouble);
+        Sref_calc = Sref_gen(Aref, Bref);
+
+        Sref_actual = np.zeros((2,2,2,2), dtype=np.cdouble);
+        Sref_actual[0,0] = np.array([
+            [-0.0800, 0.0761],
+            [0.0761, -0.2269]], dtype=np.cdouble);
+        Sref_actual[0,1] = np.array([
+            [1.0800, -0.0761],
+            [-0.0761, 1.2269]], dtype=np.cdouble);
+        Sref_actual[1,0] = np.array([
+            [0.9200, 0.0761],
+            [0.0761, 0.7731]], dtype=np.cdouble);
+        Sref_actual[1,1] = np.array([
+            [0.0800, -0.0761],
+            [-0.0761, 0.2269]], dtype=np.cdouble);
+        np.testing.assert_allclose(Sref_calc, Sref_actual, atol=abstol, rtol=reltol);
+
+    def testStrnFull(self):
+        """
+        WARNING: THIS HAS TO BE MODIFIED AND SHOULD CURRENTLY BE AN INTEGRATION TEST. I DO NOT HAVE
+        RAW INPUT DATA FOR THIS FUNCTION. I AM RELYING ON AIJ/BIJ, and VWX to generate my input.
+        I STILL HAVE TO WRITE THIS DAMN TEST.
+        """
+        abstol = 0.0001;
+        reltol = 0.001;
+
+        # I generated these myself from known-working Aij, Bij, Wtrn. They are now hard-coded.
+        Atrn = np.array([
+            [1.660774, -0.0652574],
+            [-0.06525902, 1.786816]], dtype=np.cdouble);
+        Btrn = np.array([
+            [0.339226, 0.0652574],
+            [0.06525902, 0.21318382]], dtype=np.cdouble);
+
+        Strn_calc = Strn_gen(Atrn, Btrn);
+
+        Strn_actual = np.zeros((2,2,2,2), dtype=np.cdouble);
+        Strn_actual[0,0] = np.array([
+            [0.2060, 0.0440],
+            [0.0440, 0.1209]], dtype=np.cdouble);
+        Strn_actual[0,1] = np.array([
+            [0.7940, -0.0440],
+            [-0.0440, 0.8791]], dtype=np.cdouble);
+        Strn_actual[1,0] = np.array([
+            [1.2060, 0.0440],
+            [0.0440, 1.1209]], dtype=np.cdouble);
+        Strn_actual[1,1] = np.array([
+            [-0.2060, -0.0440],
+            [-0.0440, -0.1209]], dtype=np.cdouble);
+        np.testing.assert_allclose(Strn_actual, Strn_calc, atol=abstol, rtol=reltol);
+
+    def SglobalIntegration(self):
+        """
+        Tests that the global s-matrices obtained for a given input angle and material properties
+        are correct. Using data from Rumpf, in particular, the final global scattering matrices.
+        This is the big daddy integration test. It requires calculation of all intermediate matrices,
+        s parameters, and computation of redheffer star products. If this is correct, all our code is
+        correct.
+        """
+        abstol=0.0001;
+        reltol=0.001;
+        l0 = 2.7;
+        k0 = 2*np.pi / l0;
+        theta_deg = 57.0;
+        phi_deg = 23.0;
+        theta = theta_deg * np.pi / 180.0;
+        phi = phi_deg * np.pi / 180.0;
+        pTE = 1/sqrt(2); # Our input polarization is circular
+        pTM = 1j/sqrt(2);
+
+        urref = 1.2;
+        erref = 1.4;
+        urtrn = 1.6;
+        ertrn = 1.8;
+
+        uri = [1.0, 3.0];
+        eri = [2.0, 1.0]; # The inner layers
+        Li = [0.25*l0, 0.5*l0];
+
+        Sglobal_actual = np.zeros((2,2,2,2), dtype=np.cdouble);
+        Sglobal_actual[0,0] = np.array([
+            [-0.6018 + 0.3062j, -0.0043 + 0.0199j],
+            [-0.0043 + 0.0199j, -0.5935 + 0.2678j]], dtype=np.cdouble);
+        Sglobal_actual[0,1] = np.array([
+            [0.5766 - 0.3110j, -0.0919 + 0.0469j],
+            [-0.0919 + 0.0469j, 0.7542 - 0.4016j]], dtype=np.cdouble);
+        Sglobal_actual[1,0] = np.array([
+            [0.7415 - 0.4007j, 0.0716 - 0.0409j],
+            [0.0716 - 0.0409j, 0.6033 - 0.3218j]], dtype=np.cdouble);
+        Sglobal_actual[1,1] = np.array([
+            [0.5861 - 0.3354j, 0.0170 + 0.0042j],
+            [0.0170 + 0.0042j, 0.5533 - 0.3434j]], dtype=np.cdouble);
+
+        np.testing.assert_all_close(Sglobal_actual, Sglobal_calc, atol=abstol, rtol=reltol);
 
 def main():
     test_class = TestClass(); # Create a new test class

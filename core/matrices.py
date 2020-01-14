@@ -199,47 +199,37 @@ def Si_gen(Ai, Bi, Xi, Di):
 
     return S;
 
-def SWref_gen(kx_n, ky_n, er_ref, ur_ref, Wg, Vg):
+# NOT COMPLETELY SURE ABOUT THIS FUNCTION. BARELY PASSING UNIT TESTS.
+def Sref_gen(Aref, Bref):
     """
     Compute the reflection scattering matrix (the one where we are injecting our excitation wave).
     This matrix is only computed once at the beginning of the simulation.
     """
-
-    Vref, Wref= VWX_gen(kx_n, ky_n, er_ref, ur_ref);
-
     S = np.zeros(TOTAL_SHAPE, dtype=np.cdouble);
 
-    # I don't trust this line of code (from slide 7 secture 2c of CEM lecture notes)
-    # This is inconsistent with prior notation of Aij and Bij, but I'm going to write it down as-is
-    Aref = Aij_gen(Wg, Wref, Vg, Vref);
-    Bref = Bij_gen(Wg, Wref, Vg, Vref);
     Aref_inv = inv(Aref);
-    #print(f"Wg: {Wg}\nVg: {Vg}\nWref: {Wref}\nVref:{Vref}");
 
     S[0,0] = - Aref_inv @ Bref;
     S[0,1] = 2*Aref_inv;
     S[1,0] = 0.5*(Aref - Bref @ Aref_inv @ Bref)
     S[1,1] = Bref @ Aref_inv;
 
-    return (S, Wref);
+    return S;
 
-def SWtrn_gen(kx_n, ky_n, er_trn, ur_trn, Wg, Vg):
+def Strn_gen(Atrn, Btrn):
     """
     Computes the transmission scattering matrix (the one at the 'output' of our device.)
     """
-    Vtrn, Wtrn = VWX_gen(kx_n, ky_n, er_trn, ur_trn);
 
-    Atrn = Aij_gen(Wg, Wtrn, Vg, Vtrn);
-    Btrn = Bij_gen(Wg, Wtrn, Vg, Vtrn);
     Atrn_inv = inv(Atrn);
-
     S = np.zeros(TOTAL_SHAPE, dtype=np.cdouble);
+
     S[0,0] = Btrn @ Atrn_inv;
-    S[0,1] = 0.5* (Atrn - Btrn @ Atrn_inv @ Btrn)
+    S[0,1] = 0.5* (Atrn - (Btrn @ Atrn_inv @ Btrn))
     S[1,0] = 2* Atrn_inv;
     S[1,1] = - Atrn_inv @ Btrn;
 
-    return (S, Wtrn);
+    return S;
 
 def calcEz(kx_n, ky_n, kz_n, Ex, Ey):
     '''
