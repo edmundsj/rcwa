@@ -112,6 +112,7 @@ class Test:
         self.testCaller(self.testCalculateInternalSMatrix);
         self.testCaller(self.testCalculatedReflectionRegionSMatrix);
         self.testCaller(self.testCalculatedTransmissionRegionSMatrix);
+        self.testCaller(self.testCalculateRT);
         print("--------- END UNIT TESTS... ----------");
 
     def runIntegrationTests(self):
@@ -1428,6 +1429,31 @@ class Test:
 
         assertAlmostEqual(SActual, SCalculated, absoluteTolerance, relativeTolerance);
 
+    def testCalculateRT(self):
+        absoluteTolerance = 0.0001;
+        relativeTolerance = 0.001;
+
+        kx = 1.00063;
+        ky = 0.424741;
+        kzReflectionRegion = 0.705933;
+        kzTransmissionRegion = 1.3032;
+
+        urReflectionRegion = 1.2;
+        erReflectionRegion = 1.4;
+        urTransmissionRegion = 1.6;
+        erTransmissionRegion = 1.8;
+
+        RActual = 0.4403;
+        TActual = 0.5597;
+
+        EReflected = complexArray([0.0519-0.2856j, -0.4324 + 0.0780j, 0.1866 + 0.3580j]);
+        ETransmitted = complexArray([-0.0101 + 0.3577j, 0.4358 - 0.0820j, -0.1343 - 0.2480j]);
+
+        (RCalculated, TCalculated) = calculateRT(kzReflectionRegion, kzTransmissionRegion,
+                urReflectionRegion, urTransmissionRegion, EReflected, ETransmitted);
+        assertAlmostEqual(RActual, RCalculated, absoluteTolerance, relativeTolerance);
+        assertAlmostEqual(TActual, TCalculated, absoluteTolerance, relativeTolerance);
+
     def itestGlobalScatteringMatrix(self):
         """
         Tests that the global scattering matrix is correct for the overall structure. If this works,
@@ -1487,9 +1513,6 @@ class Test:
         # THE TRANSMISSION REGION MATRIX LOOKS WRONG.
         STransmissionRegion = calculateTransmissionRegionSMatrix(kx, ky,
                 erTransmissionRegion, urTransmissionRegion, Wg, Vg);
-        print("");
-        print(SReflectionRegion);
-        print(STransmissionRegion);
 
         # Finally, compute the redheffer star product to connect our global matrix to the external
         # regions
@@ -1514,7 +1537,7 @@ class Test:
 
         assertAlmostEqual(SGlobalCalculated, SGlobalActual, absoluteTolerance, relativeTolerance);
 
-    def testReflectanceTransmittance(self):
+    def itestReflectanceTransmittance(self):
         """
         Tests that the reflectance and transmittance are correct, and that conservation of power
         is enforced.

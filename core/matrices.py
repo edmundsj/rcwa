@@ -293,15 +293,17 @@ def calculateEz(kx, ky, kz, Ex, Ey):
     Ez = - (kx*Ex + ky*Ey) / kz
     return Ez;
 
-def calculateRT(kz_ref, kz_trn, ur_ref, ur_trn, Exyz_ref, Exyz_trn):
+def calculateRT(kzReflectionRegion, kzTransmissionRegion,
+        urReflectionRegion, urTransmissionRegion, ExyzReflected, ExyzTransmitted):
     '''
     Calculate the reflectance and transmittance given an input electric field vector
     (assumed to be a column array in the form [[Ex],[Ey]]), the incident kz, and the transmitted
     kz. WARNING: assumes incident fields are normalized to a magnitude of 1. We need to enforce
     this elsewhere.
     '''
-    R = sq(norm(Exyz_ref))
-    T = np.real((kz_trn / kz_inc) * (ur_trn / ur_inc)) * sq(norm(Exyz_trn));
+    R = sq(norm(ExyzReflected))
+    T = sq(norm(ExyzTransmitted))*np.real(kzTransmissionRegion / urTransmissionRegion) / \
+            (kzReflectionRegion / urReflectionRegion);
 
     return (R, T);
 
