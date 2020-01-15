@@ -4,12 +4,14 @@
 # This is a plane-wave source of infinite extent, with angle theta and phi specified in degrees.
 # The last two numbers are the TE / TM polarization numbers. They will be normalized internally, only
 # their ratio matters.
-W0 500nm 0deg 0deg 1 0
+W0 2.7um 57deg 23deg 1 1j
 
-L0 1.5 1
+L0 1.4 1.2
 # This is layer 1. It has relative permittivity 9.0 and relative permeability 1.0. All
 # intermediate layers must have a thickness, which can be specified in real units (nm, um, mm)
 # or left as the default (if no units, microns are assumed)
 
+L1 2.0 1.0 0.675um
+L2 1.0 3.0 1.35um
 
-Lf 1 1 # This is the final layer, the layer at the 'output' of our system.
+Lf 1.8 1.6 # This is the final layer, the layer at the 'output' of our system.

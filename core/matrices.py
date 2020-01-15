@@ -16,6 +16,7 @@ OUTER_BLOCK_SHAPE = (2,2);
 scatteringElementShape = (2,2); # The shape of our core PQ matrices.
 scatteringMatrixShape = OUTER_BLOCK_SHAPE + scatteringElementShape;
 scatteringElementShape = (2,2);
+scatteringElementSize = scatteringElementShape[0];
 DBGLVL = 2;
 
 class _const:
@@ -68,6 +69,12 @@ def complexIdentity(matrixSize):
 def complexZeros(matrixDimensionsTuple):
     """ Wrapper for numpy zeros declaration that forces arrays to be complex doubles """
     return np.zeros(matrixDimensionsTuple, dtype=np.cdouble);
+
+def generateTransparentSMatrix():
+    STransparent = complexZeros(scatteringMatrixShape);
+    STransparent[0,1] = complexIdentity(scatteringElementSize);
+    STransparent[1,0] = complexIdentity(scatteringElementSize);
+    return STransparent;
 
 def calculateRedhefferProduct(SA, SB):
     """
@@ -185,28 +192,6 @@ def calculateVWXMatrices(kx, ky, kz, er, ur, k0=0, Li=0): # UNIT TESTS COMPLETE
     else:
         return (V, W);
 
-def calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di):
-    """
-    Compute the symmetric scattering matrix using free space (gap layer, Wg)
-    The goal is to minimize computation. For each layer, we only want to compute the P/Q/W matrices
-    once, and then generate the scattering matrices from that, and return the scattering matrix to
-    the main program, which will be used in subsequent computation. The exception is the generation
-    of the gap matrices, which we only want to generate once, because they are re-used throughout
-    the program
-    """
-    # The shape of our overall scattering matrix. Will be a matrix of matrices.
-    S = complexZeros(scatteringMatrixShape);
-
-    # First, compute all the auxiliary matrices we need to compute our scattering matrix
-    AiInverse = inv(Ai);
-    DiInverse = inv(Di);
-
-    S[0,0] = DiInverse @ ((Xi @ Bi @ AiInverse @ Xi @ Ai) - Bi)
-    S[0,1] = DiInverse @ Xi @ (Ai - (Bi @ AiInverse @ Bi));
-    S[1,0] = S[0,1];
-    S[1,1] = S[0,0];
-
-    return S;
 
 def calculateInternalSMatrix(kx, ky, er, ur, k0, Li, Wg, Vg):
 
@@ -247,6 +232,29 @@ def calculateTransmissionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
 
     Si = calculateTransmissionRegionSMatrixFromRaw(Ai, Bi);
     return Si;
+
+def calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di):
+    """
+    Compute the symmetric scattering matrix using free space (gap layer, Wg)
+    The goal is to minimize computation. For each layer, we only want to compute the P/Q/W matrices
+    once, and then generate the scattering matrices from that, and return the scattering matrix to
+    the main program, which will be used in subsequent computation. The exception is the generation
+    of the gap matrices, which we only want to generate once, because they are re-used throughout
+    the program
+    """
+    # The shape of our overall scattering matrix. Will be a matrix of matrices.
+    S = complexZeros(scatteringMatrixShape);
+
+    # First, compute all the auxiliary matrices we need to compute our scattering matrix
+    AiInverse = inv(Ai);
+    DiInverse = inv(Di);
+
+    S[0,0] = DiInverse @ ((Xi @ Bi @ AiInverse @ Xi @ Ai) - Bi)
+    S[0,1] = DiInverse @ Xi @ (Ai - (Bi @ AiInverse @ Bi));
+    S[1,0] = S[0,1];
+    S[1,1] = S[0,0];
+
+    return S;
 
 def calculateReflectionRegionSMatrixFromRaw(AReflectionRegion, BReflectionRegion):
     """

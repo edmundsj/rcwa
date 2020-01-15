@@ -22,13 +22,10 @@
 #   3. Standardize how you write function documentation and how long it should be.
 #
 # 1. Write unit tests for the following methods:
-#   4. calcReflectanceTransmission (calculates reflectance and transmission given an S matrix)
-#   5. calculateReflectionRegionSMatrix (move the old one into a from intermediates to abstract it)
-#   6. CalculateTransmissionRegionSMatrix (again, use abstraction here.
+#   NONE. I think we are all good here.
 #
 # 2. Write integration tests for the following:
 #   1. Reflected/transmitted fields
-#   3. (if 2 fails) smaller S-matrices
 #   4. Reflectance/trasmittance/power conservation
 #   5. Comparing s-matrix parameters to Fresnel's equations.
 
@@ -85,6 +82,7 @@ class Test:
 
     def runUnitTests(self):
         print("--------- RUNNING UNIT TESTS... ----------");
+        self.testCaller(self.testTransparentSMatrix)
         self.testCaller(self.testKz);
         self.testCaller(self.testCalculateKVector);
         self.testCaller(self.testCalcEz);
@@ -128,6 +126,20 @@ class Test:
         print("--------- END INTEGRATION TESTS... ----------");
 
     # BEGIN UNIT TESTS SECTION OF THE CLASS
+    def testTransparentSMatrix(self):
+        """
+        Tests the transparent S matrix function. Should generate a matrix with identities along the diagonal
+        """
+        absoluteTolerance = 1e-10;
+        relativeTolerance = 1e-10;
+        SActual = complexZeros((2,2,2,2));
+        SActual[1,0] = complexIdentity(2);
+        SActual[0,1] = complexIdentity(2);
+
+        SCalculated = generateTransparentSMatrix();
+
+        assertAlmostEqual(SActual, SCalculated, absoluteTolerance, relativeTolerance);
+
     def testKz(self):
         """
         Tests that we are correctly computing the z-component of our wavevector given some

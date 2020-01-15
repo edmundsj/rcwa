@@ -16,6 +16,7 @@ PERMITTIVITY_POSITION = 1;
 PERMEABILITY_POSITION = 2;
 THICKNESS_POSITION = 3;
 
+DBGLVL = 2;
 
 import re
 import numpy as np
@@ -30,11 +31,18 @@ class NetlistParser:
     # Stripts the units after the number. Will want to enhance this so we can
     # add units like 'degrees' and other arbitrary things.
     def stripUnits(self, text):
-        # First, find where the digits end and the units begin.
-        units_begin = 0;
+        # First, compress everything so there are no spaces left
+        units_begin = None; # By default, assume there are no units.
+        text = text.replace(" ", "");
         i = 0;
+
+
+        # Now, find where the digits end and the units begin.
+        contains_complex = False;
         for ch in text:
-            if(ch.isdigit() == False and ch != '.'):
+            if(ch == 'j'):
+                contains_complex = True;
+            if(((ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z')) and ch != 'j'):
                 units_begin = i;
                 break;
             i += 1;
@@ -43,21 +51,31 @@ class NetlistParser:
         units_text = text[units_begin:]
         digits_text = text[0:units_begin];
 
+        if(DBGLVL >= 2):
+            print(f"stripUnits({text}) attempting to parse.")
+            print(f"digits text: {digits_text}, units text: {units_text}")
+
         if(units_begin == 0):
             units_text = '';
 
+        multiplier = 1;
         if(units_text == 'mm'):
-            return 1e3*float(digits_text);
+            multiplier = 1e3;
         elif(units_text == 'um'):
-            return float(digits_text);
+            multiplier = 1;
         elif(units_text == 'nm'):
-            return 1e-3*float(digits_text);
+            multiplier = 1e-3;
         elif(units_text == 'rad'):
-            return float(digits_text);
+            multiplier = 1;
         elif(units_text == 'deg'):
-            return np.pi / 180.0 *float(digits_text);
+            multiplier = np.pi / 180.0;
         else:
-            return float(text);
+            multiplier = 1;
+
+        if(contains_complex == True):
+            return multiplier * complex(digits_text);
+        else:
+            return multiplier * float(digits_text);
 
     def testLargest(self, current_aperture):
         if(current_aperture > self.largest_aperture):
@@ -105,7 +123,7 @@ class NetlistParser:
                 theta = self.stripUnits(line_chunks[THETA_POSITION]);
                 phi = self.stripUnits(line_chunks[PHI_POSITION]);
                 pTE = 1;
-                pTM = 1;
+                pTM = 0;
 
                 if(len(line_chunks)>PHI_POSITION+1): # We have additional TE and TM polarization information
                     pTE = self.stripUnits(line_chunks[TE_POSITION]);

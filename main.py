@@ -34,11 +34,6 @@ parser = NetlistParser(netlist_location);
 [er, ur, t, sources] = parser.parseNetlist();
 print(f"Done. Found:\nPermittivities:{er}\nPermeabilities:{ur}\nInternal Layers: {t}")
 
-# Now that we have extracted our permittivities, permeabilities, thicknesses, and sources,
-# we are ready to start a simulation. We do that first by initializing our scattering matrix.
-# For now, we formulated everything using 2x2 matrices, so we will put things in block matrix form.
-# NOTE: HOW NUMPY DOES MULTIPLICATION MEANS WE CANNOT DIRECTLY MULTIPLY THESE HIGHER_DIMENSIONAL MATRICES.
-
 # First, figure out how many layers we have
 num_internal_layers = len(t);
 if(len(er) != num_internal_layers + 2):
@@ -48,76 +43,83 @@ if(len(ur) != num_internal_layers + 2):
     raise Exception(f"Error: The number of layers is not equal to the number of permeabilities. Number of permeabilities is {len(ur)} and number of layers is {num_layers+2}");
 
 
-# Now, figure out from phi and theta what our incident wavevector is, normalized to the wavevector of free
-# space
-ur_ref = ur[0];
-ur_trn = ur[-1];
-er_ref = er[0];
-er_trn = er[-1];
-nref = sqrt(er_ref * ur_ref); # Get the refractive index for our first semi-infinite layer.
-ntrn = sqrt(er_trn * ur_trn); # Refractive index for our final semi-infinite layer
+print("Initializing Simulation... Setting up materials, polarization, incident wave...")
+# Setup material parameters used in the simulation
+urReflectionRegion = ur[0];
+urTransmissionRegion = ur[-1];
+erReflectionRegion = er[0];
+erTransmissionRegion = er[-1];
+nReflectionRegion = sqrt(erReflectionRegion * urReflectionRegion);
+nTransmissionRegion = sqrt(erReflectionRegion * urReflectionRegion);
 
+# Setup wavelength, k vector, polarization state, and polarization vector
 wavelength = sources[0][0]; # The wavelength of our simulation
 k0 = 2*np.pi / wavelength;
 theta = sources[0][1]; # For now, we will only have one source.
 phi = sources[0][2];
 
-# The normalized directional cosines multipled by the refractive index of the incident material
-kx_n = nref * sin(theta)*cos(phi);
-ky_n = nref * sin(theta)*sin(phi);
-kz_n = nref * cos(theta);
-aTE, aTM = aTEM_gen(kx_n, ky_n, kz_n);
+kx = nReflectionRegion * sin(theta)*cos(phi);
+ky = nReflectionRegion * sin(theta)*sin(phi);
+kzReflectionRegion = nReflectionRegion * cos(theta);
+kzTransmissionRegion = sqrt(erTransmissionRegion * urTransmissionRegion - sq(kx) - sq(ky));
+aTE, aTM = aTEMGen(kx, ky, kzReflectionRegion);
 
-# Calculate the TE / TM vectors, our polarization state, and the xy electric field.
-pTE = sources[0][3];
-pTM = sources[0][4];
-Exy_i = pTE*aTE + pTM*aTM;
-Exy_i = Exy_i.reshape(2,1);
+pTEM = complexArray([sources[0][3], sources[0][4]]);
+pTEM = pTEM / norm(pTEM); # enforce normalized polarization state
+(pTE, pTM) = (pTEM[0], pTEM[1]);
+ExyIncident = pTE*aTE + pTM*aTM;
 
 # Generate our gap matrices once so we don't have to keep re-generating them.
-print("Initializing Simulation... Generating gap, transmission, reflection, system scattering matrices...");
-erg = 1; # Our gap permittivity (just the permittivity of free space)
+erg = 1 + sq(kx) + sq(ky); # Our gap permittivity (just the permittivity of free space)
 urg = 1; # Our gap permeability (just the permeability of free space)
-
-Vg, Wg = VWX_gen(kx_n, ky_n, erg, urg);
+VGap, WGap = calculateVWXMatrices(kx, ky, kzReflectionRegion, erg, urg);
 
 # Generate our reference and transmission scattering matrices 
-(Sref, Wref) = SWref_gen(kx_n, ky_n, er_ref, ur_ref, Wg, Vg);
-(Strn, Wtrn) = SWtrn_gen(kx_n, ky_n, er_trn, ur_trn, Wg, Vg);
+SReflectionRegion = calculateReflectionRegionSMatrix(kx, ky,
+        erReflectionRegion, urReflectionRegion, WGap, VGap);
+
+STransmissionRegion = calculateTransmissionRegionSMatrix(kx, ky,
+        erTransmissionRegion, urTransmissionRegion, WGap, VGap);
 
 # Initialize our system's scattering matrix. We should have no reflection in either way and total transmission
-total_shape = OUTER_BLOCK_SHAPE + PQ_SHAPE
-Sglobal = np.zeros(total_shape, dtype = np.cdouble);
-Sglobal[1, 0] = np.identity(PQ_SHAPE[0], dtype=np.cdouble); # Set our S21 coefficient to 1 (total transmission)
-Sglobal[0,1] = np.identity(PQ_SHAPE[0], dtype=np.cdouble); # Set our S12 coefficient to 1 (total backwards transmission)
-
-Sdevice = np.zeros(total_shape, dtype = np.cdouble);
-Sdevice[1, 0] = np.identity(PQ_SHAPE[0], dtype=np.cdouble); # Set our S21 coefficient to 1 (total transmission)
-Sdevice[0,1] = np.identity(PQ_SHAPE[0], dtype=np.cdouble); # Set our S12 coefficient to 1 (total backwards transmission)
+SGlobal = generateTransparentSMatrix();
 
 if(DBGLVL >= 2):
-    print(f"Initial Variables --- \nSglobal: {Sglobal}\n\nSdevice: \n{Sdevice}\nSref:\n{Sref}\n\nStrn:\n{Strn}\n")
+    print(f""""Initial Variables --- \nSGlobal: {SGlobal}\n\nSref:\n{SReflectionRegion}\n\n
+            STransmissionRegion:\n{STransmissionRegion}\n""")
 
 print("Generating scattering matrices for internal layers, updating system matrix...");
 for i in range(num_internal_layers):
     # Generate the ith scattering matrix for layer i
-    Si = Si_gen(kx_n, ky_n, er[i+1], ur[i+1], Wg, Vg, k0, t[i]);
+    Si = calculateInternalSMatrix(kx, ky, er[i+1], ur[i+1], k0, t[i], WGap, VGap);
 
     if(DBGLVL >= 2):
         print(f"LAYER {i} ---\nS{i}:\n{Si}\n\n");
 
     # Update our system's scattering matrix using the redheffer star product with the ith scattering matrix
-    Sdevice = redhefferProduct(Sdevice, Si);
+    SGlobal= calculateRedhefferProduct(SGlobal, Si);
     print(f"Layer {i+1} Done");
 
-# Finally, find the total scattering matrix.
-Sglobal = redhefferProduct(Sref, Sdevice);
-Sglobal = redhefferProduct(Sglobal, Strn);
+# Update the global scattering matrix to include the reflection and transmission regions
+SGlobal = calculateRedhefferProduct(SReflectionRegion, SGlobal);
+SGlobal = calculateRedhefferProduct(SGlobal, STransmissionRegion);
+
+# Now, we need to calculate the reflected and transmitted fields using our S-matrices
+ExyReflected = SGlobal[0,0] @ ExyIncident;
+ExyTransmitted = SGlobal[1,0] @ ExyIncident;
+EzReflected = calculateEz(kx, ky, kzReflectionRegion, ExyReflected[0], ExyReflected[1]);
+EzTransmitted = calculateEz(kx, ky, kzTransmissionRegion, ExyTransmitted[0], ExyTransmitted[1]);
+ExyzReflected = np.append(ExyReflected, EzReflected);
+ExyzTransmitted = np.append(ExyTransmitted, EzTransmitted);
+
+if(DBGLVL >= 2):
+    print(f"ExyzIncident: {ExyIncident}\nExyReflected: {ExyzReflected}\nExyzTransmitted: {ExyzTransmitted}");
 
 # And at long last, calculate the reflectance and transmittance of our device.
-[R, T] = calcReflectanceTransmittance(kx_n, ky_n, kz_n, ntrn, ur_ref, ur_trn, Exy_i, Wref, Wtrn, \
-        Sglobal[0,0], Sglobal[1,0]);
+R, T = calculateRT(kzReflectionRegion, kzTransmissionRegion, urReflectionRegion, urTransmissionRegion,
+        ExyzReflected, ExyzTransmitted);
+
 print("Done with all layers");
 print(f"R: {R}, T: {T}, R+T={R+T}");
 if(DBGLVL >= 2):
-    print(f"Sdevice:\n{Sdevice}\n\nSglobal:\n{Sglobal}\n");
+    print(f"\nSGlobal:\n{SGlobal}\n");
