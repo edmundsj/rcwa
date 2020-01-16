@@ -4,6 +4,9 @@ Date Started: 2020/01/05
 Title: Transfer Matrix Method Fullwave Rigorous Solver
 License: BSD
 
+SOFTWARE STATUS
+This software currently works for single-wavelength calculation of composite scattering matrices, reflected/transmitted fields, and reflectance/transmittance. It has been validated against benchmarking code provided by Professor Raymond Rumpf at UTEP. In the (very near) future, I plan to implement some wrappers for plotting and multi-wavelength simulation. I am currently working on creating code for the Plane Wave Expansion Method and Rigorous Coupled Wave Analysis, and I will need to implement multi-wavelength simulation shortly after I finish those.
+
 This is an implementation of the Transfer Matrix Method authored by Jordan Edmunds (currently doing my Ph.D. at UC Berkeley in the Electrical Engineering and Computer Science Department). I had previously written a simple single-polarization transfer matrix method solver in Mathematica, but am now dealing with inhomogenous, anisotropic, and nonlinear materials, and so decided to re-implement in in python under the guidance of Dr. Raymond Rumpf (no official affiliation, but I have heavily used his online lectures and available materials).
 
 Whenever possible I have attempted to stay with the convention introduced in Dr. Rumpf's online class on computational electromagnetics.
