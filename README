@@ -15,3 +15,5 @@ GETTING STARTED ---
 
 NETLIST FORMAT ---
 While I love mucking around in other people's code as much as the next guy, I actually hate doing that. I also hate mucking around in my own code months or years after I wrote the thing. For this reason, I have implemented a netlist-based interface to run the software. This is where all material parameters are specified, the simulation wavelength, polarization, etc. The simplest netlist is zero lines of code - that means you are sending a plane wave into free space. Pretty boring, but the software will work just fine. If incident and outgoing layers are not specified, these are assumed to be free space. If a layer is specified with no thickness, it is assumed to be the incident layer or the transmitted layer depending on where it is in the file. There are simple example netlists in the "netlist" folder you can run, and I would start there.
+
+Hi.
