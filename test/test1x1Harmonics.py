@@ -11,6 +11,26 @@ from matrixParser import *
 
 
 class Test1x1Harmonic(unittest.TestCase):
+    #WARNING: THE TESTS FOR CONVOLUTION MATRIX GENERATION ARE IN THE PLANE WAVE EXPANSION CODE, NOT HERE.
+    def testGenerateConvolutionMatrix(self):
+        absoluteTolerance = 1e-4
+        relativeTolerance = 1e-3
+        urDeviceRegion = 1
+        erData = np.transpose(np.loadtxt('test/triangleData.csv', delimiter=','))
+        urData = urDeviceRegion * complexOnes((512, 439))
+        numberHarmonics = (1, 1)
+
+        convolutionMatrixCalculated = generateConvolutionMatrix(urData, numberHarmonics)
+        convolutionMatrixActual = 1
+        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
+                self.relativeTolerance, "UR convolution matrices for layer 1 not equal")
+
+
+        convolutionMatrixCalculated = generateConvolutionMatrix(erData, numberHarmonics)
+        convolutionMatrixActual = 5.0449
+        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
+                self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
+
     def testCalculateKz(self):
         KzCalculated = calculateKz(self.Kx, self.Ky, self.erReflectionRegion, self.urReflectionRegion)
         KzActual = self.KzReflectionRegion
