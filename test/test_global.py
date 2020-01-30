@@ -1,48 +1,88 @@
-# Testing is even more critical for simulators than for regular software, as you need to have reference
-# data to ensure that your simulator is giving out the proper value. Otherwise, the Law garbage in ->
-# garbage out will bite you hard.
-#
-# This test suite is based on data obtained from Prof. Raymond Rumpf at UTEP
-# (empossible.net/wp-content/uploads/2019/08/Benchmarking-Aid-for-TMM.pdf)
-# in addition to data I generated myself using code that had previously been validated using the above.
-# I have not found any errors in his benchmarking data.
-#
-# This test suite also compares data to the analytic fresnel's equations for the case of a single
-# interface for LHI (Linear Homogenous Isotropic) media and for two interfaces (an etalon), as
-# formulae for the above are readily derived and can be checked against online resources. 
-#
-#
 # TODO:
 # 0. Clean up your code by doing:
-#   1. Make variable names consistent and cleaner - change all kx to kx. We will just instruct
-#       at the beginning that when we refer to kx/y/z, it refers to the normalized versions, not
-#       the non-normalized versions.
-#   2. Add documentation in function docstrings (if Clean Code suggests it) for what each variable
-#       is and how it should be formatted. Currently this knowledge is implicit.
-#   3. Standardize how you write function documentation and how long it should be.
 #
 # 1. Write unit tests for the following methods:
-#   NONE. I think we are all good here.
 #
 # 2. Write integration tests for the following:
-#   1. Reflected/transmitted fields
-#   4. Reflectance/trasmittance/power conservation
-#   5. Comparing s-matrix parameters to Fresnel's equations.
 
 import sys
 sys.path.append('core');
+from matplotlib import pyplot as plt
 
 from matrices import *
 from fresnel import *
+from convolution import generateConvolutionMatrix
 
 statuses = [];
 messages = [];
 
-def assertAlmostEqual(a, b, absoluteTolerance, relativeTolerance):
-    """ Wrapper for numpy testing 'all close' assertion, forcing specification of absolute
-    and relative tolerance. """
+def assertAlmostEqual(a, b, absoluteTolerance=1e-10, relativeTolerance=1e-9, errorMessage=""):
+    np.testing.assert_allclose(a, b, atol=absoluteTolerance, rtol=relativeTolerance, err_msg=errorMessage);
 
-    np.testing.assert_allclose(a, b, atol=absoluteTolerance, rtol=relativeTolerance);
+def assertEqual(a, b, errorMessage=""):
+    np.testing.assert_equal(a, b, err_msg=errorMessage)
+
+def complexNumberArrayFromString(stringRow):
+    delimiter = 'i'
+    rowOfStrings = stringRow.split(delimiter)
+    rowOfStrings = [elem + "j" for elem in rowOfStrings]
+    rowOfStrings.remove("j")
+    rowOfStrings = np.array(rowOfStrings)
+    rowOfComplexNumbers = rowOfStrings.astype(np.cdouble)
+
+    return rowOfComplexNumbers
+
+def numpyArrayFromFile(filename):
+    """ Requires input file with all columns together on the same 18 rows """
+    fileHandle = open(filename, 'r')
+    delimiter = 'i'
+    fileLines = fileHandle.readlines()
+    data = None
+    i = 0
+    for line in fileLines:
+        line = line.replace(" ", "")
+        if line is not "":
+            rowOfStrings = line.split(delimiter)
+            rowOfStrings = [elem + "j" for elem in rowOfStrings]
+            rowOfStrings.remove("\nj")
+            rowOfStrings = np.array(rowOfStrings)
+            rowOfComplexNumbers = rowOfStrings.astype(np.cdouble)
+            if i is 0:
+                data = rowOfComplexNumbers
+            else:
+                print(rowOfComplexNumbers)
+                data = np.vstack((data, rowOfComplexNumbers))
+            i += 1
+
+    return data;
+
+def numpyArrayFromSeparatedColumnsFile(filename):
+    """ Requires an input file with columns 1 through 6 in the first 18 columns followed by a
+    vertical spacer followed by columns 7 through 12 and so on """
+    fileHandle = open(filename, 'r')
+    fileLines = fileHandle.readlines()
+    data = [None, None, None]
+    rowNumber = 0
+    columnNumber = 0
+
+    for line in fileLines:
+        line = line.replace(" ", "")
+        line = line.replace("\n", "")
+        if line is not "":
+            rowOfComplexNumbers = complexNumberArrayFromString(line)
+
+            if rowNumber is 0:
+                data[columnNumber] = rowOfComplexNumbers
+            else:
+                data[columnNumber] = np.vstack((data[columnNumber], rowOfComplexNumbers))
+            rowNumber += 1
+
+        if line is "": # This indicates we should start a new set of columns and append it to the old one
+            columnNumber += 1
+            rowNumber = 0
+
+    data = np.hstack((data[0], data[1], data[2]))
+    return data
 
 class Test:
     def __init__(self):
@@ -58,11 +98,6 @@ class Test:
         print(f"{self.statuses.count(True)} PASSED, {self.statuses.count(False)} FAILED");
 
     def testCaller(self, testFunction, *args):
-        """
-        Handles the actual calling of test functions, manages them with try/catch blocks. Maybe
-        not the most elegant way to do things, but the best idea I currently have without wasting
-        an inordinate amount of time.
-        """
         test_status = False; # By default assume we failed the test.
         test_message = f"{testFunction.__name__}({args}): ";
 
@@ -82,8 +117,10 @@ class Test:
 
     def runUnitTests(self):
         print("--------- RUNNING UNIT TESTS... ----------");
+        self.testCaller(self.testSetupData1x1Harmonics)
+        self.testCaller(self.testGenerateConvolutionMatrix)
+        self.testCaller(self.testCalculateKz);
         self.testCaller(self.testTransparentSMatrix)
-        self.testCaller(self.testKz);
         self.testCaller(self.testCalculateKVector);
         self.testCaller(self.testCalcEz);
         self.testCaller(self.testaTEM);
@@ -111,6 +148,7 @@ class Test:
         self.testCaller(self.testCalculatedReflectionRegionSMatrix);
         self.testCaller(self.testCalculatedTransmissionRegionSMatrix);
         self.testCaller(self.testCalculateRT);
+        self.testCaller(self.setupData3x3HarmonicsOblique); # REMOVE THIS LINE ONCE YOU WRITE TESTS.
         print("--------- END UNIT TESTS... ----------");
 
     def runIntegrationTests(self):
@@ -125,7 +163,120 @@ class Test:
 
         print("--------- END INTEGRATION TESTS... ----------");
 
-    # BEGIN UNIT TESTS SECTION OF THE CLASS
+    def testSetupData1x1Harmonics(self):
+        self.setupData1x1Harmonics()
+        absoluteTolerance = 1e-4
+        relativeTolerance = 1e-3
+        lambda0Actual = 0.02
+        thetaActual = 0
+        phiActual = 0
+
+        pTEActual = 1
+        pTMActual = 0
+
+        urReflectionRegionActual = 1.0
+        erReflectionRegionActual = 2.0
+        urTransmissionRegionActual = 1.0
+        erTransmissionRegionActual = 9.0
+        urDeviceRegionActual = 1.0
+        erDeviceRegionActual = 6.0
+
+        xPeriodActual = 0.0175
+        yPeriodActual = 0.015
+        layer1ThicknessActual = 0.005
+        layer2ThicknessActual = 0.003
+        triangleWidthActual = 0.012
+
+        NxActual = 512
+        NyActual = 439
+        xHarmonicsActual = 1
+        yHarmonicsActual = 1
+        dxActual = 3.418e-5
+        dyActual = 3.4169e-5
+
+        assertEqual(lambda0Actual, self.lambda0, "Free space wavelength not equal")
+        assertEqual(thetaActual, self.theta, "Angle theta not equal")
+        assertEqual(phiActual, self.phi, "Angle phi not equal")
+        assertEqual(pTEActual, self.pTE, "TE polarization amount not equal")
+        assertEqual(pTMActual, self.pTM, "TM polarization amount not equal")
+        assertEqual(urReflectionRegionActual, self.urReflectionRegion, "ur in reflection region not equal")
+        assertEqual(erReflectionRegionActual, self.erReflectionRegion, "er in reflection region not equal")
+        assertEqual(erTransmissionRegionActual, self.erTransmissionRegion,
+                "er in transmission region not equal")
+        assertEqual(urTransmissionRegionActual, self.urTransmissionRegion,
+                "ur in transmission region not equal")
+        assertEqual(erDeviceRegionActual, self.erDeviceRegion, "er in device region not equal")
+        assertEqual(urDeviceRegionActual, self.urDeviceRegion, "ur in device region not equal")
+        assertAlmostEqual(NxActual, self.Nx, absoluteTolerance, relativeTolerance,
+                "Nx not equal")
+        assertAlmostEqual(NyActual, self.Ny, absoluteTolerance, relativeTolerance,
+                "Ny not equal")
+        assertAlmostEqual(xHarmonicsActual, self.numberHarmonics[0],
+                errorMessage="number x harmonics not equal")
+        assertEqual(yHarmonicsActual, self.numberHarmonics[1],
+                errorMessage="number y harmonics not equal")
+        assertAlmostEqual(xPeriodActual, self.xPeriod, absoluteTolerance, relativeTolerance,
+                "x Period not equal")
+        assertAlmostEqual(yPeriodActual, self.yPeriod, absoluteTolerance, relativeTolerance,
+                "y Period not equal")
+        assertAlmostEqual(layer1ThicknessActual, self.layerThickness[0], absoluteTolerance, relativeTolerance,
+                "Layer 1 thicknesses not equal")
+        assertAlmostEqual(layer2ThicknessActual, self.layerThickness[1], absoluteTolerance, relativeTolerance,
+                "Layer 2 thickness not equal")
+        assertAlmostEqual(dxActual, self.dx, absoluteTolerance, relativeTolerance,
+                "dx not equal")
+        assertAlmostEqual(dyActual, self.dy, absoluteTolerance, relativeTolerance,
+                "dy not equal")
+
+    def testGenerateConvolutionMatrix(self):
+        absoluteTolerance = 1e-4
+        relativeTolerance = 1e-3
+
+        self.setupData1x1Harmonics()
+        convolutionMatrixCalculated = generateConvolutionMatrix(self.urData[0], self.numberHarmonics)
+        convolutionMatrixActual = 1
+        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, absoluteTolerance,
+                relativeTolerance, "UR convolution matrices for layer 1 not equal")
+
+
+        convolutionMatrixCalculated = generateConvolutionMatrix(self.erData[0], self.numberHarmonics)
+        convolutionMatrixActual = 5.0449
+        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, absoluteTolerance,
+                relativeTolerance, "ER convolution matrices for layer 1 not equal")
+
+        convolutionMatrixActual = 1
+        convolutionMatrixCalculated = generateConvolutionMatrix(self.urData[1], self.numberHarmonics)
+        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, absoluteTolerance,
+                relativeTolerance, "UR convolution matrices for layer 2 not equal")
+
+        convolutionMatrixActual = 6
+        convolutionMatrixCalculated = generateConvolutionMatrix(self.erData[1], self.numberHarmonics)
+        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, absoluteTolerance,
+                relativeTolerance, "ER convolution matrices for layer 2 not equal")
+
+
+    def testCalculateKz(self):
+        absoluteTolerance = 0.0001;
+        relativeTolerance = 0.001;
+        kx = 0
+        ky = 0
+
+        # First, we have some data for reflection region
+        er = 2.0
+        ur = 1.0
+        kzActual = -1.4142
+        kzCalculated = calculateKzReflected(kx, ky, er, ur)
+        assertAlmostEqual(kzActual, kzCalculated, absoluteTolerance, relativeTolerance,
+                "kz in reflection region not correct");
+
+        # Now, we have some data for transmission region
+        er = 9.0
+        ur = 1.0
+        kzActual = 3
+        kzCalculated = calculateKz(kx, ky, er, ur)
+        assertAlmostEqual(kzActual, kzCalculated, absoluteTolerance, relativeTolerance,
+                "kz in transmission region not correct");
+
     def testTransparentSMatrix(self):
         """
         Tests the transparent S matrix function. Should generate a matrix with identities along the diagonal
@@ -140,30 +291,6 @@ class Test:
 
         assertAlmostEqual(SActual, SCalculated, absoluteTolerance, relativeTolerance);
 
-    def testKz(self):
-        """
-        Tests that we are correctly computing the z-component of our wavevector given some
-        material values and a kx and ky.
-        """
-        absoluteTolerance = 0.0001;
-        relativeTolerance = 0.001;
-        kx = 1.0006;
-        ky = 0.4247;
-
-        # First, we have some data for layer 1
-        er = 2.0;
-        ur = 1.0;
-        kz_actual = 0.9046;
-        kz_calc = calculateKz(kx, ky, er, ur);
-        assertAlmostEqual(kz_actual, kz_calc, absoluteTolerance, relativeTolerance);
-
-        # Now, we have some data for layer 2.
-        er = 1.0;
-        ur = 3.0;
-
-        kz_actual = 1.3485;
-        kz_calc = calculateKz(kx, ky, er, ur);
-        assertAlmostEqual(kz_actual, kz_calc, absoluteTolerance, relativeTolerance);
 
     def testCalculateKVector(self):
         """ Tests that the k-vector that our calculateKVector function is returning is correct
@@ -1558,6 +1685,302 @@ class Test:
         R_actual = 0.4403;
         T_actual = 0.5597;
         CON_actual = 1;
+
+    def setupData1x1Harmonics(self):
+        cm = 1e-2
+        deg = pi / 180
+        self.lambda0 = 2 * cm
+        self.theta = 0 * deg
+        self.phi = 0 * deg
+        self.pTE = 1
+        self.pTM = 0
+
+        self.urReflectionRegion = 1.0
+        self.erReflectionRegion = 2.0
+        self.urTransmissionRegion = 1.0
+        self.erTransmissionRegion = 9.0
+        self.erDeviceRegion = 6.0
+        self.urDeviceRegion = 1.0
+        self.xPeriod = 1.75 * cm
+        self.yPeriod = 1.5 * cm
+        thicknessLayer1 = 0.5 * cm
+        thicknessLayer2 = 0.3 * cm
+
+        self.Nx = 512;
+        self.Ny = round(self.Nx * self.yPeriod / self.xPeriod);
+        (spatialHarmonicsX, spatialHarmonicsY) = (1, 1)
+        self.numberHarmonics = (spatialHarmonicsX, spatialHarmonicsY)
+
+        self.dx = self.xPeriod / self.Nx;
+        self.dy = self.yPeriod / self.Ny;
+        self.xCoors = np.linspace(-self.xPeriod/2 + self.dx/2, self.xPeriod/2 - self.dx/2, self.Nx)
+        self.yCoors = np.linspace(-self.yPeriod/2 + self.dy/2, self.yPeriod/2 - self.dy/2, self.Ny)
+
+        self.triangleWidth = 0.8 * self.xPeriod
+        self.triangleHeight = 0.5 * sqrt(3) * self.triangleWidth
+
+        # NOTE - this assumes that our matrices have the x component as the 2nd index and the y component
+        # as the third, for ease of indexing. [layer][x][y]
+        self.urData = self.urDeviceRegion * complexOnes((2, self.Nx, self.Ny))
+        self.erData = self.erDeviceRegion * complexOnes((2, self.Nx, self.Ny))
+        triangleData = np.transpose(np.loadtxt('test/triangleData.csv', delimiter=','))
+        self.erData[0] = triangleData;
+        self.layerThickness = [thicknessLayer1, thicknessLayer2]
+
+    def setupData3x3Harmonics(self):
+        self.setupData1x1Harmonics() # data is equal to the old stuff, with some changes.
+        numberHarmonicsX = 3
+        numberHarmonicsY = 3
+        self.numberHarmonics = (numberHarmonicsX, numberHarmonicsY)
+
+        self.erConvolutionMatrixLayer1 = numpyArrayFromFile(
+            "test/matrixDataNormal/layer1/erConvolutionData.txt")
+        self.urConvolutionMatrixLayer1 = complexIdentity(9)
+        self.erConvolutionMatrixLayer2 = 6*complexIdentity(9)
+        self.urConvolutionMatrixLayer2 = complexIdentity(9)
+        self.Kx = np.diag(1.1429*complexArray([1,0,-1,1,0,-1,1,0,-1]))
+        self.Ky = np.diag(1.3333*complexArray([1,1,1,0,0,0,-1,-1,-1]))
+        self.KzReflectionRegion = numpyArrayFromFile(
+                "test/matrixDataNormal/reflectionRegion/KzReflectionRegion.txt")
+        self.KzTransmissionRegion = np.diag(complexArray([2.4324, 2.6874, 2.4324, 2.7738, 3.0, 2.7738,
+            2.4324, 2.6874, 2.4324]))
+
+        self.KzFreeSpace = numpyArrayFromFile("test/matrixDataNormal/freeSpace/KzFreeSpace.txt")
+        self.QFreeSpace = numpyArrayFromFile("test/matrixDataNormal/freeSpace/QFreeSpace.txt")
+        self.WFreeSpace = complexIdentity(18)
+        self.LamFreeSpace = numpyArrayFromFile("test/matrixDataNormal/freeSpace/LamFreeSpace.txt")
+        self.VFreeSpace = numpyArrayFromFile("test/matrixDataNormal/freeSpace/VFreeSpace.txt")
+
+        self.S11Transparent = complexZeros((18, 18))
+        self.S22Transparent = complexZeros((18, 18))
+        self.S21Transparent = complexIdentity(18)
+        self.S12Transparent = complexIdentity(18)
+
+        self.PLayer1 = numpyArrayFromFile("test/matrixDataNormal/layer1/PLayer1.txt")
+        self.QLayer1 = numpyArrayFromFile("test/matrixDataNormal/layer1/QLayer1.txt")
+        self.OmegaSquaredLayer1 = numpyArrayFromFile("test/matrixDataNormal/layer1/OmegaSquaredLayer1.txt")
+        self.LambdaLayer1= numpyArrayFromFile("test/matrixDataNormal/layer1/LambdaLayer1.txt")
+        self.VLayer1 = numpyArrayFromFile("test/matrixDataNormal/layer1/VLayer1.txt")
+        self.ALayer1 = numpyArrayFromFile("test/matrixDataNormal/layer1/ALayer1.txt")
+        self.BLayer1 = numpyArrayFromFile("test/matrixDataNormal/layer1/BLayer1.txt")
+        self.XLayer1 = numpyArrayFromFile("test/matrixDataNormal/layer1/XLayer1.txt")
+        self.S11Layer1 = numpyArrayFromFile("test/matrixDataNormal/layer1/S11Layer1.txt")
+        self.S12Layer1 = numpyArrayFromFile("test/matrixDataNormal/layer1/S12Layer1.txt")
+        self.S21Layer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer1/S21Layer1.txt")
+        self.S22Layer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer1/S22Layer1.txt")
+        self.SGlobal11Layer1 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/layer1/SGlobal11Layer1.txt")
+        self.SGlobal12Layer1 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/layer1/SGlobal12Layer1.txt")
+        self.SGlobal21Layer1 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/layer1/SGlobal21Layer1.txt")
+        self.SGlobal22Layer1 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/layer1/SGlobal22Layer1.txt")
+
+        self.PLayer2 = numpyArrayFromFile("test/matrixDataNormal/layer2/PLayer2.txt")
+        self.QLayer2 = numpyArrayFromFile("test/matrixDataNormal/layer2/QLayer2.txt")
+        self.OmegaSquaredLayer2 = numpyArrayFromFile("test/matrixDataNormal/layer2/OmegaSquaredLayer2.txt")
+        self.WLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer2/WLayer2.txt")
+        self.LambdaLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer2/LambdaLayer2.txt")
+        self.VLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer2/VLayer2.txt")
+        self.ALayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer2/ALayer2.txt")
+        self.BLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer2/BLayer2.txt")
+        self.XLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer2/XLayer2.txt")
+        self.S11Layer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer2/S11Layer2.txt")
+        self.S12Layer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer2/S12Layer2.txt")
+        self.S21Layer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer2/S21Layer2.txt")
+        self.S22Layer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataNormal/layer2/S22Layer2.txt")
+        self.SGlobal11Layer2 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/layer2/SGlobal11Layer2.txt")
+        self.SGlobal12Layer2 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/layer2/SGlobal12Layer2.txt")
+        self.SGlobal21Layer2 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/layer2/SGlobal21Layer2.txt")
+        self.SGlobal22Layer2 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/layer2/SGlobal22Layer2.txt")
+
+        self.QReflectionRegion = numpyArrayFromFile(
+                "test/matrixDataNormal/reflectionRegion/QReflectionRegion.txt")
+        self.LambdaReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/reflectionRegion/LambdaReflectionRegion.txt")
+        self.WReflectionRegion = complexIdentity(18)
+        self.VReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/reflectionRegion/VReflectionRegion.txt")
+        self.LambdaReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/reflectionRegion/LambdaReflectionRegion.txt")
+        self.AReflectionRegion= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/reflectionRegion/AReflectionRegion.txt")
+        self.BReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/reflectionRegion/BReflectionRegion.txt")
+        self.S11ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/reflectionRegion/S11ReflectionRegion.txt")
+        self.S12ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/reflectionRegion/S12ReflectionRegion.txt")
+        self.S21ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/reflectionRegion/S21ReflectionRegion.txt")
+        self.S22ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/reflectionRegion/S22ReflectionRegion.txt")
+
+        self.QTransmissionRegion = numpyArrayFromFile(
+                "test/matrixDataNormal/transmissionRegion/QTransmissionRegion.txt")
+        self.LambdaTransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/transmissionRegion/LambdaTransmissionRegion.txt")
+        self.WTransmissionRegion = complexIdentity(18)
+        self.VTransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/transmissionRegion/VTransmissionRegion.txt")
+        self.LambdaTransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/transmissionRegion/LambdaTransmissionRegion.txt")
+        self.ATransmissionRegion= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/transmissionRegion/ATransmissionRegion.txt")
+        self.BTransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/transmissionRegion/BTransmissionRegion.txt")
+        self.S11TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/transmissionRegion/S11TransmissionRegion.txt")
+        self.S12TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/transmissionRegion/S12TransmissionRegion.txt")
+        self.S21TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/transmissionRegion/S21TransmissionRegion.txt")
+        self.S22TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/transmissionRegion/S22TransmissionRegion.txt")
+
+        self.SGlobal11= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/SGlobal11.txt")
+        self.SGlobal12= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/SGlobal12.txt")
+        self.SGlobal21= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/SGlobal21.txt")
+        self.SGlobal22= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataNormal/SGlobal22.txt")
+        self.delta = complexArray([0,0,0,0,1,0,0,0,0])
+        # TODO: add final csrc, esrc, cref, reflection coefficients, and so on
+
+    def setupData3x3HarmonicsOblique(self):
+        self.setupData1x1Harmonics() # data is equal to the old stuff, with some changes.
+        numberHarmonicsX = 3
+        numberHarmonicsY = 3
+        self.numberHarmonics = (numberHarmonicsX, numberHarmonicsY)
+
+        self.erConvolutionMatrixLayer1 = numpyArrayFromFile(
+            "test/matrixDataOblique/layer1/erConvolutionData.txt")
+        self.urConvolutionMatrixLayer1 = complexIdentity(9)
+        self.erConvolutionMatrixLayer2 = 6*complexIdentity(9)
+        self.urConvolutionMatrixLayer2 = complexIdentity(9)
+        self.Kx = np.diag(complexArray(
+            [2.2035, 1.0607, -0.0822, 2.2035, 1.0607, -0.0822, 2.2035, 1.0607, -0.0822]))
+        self.Ky = np.diag(complexArray(
+            [1.9457, 1.9457, 1.9457, 0.6124, 0.6124, 0.6124, -0.7210, -0.7210, -0.7210]))
+        self.KzReflectionRegion = numpyArrayFromFile(
+                "test/matrixDataOblique/reflectionRegion/KzReflectionRegion.txt")
+        self.KzTransmissionRegion = np.diag(complexArray(
+            [0.5989, 2.0222, 2.2820, 1.9415, 2.7386, 2.9357, 1.9039, 2.7121, 2.9109]))
+
+        self.KzFreeSpace = numpyArrayFromFile(
+                "test/matrixDataOblique/freeSpace/KzFreeSpace.txt")
+        self.QFreeSpace = numpyArrayFromFile("test/matrixDataOblique/freeSpace/QFreeSpace.txt")
+        self.WFreeSpace = complexIdentity(18)
+        self.LambdaFreeSpace = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/freeSpace/LambdaFreeSpace.txt")
+        self.VFreeSpace = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/freeSpace/VFreeSpace.txt")
+
+        self.S11Transparent = complexZeros((18, 18))
+        self.S22Transparent = complexZeros((18, 18))
+        self.S21Transparent = complexIdentity(18)
+        self.S12Transparent = complexIdentity(18)
+
+        self.PLayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/PLayer1.txt")
+        self.QLayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/QLayer1.txt")
+        self.OmegaSquaredLayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/OmegaSquaredLayer1.txt")
+        self.LambdaLayer1= numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/LambdaLayer1.txt")
+        self.VLayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/VLayer1.txt")
+        self.ALayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/ALayer1.txt")
+        self.BLayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/BLayer1.txt")
+        self.XLayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/XLayer1.txt")
+        self.S11Layer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/S11Layer1.txt")
+        self.S12Layer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/S12Layer1.txt")
+        self.S21Layer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/S21Layer1.txt")
+        self.S22Layer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/S22Layer1.txt")
+        self.SGlobal11Layer1 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/layer1/SGlobal11Layer1.txt")
+        self.SGlobal12Layer1 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/layer1/SGlobal12Layer1.txt")
+        self.SGlobal21Layer1 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/layer1/SGlobal21Layer1.txt")
+        self.SGlobal22Layer1 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/layer1/SGlobal22Layer1.txt")
+
+        self.PLayer2 = numpyArrayFromFile("test/matrixDataOblique/layer2/PLayer2.txt")
+        self.QLayer2 = numpyArrayFromFile("test/matrixDataOblique/layer2/QLayer2.txt")
+        self.OmegaSquaredLayer2 = numpyArrayFromFile("test/matrixDataOblique/layer2/OmegaSquaredLayer2.txt")
+        self.WLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/WLayer2.txt")
+        self.LambdaLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/LambdaLayer2.txt")
+        self.VLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/VLayer2.txt")
+        self.ALayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/ALayer2.txt")
+        self.BLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/BLayer2.txt")
+        self.XLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/XLayer2.txt")
+        self.S11Layer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/S11Layer2.txt")
+        self.S12Layer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/S12Layer2.txt")
+        self.S21Layer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/S21Layer2.txt")
+        self.S22Layer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/S22Layer2.txt")
+        self.SGlobal11Layer2 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/layer2/SGlobal11Layer2.txt")
+        self.SGlobal12Layer2 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/layer2/SGlobal12Layer2.txt")
+        self.SGlobal21Layer2 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/layer2/SGlobal21Layer2.txt")
+        self.SGlobal22Layer2 = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/layer2/SGlobal22Layer2.txt")
+
+        self.QReflectionRegion = numpyArrayFromFile(
+                "test/matrixDataOblique/reflectionRegion/QReflectionRegion.txt")
+        self.LambdaReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/reflectionRegion/LambdaReflectionRegion.txt")
+        self.WReflectionRegion = complexIdentity(18)
+        self.VReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/reflectionRegion/VReflectionRegion.txt")
+        self.LambdaReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/reflectionRegion/LambdaReflectionRegion.txt")
+        self.AReflectionRegion= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/reflectionRegion/AReflectionRegion.txt")
+        self.BReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/reflectionRegion/BReflectionRegion.txt")
+        self.S11ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/reflectionRegion/S11ReflectionRegion.txt")
+        self.S12ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/reflectionRegion/S12ReflectionRegion.txt")
+        self.S21ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/reflectionRegion/S21ReflectionRegion.txt")
+        self.S22ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/reflectionRegion/S22ReflectionRegion.txt")
+
+        self.QTransmissionRegion = numpyArrayFromFile(
+                "test/matrixDataOblique/transmissionRegion/QTransmissionRegion.txt")
+        self.LambdaTransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/transmissionRegion/LambdaTransmissionRegion.txt")
+        self.WTransmissionRegion = complexIdentity(18)
+        self.VTransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/transmissionRegion/VTransmissionRegion.txt")
+        self.LambdaTransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/transmissionRegion/LambdaTransmissionRegion.txt")
+        self.ATransmissionRegion= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/transmissionRegion/ATransmissionRegion.txt")
+        self.BTransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/transmissionRegion/BTransmissionRegion.txt")
+        self.S11TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/transmissionRegion/S11TransmissionRegion.txt")
+        self.S12TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/transmissionRegion/S12TransmissionRegion.txt")
+        self.S21TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/transmissionRegion/S21TransmissionRegion.txt")
+        self.S22TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/transmissionRegion/S22TransmissionRegion.txt")
+
+        self.SGlobal11= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/SGlobal11.txt")
+        self.SGlobal12= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/SGlobal12.txt")
+        self.SGlobal21= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/SGlobal21.txt")
+        self.SGlobal22= numpyArrayFromSeparatedColumnsFile(
+                "test/matrixDataOblique/SGlobal22.txt")
 
 def main():
     test_class = Test(); # Create a new test class

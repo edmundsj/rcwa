@@ -1,0 +1,18 @@
+ 1.5238 + 0i 0i0i0i0i0i0i0i0i-0.3061 + 0i 0i0i0i  0i0i0i0i0i
+ 0i0i0i0i0i0i0i0i0i0i1.0000+ 0i0i0i        0i0i0i0i0i
+ 0i0i-1.5238 + 0i 0i0i0i0i0i0i0i0i-0.3061 + 0i 0i 0i0i0i0i0i
+ 0i0i0i0i0i0i0i0i0i0i0i0i-0.3061+ 0i        0i0i0i0i0i
+ 0i0i0i0i0i0i0i0i0i0i0i0i0i             1.0000 + 0i0i0i0i0i
+ 0i0i0i0i0i0i0i0i0i0i0i0i0i             0i-0.3061 + 0i 0i0i0i
+ 0i0i0i0i0i0i-1.5238 + 0i 0i0i0i0i0i0i       0i0i-0.3061 + 0i 0i0i
+ 0i0i0i0i0i0i0i0i0i0i0i0i0i             0i0i0i1.0000 + 0i 0i
+ 0i0i0i0i0i0i0i0i1.5238 + 0i 0i0i0i0i        0i0i0i0i-0.3061 + 0i
+ 0.7778 + 0i 0i0i0i0i0i0i0i0i-1.5238 + 0i 0i0i0i  0i0i0i0i0i
+ 0i0.7778 + 0i 0i0i0i0i0i0i0i0i0i0i0i        0i0i0i0i0i
+ 0i0i0.7778 + 0i 0i0i0i0i0i0i0i0i1.5238 + 0i 0i   0i0i0i0i0i
+ 0i0i0i-1.0000 + 0i0i0i0i0i0i0i0i0i0i       0i0i0i0i0i
+ 0i0i0i0i-1.0000 + 0i0i0i0i0i0i0i0i0i       0i0i0i0i0i
+ 0i0i0i0i0i-1.0000 + 0i0i0i0i0i0i0i0i       0i0i0i0i0i
+ 0i0i0i0i0i0i0.7778 + 0i 0i0i0i0i0i0i        0i0i1.5238 + 0i 0i0i
+ 0i0i0i0i0i0i0i0.7778 + 0i 0i0i0i0i0i        0i0i0i0i0i
+ 0i0i0i0i0i0i0i0i0.7778 + 0i 0i0i0i0i        0i0i0i0i-1.5238 + 0i

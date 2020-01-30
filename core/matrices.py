@@ -11,6 +11,7 @@ eig = sp.linalg.eig # Performs eigendecomposition of identity intuitively (vecto
 norm = np.linalg.norm;
 sin = np.sin;
 cos = np.cos;
+pi = np.pi
 
 OUTER_BLOCK_SHAPE = (2,2);
 scatteringElementShape = (2,2); # The shape of our core PQ matrices.
@@ -69,6 +70,9 @@ def complexIdentity(matrixSize):
 def complexZeros(matrixDimensionsTuple):
     """ Wrapper for numpy zeros declaration that forces arrays to be complex doubles """
     return np.zeros(matrixDimensionsTuple, dtype=np.cdouble);
+
+def complexOnes(matrixDimensionsTuple):
+    return np.ones(matrixDimensionsTuple, dtype=np.cdouble);
 
 def generateTransparentSMatrix():
     STransparent = complexZeros(scatteringMatrixShape);
@@ -158,8 +162,11 @@ def calculateRedhefferFMatrix(S22A, S11B, S21B): # UNIT TESTS COMPLETE
     """
     return S21B @ inv(complexIdentity(scatteringElementShape[0]) - S11B @ S22A)
 
-def calculateKz(kx, ky, er, ur): # UNIT TESTS COMPLETE
-    return sqrt(er*ur - sq(kx) - sq(ky));
+def calculateKz(kx, ky, er, ur):
+    return sqrt(er*ur - sq(kx) - sq(ky))
+
+def calculateKzReflected(kx, ky, er, ur):
+    return -calculateKz(kx, ky, er, ur)
 
 def calculateKVector(theta, phi, er, ur):
     n = sqrt(er*ur);
