@@ -1,0 +1,18 @@
+2.6413+0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i      0i 0i 0i 0i 0i
+ 0i -1.0892+0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i    0i 0i 0i 0i 0i
+ 0i 0i -2.2075+0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i    0i 0i 0i 0i 0i
+ 0i 0i 0i -0.7695+0i 0i 0i 0i 0i 0i 0i 0i 0i 0i    0i 0i 0i 0i 0i
+ 0i 0i 0i 0i -4.5000+0i 0i 0i 0i 0i 0i 0i 0i 0i    0i 0i 0i 0i 0i
+ 0i 0i 0i 0i 0i -5.6182+0i 0i 0i 0i 0i 0i 0i 0i    0i 0i 0i 0i 0i
+ 0i 0i 0i 0i 0i 0i -0.6247+0i 0i 0i 0i 0i 0i 0i    0i 0i 0i 0i 0i
+ 0i 0i 0i 0i 0i 0i 0i -4.3552+0i 0i 0i 0i 0i 0i    0i 0i 0i 0i 0i
+ 0i 0i 0i 0i 0i 0i 0i 0i -5.4735+0i 0i 0i 0i 0i    0i 0i 0i 0i 0i
+ 0i 0i 0i 0i 0i 0i 0i 0i 0i 2.6413+0i 0i 0i 0i     0i 0i 0i 0i 0i
+ 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i -1.0892+0i 0i 0i    0i 0i 0i 0i 0i
+ 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i -2.2075+0i 0i    0i 0i 0i 0i 0i
+ 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i -0.7695+0i    0i 0i 0i 0i 0i
+ 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i          -4.5000+0i 0i 0i 0i 0i
+ 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i          0i -5.6182+0i 0i 0i 0i
+ 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i          0i 0i -0.6247+0i 0i 0i
+ 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i          0i 0i 0i -4.3552+0i 0i
+ 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i 0i          0i 0i 0i 0i -5.4735+0i

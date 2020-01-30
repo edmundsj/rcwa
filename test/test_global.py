@@ -50,7 +50,6 @@ def numpyArrayFromFile(filename):
             if i is 0:
                 data = rowOfComplexNumbers
             else:
-                print(rowOfComplexNumbers)
                 data = np.vstack((data, rowOfComplexNumbers))
             i += 1
 
@@ -1675,16 +1674,6 @@ class Test:
             [0.0170 + 0.0042j, 0.5533 - 0.3434j]]);
 
         assertAlmostEqual(SGlobalCalculated, SGlobalActual, absoluteTolerance, relativeTolerance);
-
-    def itestReflectanceTransmittance(self):
-        """
-        Tests that the reflectance and transmittance are correct, and that conservation of power
-        is enforced.
-        """
-
-        R_actual = 0.4403;
-        T_actual = 0.5597;
-        CON_actual = 1;
 
     def setupData1x1Harmonics(self):
         cm = 1e-2
