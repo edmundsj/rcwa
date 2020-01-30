@@ -2,6 +2,8 @@ import numpy as np
 import scipy as sp
 import scipy.linalg
 
+from shorthand import *
+
 inv = np.linalg.inv;
 matrixExponentiate = sp.linalg.expm
 matrixSquareRoot = sp.linalg.sqrtm
@@ -59,21 +61,6 @@ def aTEMGen(kx, ky, kz):
 
     return (aTE[0:2], aTM[0:2]);
 
-def complexArray(arrayInListForm):
-    """ Wrapper for numpy array declaration that forces arrays to be complex doubles """
-    return np.array(arrayInListForm, dtype=np.cdouble);
-
-def complexIdentity(matrixSize):
-    """ Wrapper for numpy identity declaration that forces arrays to be complex doubles """
-    return np.identity(matrixSize, dtype=np.cdouble);
-
-def complexZeros(matrixDimensionsTuple):
-    """ Wrapper for numpy zeros declaration that forces arrays to be complex doubles """
-    return np.zeros(matrixDimensionsTuple, dtype=np.cdouble);
-
-def complexOnes(matrixDimensionsTuple):
-    return np.ones(matrixDimensionsTuple, dtype=np.cdouble);
-
 def generateTransparentSMatrix():
     STransparent = complexZeros(scatteringMatrixShape);
     STransparent[0,1] = complexIdentity(scatteringElementSize);
@@ -95,8 +82,8 @@ def calculateRedhefferProduct(SA, SB):
 
     # Making the assumption that the sub-blocks are square.
     SAB = complexZeros(mat_shape);
-    D = calculateRedhefferDMatrix(SA[0,1], SA[1,1], SB[0,0]);
-    F = calculateRedhefferFMatrix(SA[1,1], SB[0,0], SB[1,0]);
+    D = calculateRedhefferDMatrix(SA, SB)
+    F = calculateRedhefferFMatrix(SA, SB)
 
     SAB[0,0] = SA[0,0] + D @ SB[0,0] @ SA[1,0];
     SAB[0,1] = D @ SB[0,1];
@@ -150,17 +137,17 @@ def calculateScatteringDMatrix(Ai, Bi, Xi): # UNIT TESTS COMPLETE
     AiInverse = inv(Ai);
     return Ai - Xi @ Bi @ AiInverse @ Xi @ Bi;
 
-def calculateRedhefferDMatrix(S12A, S22A, S11B): # UNIT TESTS COMPLETE
+def calculateRedhefferDMatrix(SA, SB):
     """
     Generates the D-matrix for the Redheffer star product. NOT the same as the Di matrix.
     """
-    return S12A @ inv(complexIdentity(scatteringElementShape[0]) - S11B @ S22A)
+    return SA[0,1] @ inv(complexIdentity(scatteringElementShape[0]) - SB[0,0] @ SA[1,1])
 
-def calculateRedhefferFMatrix(S22A, S11B, S21B): # UNIT TESTS COMPLETE
+def calculateRedhefferFMatrix(SA, SB):
     """
     Generates the F-matrix for computing the Redheffer star product.
     """
-    return S21B @ inv(complexIdentity(scatteringElementShape[0]) - S11B @ S22A)
+    return SB[1,0] @ inv(complexIdentity(scatteringElementShape[0]) - SB[0,0] @ SA[1,1])
 
 def calculateKz(kx, ky, er, ur):
     return sqrt(er*ur - sq(kx) - sq(ky))
