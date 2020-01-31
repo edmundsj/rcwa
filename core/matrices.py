@@ -134,8 +134,15 @@ def calculateKVector(theta, phi, er, ur):
     kz = n * cos(theta);
     return complexArray([kx, ky, kz]);
 
-# This functions is gross and should be rewritten.
-def calculateVWXMatrices(kx, ky, kz, er, ur, k0=0, Li=0): # UNIT TESTS COMPLETE
+# This does not currently work because we don't have a Kz matrix in RCWA.
+def calculateVWXMatrices(kx, ky, er, ur, k0=0, Li=0):
+    if isinstance(kx, np.ndarray):
+        return calculateVWXMatricesNHarmonics(kx, ky, er, ur, k0, Li)
+    else:
+        kz = calculateKz(kx, ky, er, ur)
+        return calculateVWXMatrices1Harmonic(kx, ky, kz, er, ur, k0, Li)
+
+def calculateVWXMatrices1Harmonic(kx, ky, kz, er, ur, k0, Li):
     Q = calculateQMatrix(kx, ky, er, ur);
     O = calculateOmegaMatrix(kz);
     OInverse = inv(O);
@@ -148,9 +155,20 @@ def calculateVWXMatrices(kx, ky, kz, er, ur, k0=0, Li=0): # UNIT TESTS COMPLETE
     else:
         return (V, W);
 
+def calculateVWXMatricesNHarmonics(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix, k0, Li):
+    P = calculatePMatrix(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix)
+    Q = calculateQMatrix(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix)
+    OmegaSquared = calculateOmegaSquaredMatrix(P, Q)
+    eigenValues, W = eig(OmegaSquared)
+    Lambda = np.diag(np.sqrt(eigenValues))
+    LambdaInverse = np.diag(np.reciprocal(sqrt(eigenValues)))
+    V = Q @ W @ LambdaInverse
+    X = matrixExponentiate(Lambda * k0 * Li)
+
+    return (V, W, X)
+
 def calculateInternalSMatrix(kx, ky, er, ur, k0, Li, Wg, Vg):
-    kz = calculateKz(kx, ky, er, ur);
-    (Vi, Wi, Xi) = calculateVWXMatrices(kx, ky, kz, er, ur, k0, Li);
+    (Vi, Wi, Xi) = calculateVWXMatrices(kx, ky, er, ur, k0, Li);
     Ai = calculateScatteringAMatrix(Wi, Wg, Vi, Vg);
     Bi = calculateScatteringBMatrix(Wi, Wg, Vi, Vg);
     Di = calculateScatteringDMatrix(Ai, Bi, Xi);
@@ -160,7 +178,7 @@ def calculateInternalSMatrix(kx, ky, er, ur, k0, Li, Wg, Vg):
 
 def calculateReflectionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
     kz = calculateKz(kx, ky, er, ur);
-    (Vi, Wi) = calculateVWXMatrices(kx, ky, kz, er, ur);
+    (Vi, Wi) = calculateVWXMatrices(kx, ky, er, ur);
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi);
 
@@ -168,8 +186,7 @@ def calculateReflectionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
     return Si;
 
 def calculateTransmissionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
-    kz = calculateKz(kx, ky, er, ur);
-    (Vi, Wi) = calculateVWXMatrices(kx, ky, kz, er, ur);
+    (Vi, Wi) = calculateVWXMatrices(kx, ky, er, ur);
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi);
 

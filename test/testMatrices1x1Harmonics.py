@@ -129,22 +129,22 @@ class Test1x1Harmonic(unittest.TestCase):
         assertAlmostEqual(OActual, OCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testVMatrix(self):
-        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky, self.KzGap,
+        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky,
                 self.erGap, self.urGap)
         VActual = complexArray([[0 - 0.4250j, 0 - 1.1804j], [0 + 2.0013j, 0 + 0.4250j]]);
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky, self.KzLayer1,
+        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky,
                 self.erLayer1, self.urLayer1)
         VActual = complexArray([[0-0.4698j,0-1.1040j],[0+2.0114j,0+0.4698j]]);
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky, self.KzLayer2,
+        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky,
                 self.erLayer2, self.urLayer2)
         VActual = complexArray([[0-0.1051j,0-0.4941j],[0+0.6970j,0+0.1051j]]);
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W_ref) = calculateVWXMatrices(self.Kx, self.Ky, self.KzReflectionRegion,
+        (VCalculated, W_ref) = calculateVWXMatrices(self.Kx, self.Ky,
                 self.erReflectionRegion,
                 self.urReflectionRegion)
         VActual = complexArray([
@@ -153,12 +153,12 @@ class Test1x1Harmonic(unittest.TestCase):
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testXMatrix(self):
-        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.KzLayer1,
+        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky,
                 self.erLayer1, self.urLayer1, self.k0, self.thicknessLayer1)
         XActual = complexArray([[0.1493+0.9888j, 0+0j],[0+0j,0.1493+0.9888j]]);
         assertAlmostEqual(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.KzLayer2,
+        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky,
                 self.erLayer2, self.urLayer2, self.k0, self.thicknessLayer2)
         XActual = complexArray([[-0.4583 - 0.8888j, 0+0j],[0+0j, -0.4583 - 0.8888j]]);
         assertAlmostEqual(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);

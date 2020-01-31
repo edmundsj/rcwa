@@ -13,12 +13,9 @@ from matrixParser import *
 class Test3x3HarmonicsOblique(unittest.TestCase):
 
     def testTransparentSMatrix(self):
-
         SActual = self.transparentSMatrix
         SCalculated = generateTransparentSMatrix((18, 18));
-
         assertAlmostEqual(SActual, SCalculated,self.absoluteTolerance,self.relativeTolerance);
-
 
     def testPMatrix(self):
         PActual = self.PLayer1
@@ -41,25 +38,33 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 5*self.absoluteTolerance, self.relativeTolerance);
 
 
-#    def testVMatrix(self):
-#        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky, self.KzGap,
-#                self.erGap, self.urGap)
-#        VActual = self.VLayer1
-#        assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
-#
-#
-#    def testXMatrix(self):
-#        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.KzLayer1,
-#                self.erLayer1, self.urLayer1, self.k0, self.thicknessLayer1)
-#        XActual = complexArray([[0.1493+0.9888j, 0+0j],[0+0j,0.1493+0.9888j]]);
-#        assertAlmostEqual(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
+    def testXMatrix(self):
+        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky,
+                self.erConvolutionMatrixLayer1, self.urConvolutionMatrixLayer1, self.k0,
+                self.thicknessLayer1)
+        WActual = self.WLayer1
+        assertAlmostEqual(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance);
+
+    def testWMatrix(self):
+        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky,
+                self.erConvolutionMatrixLayer1, self.urConvolutionMatrixLayer1, self.k0,
+                self.thicknessLayer1)
+        WActual = self.WLayer1
+        assertAlmostEqual(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance);
+
+    def testVMatrix(self):
+        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky,
+                self.erConvolutionMatrixLayer1, self.urConvolutionMatrixLayer1, self.k0,
+                self.thicknessLayer1)
+        VActual = self.VLayer1
+        assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 #
 #        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.KzLayer2,
 #                self.erLayer2, self.urLayer2, self.k0, self.thicknessLayer2)
 #        XActual = complexArray([[-0.4583 - 0.8888j, 0+0j],[0+0j, -0.4583 - 0.8888j]]);
 #        assertAlmostEqual(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
-#
-#
+
+
 #    def testAMatrix(self):
 #        W1 = np.identity(2);
 #        Wg = np.identity(2);
@@ -69,16 +74,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 #        ACalculated = calculateScatteringAMatrix(W1, Wg, V1, Vg);
 #        AActual = self.ALayer1
 #        assertAlmostEqual(AActual, ACalculated, self.absoluteTolerance, self.relativeTolerance);
-#
-#        W2 = complexIdentity(2);
-#        Wg = complexIdentity(2);
-#        V2 = complexArray([[0 - 0.1051j, 0 - 0.4941j],[0 + 0.6970j, 0 + 0.1051j]]);
-#        Vg = complexArray([[0 - 0.4250j, 0 - 1.1804j],[0 + 2.0013j, 0 + 0.4250j]]);
-#
-#        ACalculated = calculateScatteringAMatrix(W2, Wg, V2, Vg);
-#        AActual = self.ALayer2
-#        assertAlmostEqual(AActual, ACalculated, self.absoluteTolerance, self.relativeTolerance);
-#
+
 #    def testBMatrix(self):
 #        W1 = complexIdentity(2);
 #        Wg = complexIdentity(2);
@@ -107,16 +103,6 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 #        DCalculated = calculateScatteringDMatrix(A, B, X);
 #        DActual = complexArray([[2.0057 - 0.0003j, -0.0445 + 0.0006j],[-0.0445 + 0.0006j, 2.0916 - 0.0013j]])
 #        assertAlmostEqual(DActual, DCalculated, absoluteTolerance, relativeTolerance);
-#
-#        # LAYER 2 DATA
-#        # Since now we have the d-matrix to higher precision we can test it more strongly.
-#        A = complexArray([[3.8324, 0.2579],[0.2579, 3.3342]]);
-#        B = complexArray([[-1.8324, -0.2579], [-0.2579, -1.3342]]);
-#        X = complexArray([[-0.4583 - 0.8888j, 0+0j],[0+0j, -0.4583 - 0.8888j]]);
-#
-#        DCalculated = calculateScatteringDMatrix(A, B, X);
-#        DActual = complexArray([[4.3436 - 0.7182j, 0.3604 - 0.1440j], [0.3604 - 0.1440j, 3.6475 - 0.4401j]]);
-#        assertAlmostEqual(DActual, DCalculated, self.absoluteTolerance, self.relativeTolerance);
 #
 #    def testScatteringMatrixFromRaw(self):
 #        SMatrixLayer1Calculated = calculateInternalSMatrixFromRaw(self.ALayer1, self.BLayer1,
@@ -305,12 +291,20 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
     def setUp(self):
         self.absoluteTolerance = 1e-3
         self.relativeTolerance = 1e-3
+        deg = pi / 180
+        self.wavelength = 2
+        self.k0 = 2*pi / self.wavelength
+        self.theta = 60 * deg
+        self.phi = 30 * deg
+
         self.erReflectionRegion = 2
         self.urReflectionRegion = 1
         self.erTransmissionRegion = 9
         self.urTransmissionRegion = 1
         self.erDeviceRegion = 6
         self.urDeviceRegion = 1
+        self.thicknessLayer1 = 0.5
+        self.thicknessLayer2 = 0.3
         numberHarmonicsX = 3
         numberHarmonicsY = 3
         self.numberHarmonics = (numberHarmonicsX, numberHarmonicsY)
@@ -349,6 +343,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         self.ALayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/ALayer1.txt")
         self.BLayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/BLayer1.txt")
         self.XLayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/XLayer1.txt")
+        self.WLayer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/WLayer1.txt")
         self.S11Layer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/S11Layer1.txt")
         self.S12Layer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/S12Layer1.txt")
         self.S21Layer1 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer1/S21Layer1.txt")
