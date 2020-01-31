@@ -1,3 +1,4 @@
+# Tests the matrices.py file, which is responsible for the creation and manipulation of scattering matrices
 import sys
 sys.path.append('core');
 sys.path.append('test')
@@ -66,7 +67,7 @@ class Test1x1Harmonic(unittest.TestCase):
     def testTransparentSMatrix(self):
 
         SActual = self.transparentSMatrix
-        SCalculated = generateTransparentSMatrix();
+        SCalculated = generateTransparentSMatrix((2,2));
 
         assertAlmostEqual(SActual, SCalculated,self.absoluteTolerance,self.relativeTolerance);
 

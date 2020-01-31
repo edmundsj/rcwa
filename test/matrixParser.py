@@ -31,6 +31,7 @@ def numpyArrayFromFile(filename):
                 data = np.vstack((data, rowOfComplexNumbers))
             i += 1
 
+    fileHandle.close()
     return data;
 
 def numpyArrayFromSeparatedColumnsFile(filename):
@@ -57,6 +58,8 @@ def numpyArrayFromSeparatedColumnsFile(filename):
         if line is "": # This indicates we should start a new set of columns and append it to the old one
             columnNumber += 1
             rowNumber = 0
+
+    fileHandle.close()
 
     data = np.hstack((data[0], data[1], data[2]))
     return data

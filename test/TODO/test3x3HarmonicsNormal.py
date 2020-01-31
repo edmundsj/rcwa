@@ -10,7 +10,7 @@ from convolution import generateConvolutionMatrix
 from matrixParser import *
 
 
-class Test1x1Harmonic(unittest.TestCase):
+class Test3x3HarmonicsNormal(unittest.TestCase):
     def testCalculateKz(self):
         KzCalculated = calculateKz(self.Kx, self.Ky, self.erReflectionRegion, self.urReflectionRegion)
         KzActual = self.KzReflectionRegion

@@ -1,13 +1,13 @@
 import numpy as np
 import scipy as sp
 import scipy.linalg
-import math as math
+import math
 from collections import OrderedDict
 
 inv = np.linalg.inv;
 matrixExponentiate = sp.linalg.expm
 matrixSquareRoot = sp.linalg.sqrtm
-sqrt = np.lib.scimath.sqrt; # Takes sqrt of complex numbers
+sqrt = np.lib.scimath.sqrt; # Takes sqrt of complex numbers successfully
 sq = np.square;
 eig = sp.linalg.eig # Performs eigendecomposition of identity intuitively (vectors are unit vectors)
 norm = np.linalg.norm;
