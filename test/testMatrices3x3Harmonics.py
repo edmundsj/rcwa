@@ -39,11 +39,11 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
 
     def testXMatrix(self):
-        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky,
+        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky,
                 self.erConvolutionMatrixLayer1, self.urConvolutionMatrixLayer1, self.k0,
                 self.thicknessLayer1)
-        WActual = self.WLayer1
-        assertAlmostEqual(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance);
+        XActual = self.XLayer1
+        assertAlmostEqual(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testWMatrix(self):
         (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky,
