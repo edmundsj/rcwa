@@ -16,6 +16,9 @@ cos = np.cos;
 pi = np.pi;
 dot = np.dot;
 cross = np.cross;
+diag = np.diag
+diagonal = np.diagonal
+conj = np.conj
 
 def fftn(data):
     """ Return the shifted version so the zeroth-order harmonic is in the center with

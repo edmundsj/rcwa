@@ -28,11 +28,7 @@ def generateTransparentSMatrix(matrixShape):
     return STransparent;
 
 def calculateRedhefferProduct(SA, SB):
-    mat_shape = SA.shape;
-    if(mat_shape != SB.shape):
-        raise Exception(f'redhefferProduct: SA and SB are not of the same shape. SA is of shape {SA.shape} and SB is of shape {SB.shape}');
-
-    SAB = complexZeros(mat_shape);
+    SAB = complexZeros(SA.shape);
     D = calculateRedhefferDMatrix(SA, SB)
     F = calculateRedhefferFMatrix(SA, SB)
 
@@ -108,18 +104,18 @@ def calculateOmegaSquaredMatrix(P, Q):
 def calculateScatteringAMatrix(Wi, Wj, Vi, Vj):
     return inv(Wi) @ Wj + inv(Vi) @ Vj;
 
-def calculateScatteringBMatrix(Wi, Wj, Vi, Vj): # UNIT TESTS COMPLETE
+def calculateScatteringBMatrix(Wi, Wj, Vi, Vj):
     return inv(Wi) @ Wj - inv(Vi) @ Vj;
 
-def calculateScatteringDMatrix(Ai, Bi, Xi): # UNIT TESTS COMPLETE
+def calculateScatteringDMatrix(Ai, Bi, Xi):
     AiInverse = inv(Ai);
     return Ai - Xi @ Bi @ AiInverse @ Xi @ Bi;
 
 def calculateRedhefferDMatrix(SA, SB):
-    return SA[0,1] @ inv(complexIdentity(scatteringElementShape[0]) - SB[0,0] @ SA[1,1])
+    return SA[0,1] @ inv(complexIdentity(SA[0,0].shape[0]) - SB[0,0] @ SA[1,1])
 
 def calculateRedhefferFMatrix(SA, SB):
-    return SB[1,0] @ inv(complexIdentity(scatteringElementShape[0]) - SB[0,0] @ SA[1,1])
+    return SB[1,0] @ inv(complexIdentity(SA[0,0].shape[0]) - SB[0,0] @ SA[1,1])
 
 def calculateKz(kx, ky, er, ur):
     return sqrt(er*ur - sq(kx) - sq(ky))
@@ -160,10 +156,10 @@ def calculateVWXMatricesNHarmonics(Kx, Ky, erConvolutionMatrix, urConvolutionMat
     Q = calculateQMatrix(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix)
     OmegaSquared = calculateOmegaSquaredMatrix(P, Q)
     eigenValues, W = eig(OmegaSquared)
-    Lambda = np.diag(np.sqrt(eigenValues))
+    Lambda = np.diag(sqrt(eigenValues))
     LambdaInverse = np.diag(np.reciprocal(sqrt(eigenValues)))
     V = Q @ W @ LambdaInverse
-    X = matrixExponentiate(Lambda * k0 * Li)
+    X = matrixExponentiate( - Lambda * k0 * Li)
 
     return (V, W, X)
 
@@ -194,18 +190,18 @@ def calculateTransmissionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
     return Si;
 
 def calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di):
-    AiInverse = inv(Ai);
+    AiInverse = inv(Ai)
     DiInverse = inv(Di);
 
-    S = complexZeros(scatteringMatrixShape);
-    S[0,0] = DiInverse @ ((Xi @ Bi @ AiInverse @ Xi @ Ai) - Bi)
-    S[0,1] = DiInverse @ Xi @ (Ai - (Bi @ AiInverse @ Bi));
-    S[1,0] = S[0,1];
-    S[1,1] = S[0,0];
-    return S;
+    S = complexZeros((2, 2) + Ai.shape)
+    S[0, 0] = DiInverse @ (Xi @ Bi @ AiInverse @ Xi @ Ai - Bi)
+    S[0, 1] = DiInverse @ Xi @ (Ai - Bi @ AiInverse @ Bi)
+    S[1, 0] = S[0, 1]
+    S[1, 1] = S[0, 0]
+    return S
 
 def calculateReflectionRegionSMatrixFromRaw(AReflectionRegion, BReflectionRegion):
-    S = complexZeros(scatteringMatrixShape);
+    S = complexZeros((2, 2) + AReflectionRegion.shape);
     A = AReflectionRegion;
     B = BReflectionRegion;
     AInverse = inv(A);
@@ -221,7 +217,7 @@ def calculateTransmissionRegionSMatrixFromRaw(ATransmissionRegion, BTransmission
     B = BTransmissionRegion;
     AInverse = inv(A);
 
-    S = complexZeros(scatteringMatrixShape);
+    S = complexZeros((2, 2) + A.shape);
     S[0,0] = B@ AInverse;
     S[0,1] = 0.5* (A- (B @ AInverse @ B))
     S[1,0] = 2* AInverse;
