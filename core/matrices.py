@@ -69,7 +69,10 @@ def calculatePMatrixNHarmonics(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix)
 
 def calculateQMatrix(kx, ky, eri, uri):
     if isinstance(kx, np.ndarray):
-        return calculateQMatrixNHarmonics(kx, ky, eri, uri)
+        if isinstance(eri, np.ndarray):
+            return calculateQMatrixNHarmonics(kx, ky, eri, uri)
+        else:
+            return calculateQReflectionTransmissionMatrix(kx, ky, eri, uri)
     else:
         return calculateQMatrix1Harmonic(kx, ky, eri, uri)
 
@@ -93,6 +96,16 @@ def calculateQMatrixNHarmonics(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix)
     Q[:KMatrixDimension,KMatrixDimension:] = erConvolutionMatrix - Kx @ urConvolutionMatrixInverse @ Kx
     Q[KMatrixDimension:,:KMatrixDimension] = Ky @ urConvolutionMatrixInverse @ Ky - erConvolutionMatrix
     Q[KMatrixDimension:,KMatrixDimension:] = - Ky @ urConvolutionMatrixInverse @ Kx
+    return Q
+
+def calculateQReflectionTransmissionMatrix(Kx, Ky, er, ur):
+    KDimension = Kx.shape[0]
+    Q = complexZeros((KDimension * 2, KDimension*2))
+    Q[:KDimension, :KDimension] = Kx @ Ky
+    Q[:KDimension, KDimension:] = ur * er *complexIdentity(KDimension) - Kx @ Kx
+    Q[KDimension:, :KDimension] = Ky @ Ky - ur*er*complexIdentity(KDimension)
+    Q[KDimension:, KDimension:] = - Ky @ Kx
+    Q /= ur
     return Q
 
 def calculateOmegaMatrix(kz):
@@ -130,7 +143,8 @@ def calculateKVector(theta, phi, er, ur):
     kz = n * cos(theta);
     return complexArray([kx, ky, kz]);
 
-# This does not currently work because we don't have a Kz matrix in RCWA.
+# TODO: MUST BE MODIFIED TO HANDLE HOMOGENOUS LAYERS AND NOT DIRECTLY SOLVE THE 
+# EIGENVALUE PROBLEM, BUT PROVIDE THE KNOWN SOLUTION.
 def calculateVWXMatrices(kx, ky, er, ur, k0=0, Li=0):
     if isinstance(kx, np.ndarray):
         return calculateVWXMatricesNHarmonics(kx, ky, er, ur, k0, Li)
@@ -173,6 +187,12 @@ def calculateInternalSMatrix(kx, ky, er, ur, k0, Li, Wg, Vg):
     return Si;
 
 def calculateReflectionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
+    if isinstance(kx, np.ndarray):
+        return calculateReflectionRegionSMatrixNHarmonics(kx, ky, er, ur, Wg, Vg)
+    else:
+        return calculateReflectionRegionSMatrix1Harmonic(kx, ky, er, ur, Wg, Vg)
+
+def calculateReflectionRegionSMatrix1Harmonic(kx, ky, er, ur, Wg, Vg):
     kz = calculateKz(kx, ky, er, ur);
     (Vi, Wi) = calculateVWXMatrices(kx, ky, er, ur);
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
@@ -181,13 +201,56 @@ def calculateReflectionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
     Si = calculateReflectionRegionSMatrixFromRaw(Ai, Bi);
     return Si;
 
+# THIS FUNCTION IS DOING WAY TOO MANY THINGS. IT SHOULD BE REFACTORED AND SPLIT UP.
+# THIS WILL NEED TO WORK IN TANDEM WITH THE VWX FUNCTION. I MIGHT HAVE TO TURN IT INTO 
+# A VWLAMBDA FUNCTION.
+def calculateReflectionRegionSMatrixNHarmonics(Kx, Ky, er, ur, Wg, Vg):
+    KDimension = Kx.shape[0]
+    lambdaRef = complexZeros((KDimension*2, KDimension*2))
+    Wi = complexIdentity(KDimension * 2)
+    Q = calculateQMatrix(Kx, Ky, er, ur)
+
+    # I have no idea why we conjugate ur * er and then conjugate the whole thing.
+    Kz = conj(sqrt (conj(ur*er)*complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
+    lambdaRef[:KDimension, :KDimension] = 1j*Kz
+    lambdaRef[KDimension:,KDimension:] = 1j*Kz
+    Vi = Q @ inv(lambdaRef)
+    Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi)
+    Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi)
+
+    Sref = calculateReflectionRegionSMatrixFromRaw(Ai, Bi)
+    return Sref
+
 def calculateTransmissionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
+    if isinstance(kx, np.ndarray):
+        return calculateTransmissionRegionSMatrixNHarmonics(kx, ky, er, ur, Wg, Vg)
+    else:
+        return calculateTransmissionRegionSMatrix1Harmonic(kx, ky, er, ur, Wg, Vg)
+
+def calculateTransmissionRegionSMatrix1Harmonic(kx, ky, er, ur, Wg, Vg):
     (Vi, Wi) = calculateVWXMatrices(kx, ky, er, ur);
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi);
 
     Si = calculateTransmissionRegionSMatrixFromRaw(Ai, Bi);
     return Si;
+
+def calculateTransmissionRegionSMatrixNHarmonics(Kx, Ky, er, ur, Wg, Vg):
+    KDimension = Kx.shape[0]
+    lambdaRef = complexZeros((KDimension*2, KDimension*2))
+    Wi = complexIdentity(KDimension * 2)
+    Q = calculateQMatrix(Kx, Ky, er, ur)
+
+    # I have no idea why we conjugate ur * er and then conjugate the whole thing.
+    Kz = conj(sqrt (conj(ur*er)*complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
+    lambdaRef[:KDimension, :KDimension] = 1j*Kz
+    lambdaRef[KDimension:,KDimension:] = 1j*Kz
+    Vi = Q @ inv(lambdaRef)
+    Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi)
+    Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi)
+
+    Strn = calculateTransmissionRegionSMatrixFromRaw(Ai, Bi)
+    return Strn
 
 def calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di):
     AiInverse = inv(Ai)
