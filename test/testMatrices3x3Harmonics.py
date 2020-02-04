@@ -277,25 +277,23 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         # Sanity check - Redheffer product works when one matrix is the transparent matrix.
         SA = self.transparentSMatrix
         SB = self.SLayer1
-        SABActual = self.SLayer1
+        SABActual = self.SGlobalLayer1
         SABCalculated = calculateRedhefferProduct(SA, SB)
         assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer product with Layer 1 and transparent matrix")
         SA = self.SLayer1
         SB = self.transparentSMatrix
-        SABActual = self.SLayer1
+        SABActual = self.SGlobalLayer1
         SABCalculated = calculateRedhefferProduct(SA, SB)
         assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer product with Layer 1 and transparent matrix (reversed order)")
 
-        SGlobal = self.SLayer1
-        SGlobal = self.SLayer1
-        SGlobal = calculateRedhefferProduct(SGlobal, self.SLayer2)
-        SGlobal = calculateRedhefferProduct(SGlobal, self.STransmissionRegion)
-        SGlobalCalculated = calculateRedhefferProduct(self.SReflectionRegion, SGlobal)
-        SGlobalActual = self.SGlobal
-        #assertAlmostEqual(SGlobalActual, SGlobalCalculated, self.absoluteTolerance, self.relativeTolerance,
-        #        "Global Redheffer Product")
+        SA = self.SLayer1
+        SB = self.SLayer2
+        SABActual = self.SGlobalLayer2
+        SABCalculated = calculateRedhefferProduct(SA, SB)
+        assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
+                "Redheffer Product Layers 1 and 2")
 
 #    def testCalcEz(self):
 #        EzActual = self.EzReflected
@@ -397,6 +395,9 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 "test/matrixDataOblique/layer1/SGlobal21Layer1.txt")
         self.SGlobal22Layer1 = numpyArrayFromSeparatedColumnsFile(
                 "test/matrixDataOblique/layer1/SGlobal22Layer1.txt")
+        self.SGlobalLayer1 = complexArray([
+            [self.SGlobal11Layer1, self.SGlobal12Layer1],
+            [self.SGlobal21Layer1, self.SGlobal22Layer1]])
 
         self.PLayer2 = numpyArrayFromFile("test/matrixDataOblique/layer2/PLayer2.txt")
         self.QLayer2 = numpyArrayFromFile("test/matrixDataOblique/layer2/QLayer2.txt")
@@ -423,7 +424,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 "test/matrixDataOblique/layer2/SGlobal21Layer2.txt")
         self.SGlobal22Layer2 = numpyArrayFromSeparatedColumnsFile(
                 "test/matrixDataOblique/layer2/SGlobal22Layer2.txt")
-        self.SGlobalLayer2 = complexArray([[self.SGlobal11Layer2, self.SGlobal12Layer2],
+        self.SGlobalLayer2 = complexArray([
+            [self.SGlobal11Layer2, self.SGlobal12Layer2],
             [self.SGlobal21Layer2, self.SGlobal22Layer2]])
 
         self.QReflectionRegion = numpyArrayFromFile(
