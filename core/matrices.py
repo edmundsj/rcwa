@@ -128,7 +128,7 @@ def calculateRedhefferDMatrix(SA, SB):
     return SA[0,1] @ inv(complexIdentity(SA[0,0].shape[0]) - SB[0,0] @ SA[1,1])
 
 def calculateRedhefferFMatrix(SA, SB):
-    return SB[1,0] @ inv(complexIdentity(SA[0,0].shape[0]) - SB[0,0] @ SA[1,1])
+    return SB[1,0] @ inv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
 
 def calculateKz(kx, ky, er, ur):
     return sqrt(er*ur - sq(kx) - sq(ky))

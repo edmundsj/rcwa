@@ -161,17 +161,20 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         assertAlmostEqual(DRedhefferMatrixActual, DRedhefferMatrixCalculated, self.absoluteTolerance,
                 self.relativeTolerance, "Layer 1 D matrix")
 
-# WE HAVE NO TEST DATA FOR THIS MATRIX. HAVE TO HOPE THE 1D TESTS ARE GENERALIZABLE.
-#    def testFRedhefferMatrix(self):
-#        SA = self.transparentSMatrix
-#        SB = self.SLayer1
-#        FRedhefferMatrixActual = complexArray([
-#            [0.1490 + 0.9880j, 0.0005 + 0.0017j],
-#            [0.0005 + 0.0017j, 0.148 + 0.9848j]]);
-#        FRedhefferMatrixCalculated = calculateRedhefferFMatrix(SA, SB)
-#        assertAlmostEqual(FRedhefferMatrixActual, FRedhefferMatrixCalculated, self.absoluteTolerance,
-#                self.relativeTolerance, "Layer 1 F matrix")
-#
+        SA = self.SLayer1
+        SB = self.SLayer2
+        DRedhefferMatrixActual = self.DLayer12
+        DRedhefferMatrixCalculated = calculateRedhefferDMatrix(SA, SB)
+        assertAlmostEqual(DRedhefferMatrixActual, DRedhefferMatrixCalculated, self.absoluteTolerance,
+                self.relativeTolerance, "D12 for layer 1 - 2")
+
+    def testFRedhefferMatrix(self):
+        SA = self.SLayer1
+        SB = self.SLayer2
+        FRedhefferMatrixActual = self.FLayer12
+        FRedhefferMatrixCalculated = calculateRedhefferFMatrix(SA, SB)
+        assertAlmostEqual(FRedhefferMatrixActual, FRedhefferMatrixCalculated, self.absoluteTolerance,
+                self.relativeTolerance, "F12 for layer 1 - 2")
 
 
     def testSReflectionRegionMatrixFromRaw(self):
@@ -295,6 +298,17 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer Product Layers 1 and 2")
 
+        SA = self.SReflectionRegion
+        SB1 = self.SLayer1
+        SB2 = self.SLayer2
+        SB3 = self.STransmissionRegion
+        SABCalculated = calculateRedhefferProduct(SA, SB1)
+        SABCalculated = calculateRedhefferProduct(SABCalculated, SB2)
+        SABCalculated = calculateRedhefferProduct(SABCalculated, SB3)
+        SABActual = self.SGlobal
+        assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
+                "Redheffer Product Layers 1 and 2")
+
 #    def testCalcEz(self):
 #        EzActual = self.EzReflected
 #        EzCalculated = calculateEz(self.Kx, self.Ky, self.KzReflectionRegion,
@@ -415,6 +429,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         self.SLayer2 = complexArray([
             [self.S11Layer2, self.S12Layer2],
             [self.S21Layer2, self.S22Layer2]])
+        self.DLayer12= np.loadtxt('test/matrixDataOblique/layer2/D12.csv', dtype=np.cdouble)
+        self.FLayer12= np.loadtxt('test/matrixDataOblique/layer2/F12.csv', dtype=np.cdouble)
 
         self.SGlobal11Layer2 = numpyArrayFromSeparatedColumnsFile(
                 "test/matrixDataOblique/layer2/SGlobal11Layer2.txt")
