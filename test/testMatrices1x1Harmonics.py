@@ -7,56 +7,36 @@ import unittest
 from shorthandTest import *
 from matrices import *
 from fresnel import *
-from convolution import generateConvolutionMatrix
 from matrixParser import *
+from source import *
 
 
 class Test1x1Harmonic(unittest.TestCase):
-    #WARNING: THE TESTS FOR CONVOLUTION MATRIX GENERATION ARE IN THE PLANE WAVE EXPANSION CODE, NOT HERE.
-    def testGenerateConvolutionMatrix(self):
-        absoluteTolerance = 1e-4
-        relativeTolerance = 1e-3
-        urDeviceRegion = 1
-        erData = np.transpose(np.loadtxt('test/triangleData.csv', delimiter=','))
-        urData = urDeviceRegion * complexOnes((512, 439))
-        numberHarmonics = (1, 1)
-
-        convolutionMatrixCalculated = generateConvolutionMatrix(urData, numberHarmonics)
-        convolutionMatrixActual = 1
-        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
-                self.relativeTolerance, "UR convolution matrices for layer 1 not equal")
-
-
-        convolutionMatrixCalculated = generateConvolutionMatrix(erData, numberHarmonics)
-        convolutionMatrixActual = 5.0449
-        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
-                self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
-
     def testCalculateKz(self):
-        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.erReflectionRegion, self.urReflectionRegion)
+        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
         KzActual = self.KzReflectionRegion
         assertAlmostEqual(KzActual, KzCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Kz in Reflection region not correct")
 
-        KzCalculated = calculateKzForward(self.Kx, self.Ky,
-                self.erTransmissionRegion, self.urTransmissionRegion)
+        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmissionLayer)
         KzActual = self.KzTransmissionRegion
         assertAlmostEqual(KzActual, KzCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Kz in transmission region not correct")
 
     def testaTEM(self):
-        aTEActual = complexArray([-0.39073, 0.920505])
-        aTMActual = complexArray([0.50137, 0.21282])
-        (aTECalculated, aTMCalculated) = aTEMGen(self.theta, self.phi)
+        aTEActual = complexArray([-0.39073, 0.920505, 0])
+        aTMActual = complexArray([0.50137, 0.21282, -0.838671])
+        (aTECalculated, aTMCalculated) = self.source.aTE, self.source.aTM
         assertAlmostEqual(aTEActual, aTECalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Oblique incidence TE vector wrong");
         assertAlmostEqual(aTMActual, aTMCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Oblique incidence TM vector wrong");
 
         # Important corner case where the cross product fails
-        aTEActual = complexArray([0,1,0])[0:2];
-        aTMActual = complexArray([1,0,0])[0:2];
-        (aTECalculated, aTMCalculated) = aTEMGen(0.0001, 0)
+        aTEActual = complexArray([0,1,0]);
+        aTMActual = complexArray([1,0,0]);
+        zeroAngleSource = Source()
+        (aTECalculated, aTMCalculated) = zeroAngleSource.aTE, zeroAngleSource.aTM
         assertAlmostEqual(aTEActual, aTECalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Near-normal Incidence TE vector wrong");
         assertAlmostEqual(aTMActual, aTMCalculated,
@@ -71,8 +51,7 @@ class Test1x1Harmonic(unittest.TestCase):
 
     def testCalculateKVector(self):
         kVectorActual = complexArray([self.Kx, self.Ky, self.KzReflectionRegion])
-        kVectorCalculated = calculateKVector(self.theta, self.phi,
-                self.erReflectionRegion, self.urReflectionRegion)
+        kVectorCalculated = calculateKVector(self.source, self.layerStack.reflectionLayer)
         assertAlmostEqual(kVectorActual, kVectorCalculated,self.absoluteTolerance,self.relativeTolerance);
 
     def testCalcEz(self):
@@ -94,26 +73,26 @@ class Test1x1Harmonic(unittest.TestCase):
         TActual = self.T;
 
         (RCalculated, TCalculated) = calculateRT(self.KzReflectionRegion, self.KzTransmissionRegion,
-                self.urReflectionRegion, self.urTransmissionRegion,
-                self.ExyzReflected, self.ExyzTransmitted);
+                self.layerStack, self.ExyzReflected, self.ExyzTransmitted);
         assertAlmostEqual(RActual, RCalculated, self.absoluteTolerance, self.relativeTolerance);
         assertAlmostEqual(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
+
     def testPMatrix(self):
         PActual = complexArray([
             [0.212504, 0.499373],
             [-0.909798, -0.212504]])
-        PCalculated = calculatePMatrix(self.Kx, self.Ky, self.erLayer1, self.urLayer1)
+        PCalculated = calculatePMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[0])
         assertAlmostEqual(PActual, PCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "P matrix layer 1");
 
     def testQMatrix(self):
         QActual = complexArray([[0.4250, 0.9987],[-1.8196, -0.4250]]);
-        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.erLayer1, self.urLayer1);
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[0])
         assertAlmostEqual(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q matrix Layer 1");
 
         QActual = complexArray([[0.1417, 0.6662],[-0.9399, -0.1417]]);
-        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.erLayer2, self.urLayer2);
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[1])
         assertAlmostEqual(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q matrix layer 2")
 
@@ -127,37 +106,32 @@ class Test1x1Harmonic(unittest.TestCase):
         assertAlmostEqual(OActual, OCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testVMatrix(self):
-        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky,
-                self.erGap, self.urGap)
+        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.gapLayer)
         VActual = complexArray([[0 - 0.4250j, 0 - 1.1804j], [0 + 2.0013j, 0 + 0.4250j]]);
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky,
-                self.erLayer1, self.urLayer1)
+        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0])
         VActual = complexArray([[0-0.4698j,0-1.1040j],[0+2.0114j,0+0.4698j]]);
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky,
-                self.erLayer2, self.urLayer2)
+        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[1])
         VActual = complexArray([[0-0.1051j,0-0.4941j],[0+0.6970j,0+0.1051j]]);
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W_ref) = calculateVWXMatrices(self.Kx, self.Ky,
-                self.erReflectionRegion,
-                self.urReflectionRegion)
+        (VCalculated, W_ref) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.reflectionLayer)
         VActual = complexArray([
             [0 - 0.5017j, 0 - 0.8012j],
             [0 + 1.7702j, 0 + 0.5017j]]);
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testXMatrix(self):
-        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky,
-                self.erLayer1, self.urLayer1, self.k0, self.thicknessLayer1)
+        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0],
+                self.source)
         XActual = complexArray([[0.1493+0.9888j, 0+0j],[0+0j,0.1493+0.9888j]]);
         assertAlmostEqual(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky,
-                self.erLayer2, self.urLayer2, self.k0, self.thicknessLayer2)
+        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[1],
+                self.source)
         XActual = complexArray([[-0.4583 - 0.8888j, 0+0j],[0+0j, -0.4583 - 0.8888j]]);
         assertAlmostEqual(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
 
@@ -327,14 +301,14 @@ class Test1x1Harmonic(unittest.TestCase):
 
     def testSMatrixFromFundamentals(self):
         SiActual = self.SLayer1
-        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.erLayer1, self.urLayer1,
-                self.k0, self.thicknessLayer1, self.WGap, self.VGap)
+        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[0],
+                self.source, self.WGap, self.VGap)
         assertAlmostEqual(SiActual, SiCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
         SiActual = self.SLayer2
-        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.erLayer2, self.urLayer2,
-                self.k0, self.thicknessLayer2, self.WGap, self.VGap)
+        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[1],
+                self.source, self.WGap, self.VGap)
         assertAlmostEqual(SiActual, SiCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
@@ -370,15 +344,15 @@ class Test1x1Harmonic(unittest.TestCase):
 
     def testReflectionRegionSMatrixFromFundamentals(self):
         SActual = self.SReflectionRegion
-        SCalculated = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.erReflectionRegion,
-                self.urReflectionRegion, self.WGap, self.VGap)
+        SCalculated = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.layerStack,
+                self.WGap, self.VGap)
         assertAlmostEqual(SActual, SCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
     def testTransmissionRegionSMatrixFromFundamentals(self):
         SActual = self.STransmissionRegion
-        SCalculated = calculateTransmissionRegionSMatrix(self.Kx, self.Ky, self.erTransmissionRegion,
-                self.urTransmissionRegion, self.WGap, self.VGap)
+        SCalculated = calculateTransmissionRegionSMatrix(self.Kx, self.Ky, self.layerStack,
+                self.WGap, self.VGap)
         assertAlmostEqual(SActual, SCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
@@ -389,27 +363,31 @@ class Test1x1Harmonic(unittest.TestCase):
         self.theta = 57 * deg
         self.phi = 23 * deg
         self.wavelength = 2.7
+        self.source = Source(self.wavelength, self.theta, self.phi)
+        erReflectionRegion = 1.4
+        urReflectionRegion = 1.2
+        erTransmissionRegion = 1.8
+        urTransmissionRegion = 1.6
+        erLayer1 = 2.0
+        urLayer1 = 1.0
+        erLayer2 = 1.0
+        urLayer2 = 3.0
+        thicknessLayer1 = 0.25*self.source.wavelength
+        thicknessLayer2 = 0.5*self.source.wavelength
 
-        self.erReflectionRegion = 1.4
-        self.urReflectionRegion = 1.2
-        self.erTransmissionRegion = 1.8
-        self.urTransmissionRegion = 1.6
-        self.erLayer1 = 2.0
-        self.urLayer1 = 1.0
-        self.erLayer2 = 1.0
-        self.urLayer2 = 3.0
+        reflectionLayer = Layer(erReflectionRegion, urReflectionRegion)
+        transmissionLayer = Layer(erTransmissionRegion, urTransmissionRegion)
+        layer1 = Layer(er=erLayer1, ur=urLayer1, L=thicknessLayer1)
+        layer2 = Layer(er=erLayer2, ur=urLayer2, L=thicknessLayer2)
+        self.layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
 
-        self.thicknessLayer1 = 0.25*self.wavelength
-        self.thicknessLayer2 = 0.5*self.wavelength
-
-        self.nReflectionRegion = sqrt (self.erReflectionRegion * self.urReflectionRegion)
-        self.Kx = self.nReflectionRegion * sin(self.theta) * cos(self.phi)
-        self.Ky = self.nReflectionRegion * sin(self.theta) * sin(self.phi)
+        self.Kx = reflectionLayer.n* sin(self.theta) * cos(self.phi)
+        self.Ky = reflectionLayer.n* sin(self.theta) * sin(self.phi)
+        self.layerStack.setGapLayer(self.Kx, self.Ky)
         self.KzReflectionRegion = 0.705995
         self.KzTransmissionRegion = 1.3032
         self.KzLayer1 = 0.9046
         self.KzLayer2 = 1.3485
-        self.k0 = 2.3271
 
         self.ExReflected = 0.0519 - 0.2856j
         self.EyReflected = -0.4324 + 0.0780j
@@ -422,8 +400,6 @@ class Test1x1Harmonic(unittest.TestCase):
         self.R = 0.4403
         self.T = 0.5597
 
-        self.erGap = 1 + sq(self.Kx) + sq(self.Ky)
-        self.urGap = 1
         self.KzGap = 1
         self.WGap = complexIdentity(2)
         self.VGap = complexArray([

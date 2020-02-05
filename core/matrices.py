@@ -1,4 +1,5 @@
 from shorthand import *
+from source import *
 
 OUTER_BLOCK_SHAPE = (2,2);
 scatteringElementShape = (2,2); # The shape of our core PQ matrices.
@@ -6,25 +7,10 @@ scatteringMatrixShape = OUTER_BLOCK_SHAPE + scatteringElementShape;
 scatteringElementShape = (2,2);
 scatteringElementSize = scatteringElementShape[0];
 
-def aTEMGen(theta, phi):
-    incidentVector = complexArray([sin(theta) * cos(phi), sin(theta)*sin(phi), cos(theta)])
-    deviceNormalUnitVector = complexArray([0,0,-1]); # The z-normal vector (plane wave opposite direction as surface)
-    epsilon = 1e-3; # a small number. If theta is close to zero we cannot calculate the cross product
-
-    if(abs(incidentVector[0]) < epsilon and abs(incidentVector[1]) < epsilon):
-        aTE = np.array([0,1,0]);
-    else:
-        aTE = - np.cross(deviceNormalUnitVector, incidentVector);
-        aTE = aTE / norm(aTE);
-
-    aTM = np.cross(aTE, incidentVector);
-    aTM = aTM / norm(aTM);
-    return (aTE[0:2], aTM[0:2]);
-
-def calculateIncidentFieldHarmonics(pXY, numberHarmonics):
+def calculateIncidentFieldHarmonics(source, numberHarmonics):
     totalNumberHarmonics = np.prod(numberHarmonics)
-    return np.hstack((pXY[0] * kroneckerDeltaVector(totalNumberHarmonics),
-            pXY[1] * kroneckerDeltaVector(totalNumberHarmonics)))
+    return np.hstack((source.pX * kroneckerDeltaVector(totalNumberHarmonics),
+            source.pY * kroneckerDeltaVector(totalNumberHarmonics)))
 
 def generateTransparentSMatrix(matrixShape):
     STransparent = complexZeros((2, 2) + matrixShape);
@@ -43,74 +29,74 @@ def calculateRedhefferProduct(SA, SB):
     SAB[1,1] = SB[1,1] +  F @ SA[1,1] @ SB[0,1];
     return SAB;
 
-def calculatePMatrix(kx, ky, eri, uri):
+def calculatePMatrix(kx, ky, layer):
     if isinstance(kx, np.ndarray):
-        return calculatePMatrixNHarmonics(kx, ky, eri, uri)
+        return calculatePMatrixNHarmonics(kx, ky, layer)
 
     else:
-        return calculatePMatrix1Harmonic(kx, ky, eri, uri)
+        return calculatePMatrix1Harmonic(kx, ky, layer)
 
-def calculatePMatrix1Harmonic(kx, ky, eri, uri):
+def calculatePMatrix1Harmonic(kx, ky, layer):
     P = complexZeros((2, 2));
 
     P[0,0] = kx*ky;
-    P[0,1] = uri*eri - np.square(kx);
-    P[1,0] = sq(ky) - uri*eri;
+    P[0,1] = layer.er*layer.ur - np.square(kx);
+    P[1,0] = sq(ky) - layer.er*layer.ur
     P[1,1] = - kx*ky;
-    P /= eri;
+    P /= layer.er;
     return P
 
-def calculatePMatrixNHarmonics(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix):
-    erConvolutionMatrixInverse = inv(erConvolutionMatrix)
+def calculatePMatrixNHarmonics(Kx, Ky, layer):
+    erInverse = inv(layer.er)
     KMatrixDimension = Kx.shape[0]
     matrixShape = (2 *KMatrixDimension, 2 * KMatrixDimension)
     P = complexZeros(matrixShape)
 
-    P[:KMatrixDimension,:KMatrixDimension] = Kx @ erConvolutionMatrixInverse @ Ky
-    P[:KMatrixDimension,KMatrixDimension:] = urConvolutionMatrix - Kx @ erConvolutionMatrixInverse @ Kx
-    P[KMatrixDimension:,:KMatrixDimension] = Ky @ erConvolutionMatrixInverse @ Ky - urConvolutionMatrix
-    P[KMatrixDimension:,KMatrixDimension:] = - Ky @ erConvolutionMatrixInverse @ Kx
+    P[:KMatrixDimension,:KMatrixDimension] = Kx @ erInverse @ Ky
+    P[:KMatrixDimension,KMatrixDimension:] = layer.ur - Kx @ erInverse @ Kx
+    P[KMatrixDimension:,:KMatrixDimension] = Ky @ erInverse @ Ky - layer.ur
+    P[KMatrixDimension:,KMatrixDimension:] = - Ky @ erInverse @ Kx
     return P
 
-def calculateQMatrix(kx, ky, eri, uri):
+def calculateQMatrix(kx, ky, layer):
     if isinstance(kx, np.ndarray):
-        if isinstance(eri, np.ndarray):
-            return calculateQMatrixNHarmonics(kx, ky, eri, uri)
+        if isinstance(layer.er, np.ndarray):
+            return calculateQMatrixNHarmonics(kx, ky, layer)
         else:
-            return calculateQReflectionTransmissionMatrix(kx, ky, eri, uri)
+            return calculateQReflectionTransmissionMatrix(kx, ky, layer)
     else:
-        return calculateQMatrix1Harmonic(kx, ky, eri, uri)
+        return calculateQMatrix1Harmonic(kx, ky, layer)
 
-def calculateQMatrix1Harmonic(kx, ky, eri, uri):
+def calculateQMatrix1Harmonic(kx, ky, layer):
     Q = complexZeros(scatteringElementShape);
 
     Q[0,0] = kx * ky;
-    Q[0,1] = uri*eri - sq(kx);
-    Q[1,0] = sq(ky) - uri*eri;
+    Q[0,1] = layer.er*layer.ur- sq(kx);
+    Q[1,0] = sq(ky) - layer.er*layer.ur;
     Q[1,1] = - kx * ky;
-    Q = Q / uri;
+    Q = Q / layer.ur;
     return Q;
 
-def calculateQMatrixNHarmonics(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix):
-    urConvolutionMatrixInverse = inv(urConvolutionMatrix)
+def calculateQMatrixNHarmonics(Kx, Ky, layer):
+    urInverse = inv(layer.ur)
     KMatrixDimension = Kx.shape[0]
     matrixShape = (2 *KMatrixDimension, 2 * KMatrixDimension)
     Q = complexZeros(matrixShape)
 
-    Q[:KMatrixDimension,:KMatrixDimension] = Kx @ urConvolutionMatrixInverse @ Ky
-    Q[:KMatrixDimension,KMatrixDimension:] = erConvolutionMatrix - Kx @ urConvolutionMatrixInverse @ Kx
-    Q[KMatrixDimension:,:KMatrixDimension] = Ky @ urConvolutionMatrixInverse @ Ky - erConvolutionMatrix
-    Q[KMatrixDimension:,KMatrixDimension:] = - Ky @ urConvolutionMatrixInverse @ Kx
+    Q[:KMatrixDimension,:KMatrixDimension] = Kx @ urInverse @ Ky
+    Q[:KMatrixDimension,KMatrixDimension:] = layer.er - Kx @ urInverse @ Kx
+    Q[KMatrixDimension:,:KMatrixDimension] = Ky @ urInverse @ Ky - layer.er
+    Q[KMatrixDimension:,KMatrixDimension:] = - Ky @ urInverse @ Kx
     return Q
 
-def calculateQReflectionTransmissionMatrix(Kx, Ky, er, ur):
+def calculateQReflectionTransmissionMatrix(Kx, Ky, layer):
     KDimension = Kx.shape[0]
     Q = complexZeros((KDimension * 2, KDimension*2))
     Q[:KDimension, :KDimension] = Kx @ Ky
-    Q[:KDimension, KDimension:] = ur * er *complexIdentity(KDimension) - Kx @ Kx
-    Q[KDimension:, :KDimension] = Ky @ Ky - ur*er*complexIdentity(KDimension)
+    Q[:KDimension, KDimension:] = layer.ur * layer.er *complexIdentity(KDimension) - Kx @ Kx
+    Q[KDimension:, :KDimension] = Ky @ Ky - layer.ur*layer.er*complexIdentity(KDimension)
     Q[KDimension:, KDimension:] = - Ky @ Kx
-    Q /= ur
+    Q /= layer.ur
     return Q
 
 def calculateOmegaMatrix(kz):
@@ -135,64 +121,61 @@ def calculateRedhefferDMatrix(SA, SB):
 def calculateRedhefferFMatrix(SA, SB):
     return SB[1,0] @ inv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
 
-def calculateKzBackward(kx, ky, er, ur):
+def calculateKzBackward(kx, ky, layer):
     if isinstance(kx, np.ndarray):
-        return -conj(sqrt(conj(er*ur)*complexIdentity(kx.shape[0]) - kx @ kx - ky @ ky))
+        return -conj(sqrt(conj(layer.er*layer.ur)*complexIdentity(kx.shape[0]) - kx @ kx - ky @ ky))
     else:
-        return sqrt(er*ur - sq(kx) - sq(ky))
+        return sqrt(layer.er*layer.ur - sq(kx) - sq(ky))
 
-def calculateKzForward(kx, ky, er, ur):
+def calculateKzForward(kx, ky, layer):
     if isinstance(kx, np.ndarray):
-        return conj(sqrt(conj(er*ur)*complexIdentity(kx.shape[0]) - kx @ kx - ky @ ky))
+        return conj(sqrt(conj(layer.er*layer.ur)*complexIdentity(kx.shape[0]) - kx @ kx - ky @ ky))
     else:
-        return sqrt(er*ur - sq(kx) - sq(ky))
+        return sqrt(layer.er*layer.ur - sq(kx) - sq(ky))
 
-def calculateKzReflected(kx, ky, er, ur):
-    return -calculateKz(kx, ky, er, ur)
-
-def calculateKVector(theta, phi, er, ur):
-    n = sqrt(er*ur);
-    kx = n * sin(theta) * cos(phi);
-    ky = n * sin(theta) * sin(phi);
-    kz = n * cos(theta);
+def calculateKVector(source, layer):
+    kx = layer.n * sin(source.theta) * cos(source.phi);
+    ky = layer.n * sin(source.theta) * sin(source.phi);
+    kz = layer.n * cos(source.theta);
     return complexArray([kx, ky, kz]);
 
 # TODO: MUST BE MODIFIED TO HANDLE HOMOGENOUS LAYERS AND NOT DIRECTLY SOLVE THE 
 # EIGENVALUE PROBLEM, BUT PROVIDE THE KNOWN SOLUTION.
-def calculateVWXMatrices(kx, ky, er, ur, k0=0, Li=0):
+def calculateVWXMatrices(kx, ky, layer, source=zeroSource):
     if isinstance(kx, np.ndarray):
-        return calculateVWXMatricesNHarmonics(kx, ky, er, ur, k0, Li)
+        return calculateVWXMatricesNHarmonics(kx, ky, layer, source)
     else:
-        kz = calculateKzForward(kx, ky, er, ur) # This *should* work.
-        return calculateVWXMatrices1Harmonic(kx, ky, kz, er, ur, k0, Li)
+        kz = calculateKzForward(kx, ky, layer) # This *should* work.
+        return calculateVWXMatrices1Harmonic(kx, ky, kz, layer, source)
 
-def calculateVWXMatrices1Harmonic(kx, ky, kz, er, ur, k0, Li):
-    Q = calculateQMatrix(kx, ky, er, ur);
+def calculateVWXMatrices1Harmonic(kx, ky, kz, layer, source):
+    Q = calculateQMatrix(kx, ky, layer);
     O = calculateOmegaMatrix(kz);
     OInverse = inv(O);
     W = complexIdentity(scatteringElementShape[0]);
-    X = matrixExponentiate(O * k0 * Li)
+    X = matrixExponentiate(O * source.k0 * layer.L)
     V = Q @ W @ OInverse;
 
-    if(k0 > 0):
+    if(layer.L > 0):
         return (V, W, X);
     else:
         return (V, W);
 
-def calculateVWXMatricesNHarmonics(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix, k0, Li):
-    P = calculatePMatrix(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix)
-    Q = calculateQMatrix(Kx, Ky, erConvolutionMatrix, urConvolutionMatrix)
+# TODO - INCORPORATE CONVOLUTION MATRIX INTO THE LAYERS
+def calculateVWXMatricesNHarmonics(Kx, Ky, layer, source):
+    P = calculatePMatrix(Kx, Ky, layer)
+    Q = calculateQMatrix(Kx, Ky, layer)
     OmegaSquared = calculateOmegaSquaredMatrix(P, Q)
     eigenValues, W = eig(OmegaSquared)
     Lambda = np.diag(sqrt(eigenValues))
     LambdaInverse = np.diag(np.reciprocal(sqrt(eigenValues)))
     V = Q @ W @ LambdaInverse
-    X = matrixExponentiate( - Lambda * k0 * Li)
+    X = matrixExponentiate( - Lambda * source.k0 * layer.L)
 
     return (V, W, X)
 
-def calculateInternalSMatrix(kx, ky, er, ur, k0, Li, Wg, Vg):
-    (Vi, Wi, Xi) = calculateVWXMatrices(kx, ky, er, ur, k0, Li);
+def calculateInternalSMatrix(kx, ky, layer, source, Wg, Vg):
+    (Vi, Wi, Xi) = calculateVWXMatrices(kx, ky, layer, source);
     Ai = calculateScatteringAMatrix(Wi, Wg, Vi, Vg);
     Bi = calculateScatteringBMatrix(Wi, Wg, Vi, Vg);
     Di = calculateScatteringDMatrix(Ai, Bi, Xi);
@@ -200,32 +183,30 @@ def calculateInternalSMatrix(kx, ky, er, ur, k0, Li, Wg, Vg):
     Si = calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di);
     return Si;
 
-def calculateReflectionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
+def calculateReflectionRegionSMatrix(kx, ky, layerStack, Wg, Vg):
     if isinstance(kx, np.ndarray):
-        return calculateReflectionRegionSMatrixNHarmonics(kx, ky, er, ur, Wg, Vg)
+        return calculateReflectionRegionSMatrixNHarmonics(kx, ky, layerStack, Wg, Vg)
     else:
-        return calculateReflectionRegionSMatrix1Harmonic(kx, ky, er, ur, Wg, Vg)
+        return calculateReflectionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg)
 
-def calculateReflectionRegionSMatrix1Harmonic(kx, ky, er, ur, Wg, Vg):
-    kz = calculateKzForward(kx, ky, er, ur);
-    (Vi, Wi) = calculateVWXMatrices(kx, ky, er, ur);
+def calculateReflectionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg):
+    kz = calculateKzForward(kx, ky, layerStack.reflectionLayer);
+    (Vi, Wi) = calculateVWXMatrices(kx, ky, layerStack.reflectionLayer);
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi);
 
     Si = calculateReflectionRegionSMatrixFromRaw(Ai, Bi);
     return Si;
 
-# THIS FUNCTION IS DOING WAY TOO MANY THINGS. IT SHOULD BE REFACTORED AND SPLIT UP.
-# THIS WILL NEED TO WORK IN TANDEM WITH THE VWX FUNCTION. I MIGHT HAVE TO TURN IT INTO 
-# A VWLAMBDA FUNCTION.
-def calculateReflectionRegionSMatrixNHarmonics(Kx, Ky, er, ur, Wg, Vg):
+def calculateReflectionRegionSMatrixNHarmonics(Kx, Ky, layerStack, Wg, Vg):
     KDimension = Kx.shape[0]
     lambdaRef = complexZeros((KDimension*2, KDimension*2))
     Wi = complexIdentity(KDimension * 2)
-    Q = calculateQMatrix(Kx, Ky, er, ur)
+    Q = calculateQMatrix(Kx, Ky, layerStack.reflectionLayer)
 
     # I have no idea why we conjugate ur * er and then conjugate the whole thing.
-    Kz = conj(sqrt (conj(ur*er)*complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
+    Kz = conj(sqrt (conj(layerStack.reflectionLayer.er*layerStack.reflectionLayer.ur)* \
+            complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
     lambdaRef[:KDimension, :KDimension] = 1j*Kz
     lambdaRef[KDimension:,KDimension:] = 1j*Kz
     Vi = Q @ inv(lambdaRef)
@@ -235,28 +216,29 @@ def calculateReflectionRegionSMatrixNHarmonics(Kx, Ky, er, ur, Wg, Vg):
     Sref = calculateReflectionRegionSMatrixFromRaw(Ai, Bi)
     return Sref
 
-def calculateTransmissionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
+def calculateTransmissionRegionSMatrix(kx, ky, layerStack, Wg, Vg):
     if isinstance(kx, np.ndarray):
-        return calculateTransmissionRegionSMatrixNHarmonics(kx, ky, er, ur, Wg, Vg)
+        return calculateTransmissionRegionSMatrixNHarmonics(kx, ky, layerStack, Wg, Vg)
     else:
-        return calculateTransmissionRegionSMatrix1Harmonic(kx, ky, er, ur, Wg, Vg)
+        return calculateTransmissionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg)
 
-def calculateTransmissionRegionSMatrix1Harmonic(kx, ky, er, ur, Wg, Vg):
-    (Vi, Wi) = calculateVWXMatrices(kx, ky, er, ur);
+def calculateTransmissionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg):
+    (Vi, Wi) = calculateVWXMatrices(kx, ky, layerStack.transmissionLayer)
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi);
 
     Si = calculateTransmissionRegionSMatrixFromRaw(Ai, Bi);
     return Si;
 
-def calculateTransmissionRegionSMatrixNHarmonics(Kx, Ky, er, ur, Wg, Vg):
+def calculateTransmissionRegionSMatrixNHarmonics(Kx, Ky, layerStack, Wg, Vg):
     KDimension = Kx.shape[0]
     lambdaRef = complexZeros((KDimension*2, KDimension*2))
     Wi = complexIdentity(KDimension * 2)
-    Q = calculateQMatrix(Kx, Ky, er, ur)
+    Q = calculateQMatrix(Kx, Ky, layerStack.transmissionLayer)
 
     # I have no idea why we conjugate ur * er and then conjugate the whole thing.
-    Kz = conj(sqrt (conj(ur*er)*complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
+    Kz = conj(sqrt (conj(layerStack.transmissionLayer.er * layerStack.transmissionLayer.ur)* \
+            complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
     lambdaRef[:KDimension, :KDimension] = 1j*Kz
     lambdaRef[KDimension:,KDimension:] = 1j*Kz
     Vi = Q @ inv(lambdaRef)
@@ -301,13 +283,13 @@ def calculateTransmissionRegionSMatrixFromRaw(ATransmissionRegion, BTransmission
     S[1,1] = - AInverse @ B;
     return S;
 
-def calculateReflectionCoefficient(S, WReflectionRegion, pXY, numberHarmonics):
-    incidentFieldHarmonics = calculateIncidentFieldHarmonics(pXY, numberHarmonics)
+def calculateReflectionCoefficient(S, WReflectionRegion, source, numberHarmonics):
+    incidentFieldHarmonics = calculateIncidentFieldHarmonics(source, numberHarmonics)
     rTransverse = WReflectionRegion @ S[0,0] @ inv(WReflectionRegion) @ incidentFieldHarmonics
     return rTransverse
 
-def calculateTransmissionCoefficient(S, WTransmissionRegion, pXY, numberHarmonics):
-    incidentFieldHarmonics = calculateIncidentFieldHarmonics(pXY, numberHarmonics)
+def calculateTransmissionCoefficient(S, WTransmissionRegion, source, numberHarmonics):
+    incidentFieldHarmonics = calculateIncidentFieldHarmonics(source, numberHarmonics)
     tTransverse = WTransmissionRegion @ S[1,0] @ inv(WTransmissionRegion) @ incidentFieldHarmonics
     return tTransverse
 
@@ -319,14 +301,18 @@ def calculateTransmissionZCoefficient(tx, ty, Kx, Ky, KzTransmissionRegion):
     tz = - inv(KzTransmissionRegion) @ (Kx @ tx + Ky @ ty)
     return tz
 
-def calculateDiffractionReflectionEfficiency(rx, ry, rz, kzIncident, KzReflectionRegion, urReflectionRegion):
-    preMatrix = real(-1 /urReflectionRegion * KzReflectionRegion) / real(kzIncident / urReflectionRegion)
+def calculateDiffractionReflectionEfficiency(rx, ry, rz, source, KzReflectionRegion, layerStack):
+    urReflectionRegion = layerStack.reflectionLayer.ur
+    preMatrix = real(-1 /urReflectionRegion * KzReflectionRegion) / \
+            real(source.kIncident[2] / urReflectionRegion)
     R = preMatrix @ (sq(np.abs(rx)) + sq(np.abs(ry)) + sq(np.abs(rz)))
     return R
 
-def calculateDiffractionTransmissionEfficiency(tx, ty, tz, kzIncident, KzTransmissionRegion, urReflectionRegion,
-        urTransmissionRegion):
-    preMatrix = real(1 / urTransmissionRegion * KzTransmissionRegion) / real(kzIncident / urReflectionRegion)
+def calculateDiffractionTransmissionEfficiency(tx, ty, tz, source, KzTransmissionRegion, layerStack):
+    urTransmissionRegion = layerStack.transmissionLayer.ur
+    urReflectionRegion = layerStack.reflectionLayer.ur
+    preMatrix = real(1 / urTransmissionRegion * KzTransmissionRegion) / \
+            real(source.kIncident[2] / urReflectionRegion)
     T = preMatrix @ (sq(np.abs(tx)) + sq(np.abs(ty)) + sq(np.abs(tz)))
     return T
 
@@ -335,7 +321,9 @@ def calculateEz(kx, ky, kz, Ex, Ey):
     return Ez;
 
 def calculateRT(kzReflectionRegion, kzTransmissionRegion,
-        urReflectionRegion, urTransmissionRegion, ExyzReflected, ExyzTransmitted):
+        layerStack, ExyzReflected, ExyzTransmitted):
+    urTransmissionRegion = layerStack.transmissionLayer.ur
+    urReflectionRegion = layerStack.reflectionLayer.ur
     R = sq(norm(ExyzReflected))
     T = sq(norm(ExyzTransmitted))*np.real(kzTransmissionRegion / urTransmissionRegion) / \
             (kzReflectionRegion / urReflectionRegion);

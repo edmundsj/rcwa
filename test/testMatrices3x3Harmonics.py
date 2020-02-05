@@ -6,11 +6,39 @@ import unittest
 from shorthandTest import *
 from matrices import *
 from fresnel import *
-from convolution import generateConvolutionMatrix
 from matrixParser import *
+from source import Source
+from source import Layer
+from crystal import Crystal
 
 
 class Test3x3HarmonicsOblique(unittest.TestCase):
+
+    def testGenerateConvolutionMatrix(self):
+        absoluteTolerance = 1e-4
+        relativeTolerance = 1e-3
+        urDeviceRegion = 1
+        numberHarmonics = (1, 1)
+        t1 = complexArray([1.75,0,0])
+        t2 = complexArray([0, 1.5, 0])
+
+
+        erData = np.transpose(np.loadtxt('test/triangleData.csv', delimiter=','))
+        urData = urDeviceRegion * complexOnes((512, 439))
+        triangleCrystal = Crystal(erData, urData, t1, t2)
+        dummyLayer = Layer(crystal=triangleCrystal)
+        dummyLayer.setConvolutionMatrices(self.numberHarmonics)
+
+        convolutionMatrixCalculated = dummyLayer.ur
+        convolutionMatrixActual = 1
+        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
+                self.relativeTolerance, "UR convolution matrices for layer 1 not equal")
+
+
+        convolutionMatrixCalculated = dummyLayer.er
+        convolutionMatrixActual = 5.0449
+        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
+                self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
 
     def testKroneckerDelta(self):
         size = 9
@@ -24,27 +52,23 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
     def testPMatrix(self):
         PActual = self.PLayer1
-        PCalculated = calculatePMatrix(self.Kx, self.Ky,
-               self.erConvolutionMatrixLayer1, self.urConvolutionMatrixLayer1)
+        PCalculated = calculatePMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[0])
         assertAlmostEqual(PActual, PCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "P matrix layer 1");
 
     def testQMatrix(self):
         QActual = self.QLayer1
-        QCalculated = calculateQMatrix(self.Kx, self.Ky,
-                self.erConvolutionMatrixLayer1, self.urConvolutionMatrixLayer1)
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[0])
         assertAlmostEqual(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q matrix Layer 1");
 
         QActual = self.QReflectionRegion
-        QCalculated = calculateQMatrix(self.Kx, self.Ky,
-                self.erReflectionRegion, self.urReflectionRegion)
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.reflectionLayer)
         assertAlmostEqual(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q Reflection Region");
 
         QActual = self.QTransmissionRegion
-        QCalculated = calculateQMatrix(self.Kx, self.Ky,
-                self.erTransmissionRegion, self.urTransmissionRegion)
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.transmissionLayer)
         assertAlmostEqual(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q Transmission Region");
 
@@ -55,17 +79,15 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance);
 
     def testWMatrix(self):
-        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky,
-                self.erConvolutionMatrixLayer1, self.urConvolutionMatrixLayer1, self.k0,
-                self.thicknessLayer1)
+        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0],
+                self.source)
         WActual = self.WLayer1
         assertAlmostEqual(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer 1");
 
     def testVMatrix(self):
-        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky,
-                self.erConvolutionMatrixLayer1, self.urConvolutionMatrixLayer1, self.k0,
-                self.thicknessLayer1)
+        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0],
+                self.source)
         VActual = self.VLayer1
 
         # Because the inverse of the lambda matrix has some negative values where they should be
@@ -77,9 +99,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 "V matrix Layer 1");
 
     def testXMatrix(self):
-        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky,
-                self.erConvolutionMatrixLayer1, self.urConvolutionMatrixLayer1, self.k0,
-                self.thicknessLayer1)
+        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0], self.source)
         XActual = self.XLayer1
 
         # Numerical error is causing accidental conjugation. To match the test data we need
@@ -133,9 +153,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 "S22 for Layer 1");
 
     def testSMatrixFromFundamentals(self):
-        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.erConvolutionMatrixLayer1,
-                self.urConvolutionMatrixLayer1,
-                self.k0, self.thicknessLayer1, self.WFreeSpace, self.VFreeSpace)
+        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[0],
+                self.source, self.WFreeSpace, self.VFreeSpace)
 
         S11Actual = self.S11Layer1
         S11Calculated = SiCalculated[0,0]
@@ -234,8 +253,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
     # HOMOGENOUS LAYERS. CURRENTLY BREAKING LINEAR ALGEBRA ENGINE TRYING TO INVERT A 
     # NONINVERTIBLE MATRIX (I think).
     def testReflectionRegionSMatrixFromFundamentals(self):
-        SCalculated = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.erReflectionRegion,
-                self.urReflectionRegion, self.WFreeSpace, self.VFreeSpace)
+        SCalculated = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.layerStack,
+                self.WFreeSpace, self.VFreeSpace)
 
         S11Actual = self.S11ReflectionRegion
         S11Calculated = SCalculated[0,0]
@@ -258,8 +277,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance, "S22 Reflection Region ")
 
     def testTransmissionRegionSMatrixFromFundamentals(self):
-        SCalculated = calculateTransmissionRegionSMatrix(self.Kx, self.Ky, self.erTransmissionRegion,
-                self.urTransmissionRegion, self.WFreeSpace, self.VFreeSpace)
+        SCalculated = calculateTransmissionRegionSMatrix(self.Kx, self.Ky, self.layerStack,
+                self.WFreeSpace, self.VFreeSpace)
 
         S11Calculated = SCalculated[0,0]
         S11Actual = self.S11TransmissionRegion
@@ -316,25 +335,21 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
     def testCalculateKz(self):
         KzActual = self.KzReflectionRegion
-        KzCalculated = calculateKzBackward(self.Kx, self.Ky,
-                self.erReflectionRegion, self.urReflectionRegion)
+        KzCalculated = calculateKzBackward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
         assertAlmostEqual(KzActual, KzCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Kz Reflection")
 
         KzActual = self.KzTransmissionRegion
-        KzCalculated = calculateKzForward(self.Kx, self.Ky,
-                self.erTransmissionRegion, self.urTransmissionRegion)
+        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmissionLayer)
         assertAlmostEqual(KzActual, KzCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Kz Transmission")
 
 
     def testCalculateIncidentFieldHarmonics(self):
-        px = 0.6
-        py = 0.3
-        pXY = complexArray([px, py])
         numberHarmonics = (3, 3, 1)
-        fieldHarmonicsActual = complexArray([0,0,0,0,0.6,0,0,0,0,0,0,0,0,0.3,0,0,0,0])
-        fieldHarmonicsCalculated = calculateIncidentFieldHarmonics(pXY, numberHarmonics)
+        fieldHarmonicsActual = complexArray([0,0,0,0,-0.35355+0.306186j,0,0,0,0,0,0,0,0,0.61237+0.1767j,0,0,0,0])
+        fieldHarmonicsCalculated = calculateIncidentFieldHarmonics(self.source, numberHarmonics)
+        print(fieldHarmonicsCalculated)
         assertAlmostEqual(fieldHarmonicsActual, fieldHarmonicsCalculated,
                 self.absoluteTolerance, self.relativeTolerance,
                 "Incident field harmonics")
@@ -344,7 +359,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         # CAUSING HIS REFLECTION COEFFICIENT TO BE INVERTED COMPARED TO MINE. I DO NOT KNOW WHO IS
         # CORRECT.
         rActual = -self.rT
-        rCalculated = calculateReflectionCoefficient(self.SGlobal, self.WReflectionRegion, self.pXY,
+        rCalculated = calculateReflectionCoefficient(self.SGlobal, self.WReflectionRegion, self.source,
                 self.numberHarmonics)
         assertAlmostEqual(rActual, rCalculated, self.absoluteTolerance, self.relativeTolerance,
                "rxy")
@@ -359,7 +374,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         # CAUSING HIS TRANSMISSION COEFFICIENT TO BE INVERTED COMPARED TO MINE. I DO NOT KNOW WHO IS
         # CORRECT.
         tActual = -self.tT
-        tCalculated = calculateTransmissionCoefficient(self.SGlobal, self.WReflectionRegion, self.pXY,
+        tCalculated = calculateTransmissionCoefficient(self.SGlobal, self.WReflectionRegion, self.source,
                 self.numberHarmonics)
         assertAlmostEqual(tActual, tCalculated, self.absoluteTolerance, self.relativeTolerance,
                "txy")
@@ -375,14 +390,13 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
     def testCalculateDiffractionEfficiencies(self):
         RActual = np.transpose(self.R);
         RCalculated = calculateDiffractionReflectionEfficiency(self.rx, self.ry, self.rz,
-                self.kzIncident, self.KzReflectionRegion, self.urReflectionRegion)
+                self.source, self.KzReflectionRegion, self.layerStack)
         RCalculated = RCalculated.reshape(3,3)
         assertAlmostEqual(RActual, RCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         TActual = np.transpose(self.T)
         TCalculated = calculateDiffractionTransmissionEfficiency(self.tx, self.ty, self.tz,
-                self.kzIncident, self.KzTransmissionRegion, self.urReflectionRegion,
-                self.urTransmissionRegion)
+                self.source, self.KzTransmissionRegion, self.layerStack)
         TCalculated = TCalculated.reshape(3,3)
         assertAlmostEqual(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
 
@@ -390,33 +404,42 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         self.absoluteTolerance = 1e-3
         self.relativeTolerance = 1e-3
         deg = pi / 180
-        self.wavelength = 2
-        self.k0 = 2*pi / self.wavelength
-        self.theta = 60 * deg
-        self.phi = 30 * deg
-        self.aTEM = aTEMGen(self.theta, self.phi)
-        self.pTEM = 1 / sqrt(2) * complexArray([1, 1j])
-        self.pXY = self.aTEM[0]*self.pTEM[0] + self.aTEM[1]*self.pTEM[1]
+        wavelength = 2
+        theta = 60 * deg
+        phi = 30 * deg
+        pTEM = 1 / sqrt(2) * complexArray([1, 1j])
 
-        self.erReflectionRegion = 2
-        self.urReflectionRegion = 1
-        self.nIncident = sqrt(self.erReflectionRegion * self.urReflectionRegion)
-        self.erTransmissionRegion = 9
-        self.urTransmissionRegion = 1
-        self.erDeviceRegion = 6
-        self.urDeviceRegion = 1
-        self.thicknessLayer1 = 0.5
-        self.thicknessLayer2 = 0.3
+        erReflectionRegion = 2
+        urReflectionRegion = 1
+        erTransmissionRegion = 9
+        urTransmissionRegion = 1
+        erDeviceRegion = 6
+        urDeviceRegion = 1
+        thicknessLayer1 = 0.5
+        thicknessLayer2 = 0.3
         numberHarmonicsX = 3
         numberHarmonicsY = 3
-        self.numberHarmonics = (numberHarmonicsX, numberHarmonicsY)
-        self.kzIncident = self.nIncident * cos(self.theta)
 
-        self.erConvolutionMatrixLayer1 = numpyArrayFromFile(
+        reflectionLayer = Layer(erReflectionRegion, urReflectionRegion)
+        transmissionLayer = Layer(erTransmissionRegion, urTransmissionRegion)
+        layer1 = Layer(erDeviceRegion, urDeviceRegion, thicknessLayer1)
+        layer2 = Layer(erDeviceRegion, urDeviceRegion, thicknessLayer2)
+
+        self.layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
+        self.source = Source(wavelength, theta, phi, pTEM, reflectionLayer)
+        self.numberHarmonics = (numberHarmonicsX, numberHarmonicsY)
+
+        erConvolutionMatrixLayer1 = numpyArrayFromFile(
             "test/matrixDataOblique/layer1/erConvolutionData.txt")
-        self.urConvolutionMatrixLayer1 = complexIdentity(9)
-        self.erConvolutionMatrixLayer2 = self.erDeviceRegion*complexIdentity(9)
-        self.urConvolutionMatrixLayer2 = complexIdentity(9)
+        urConvolutionMatrixLayer1 = complexIdentity(9)
+        erConvolutionMatrixLayer2 = erDeviceRegion*complexIdentity(9)
+        urConvolutionMatrixLayer2 = complexIdentity(9)
+        # This is a bit of a hack, but that's good for test purposes.
+        self.layerStack.internalLayer[0].er = erConvolutionMatrixLayer1
+        self.layerStack.internalLayer[0].ur = urConvolutionMatrixLayer1
+        self.layerStack.internalLayer[1].er = erConvolutionMatrixLayer2
+        self.layerStack.internalLayer[1].ur = urConvolutionMatrixLayer2
+
         self.Kx = np.diag(complexArray(
             [2.2035, 1.0607, -0.0822, 2.2035, 1.0607, -0.0822, 2.2035, 1.0607, -0.0822]))
         self.Ky = np.diag(complexArray(

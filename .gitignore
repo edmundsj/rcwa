@@ -1,0 +1,11 @@
+# ignore all vim-generated swap files
+*.swp
+
+# ignore whatever this is
+.DS_STORE
+
+# ignore all log files
+*.log
+
+# ignore everything in the pycache directory
+**/__pycache__

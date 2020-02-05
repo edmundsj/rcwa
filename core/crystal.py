@@ -7,7 +7,10 @@ class Crystal:
         self.permittivityCellData = permittivityCellData
 
         self.dimensions = len(latticeVectors)
-        self.latticeVectors = latticeVectors
+        self.latticeVectors = list(latticeVectors)
+        if(self.dimensions == 2 and len(latticeVectors[0]) > 2):
+            self.latticeVectors[0] = self.latticeVectors[0][0:2]
+            self.latticeVectors[1] = self.latticeVectors[1][0:2]
         self.reciprocalLatticeVectors = self.calculateReciprocalLatticeVectors();
         self.crystalType = self.determineCrystalType();
         (self.keySymmetryPoints, self.keySymmetryNames) = self.generateKeySymmetryPoints()
