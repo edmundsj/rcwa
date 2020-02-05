@@ -6,20 +6,25 @@ scatteringMatrixShape = OUTER_BLOCK_SHAPE + scatteringElementShape;
 scatteringElementShape = (2,2);
 scatteringElementSize = scatteringElementShape[0];
 
-def aTEMGen(kx, ky, kz):
+def aTEMGen(theta, phi):
+    incidentVector = complexArray([sin(theta) * cos(phi), sin(theta)*sin(phi), cos(theta)])
     deviceNormalUnitVector = complexArray([0,0,-1]); # The z-normal vector (plane wave opposite direction as surface)
-    kn_vec = complexArray([kx, ky, kz]);
-    epsilon = 1e-3; # a small number. If both our kx and ky vectors are tiny, our cross product will not
+    epsilon = 1e-3; # a small number. If theta is close to zero we cannot calculate the cross product
 
-    if(abs(kx) < epsilon and abs(ky) < epsilon):
-        aTE = np.array([0,1,0]); # This is assuming W is the identity matrix.
+    if(abs(incidentVector[0]) < epsilon and abs(incidentVector[1]) < epsilon):
+        aTE = np.array([0,1,0]);
     else:
-        aTE = - np.cross(deviceNormalUnitVector, kn_vec);
+        aTE = - np.cross(deviceNormalUnitVector, incidentVector);
         aTE = aTE / norm(aTE);
 
-    aTM = np.cross(aTE, kn_vec);
+    aTM = np.cross(aTE, incidentVector);
     aTM = aTM / norm(aTM);
     return (aTE[0:2], aTM[0:2]);
+
+def calculateIncidentFieldHarmonics(pXY, numberHarmonics):
+    totalNumberHarmonics = np.prod(numberHarmonics)
+    return np.hstack((pXY[0] * kroneckerDeltaVector(totalNumberHarmonics),
+            pXY[1] * kroneckerDeltaVector(totalNumberHarmonics)))
 
 def generateTransparentSMatrix(matrixShape):
     STransparent = complexZeros((2, 2) + matrixShape);
@@ -130,8 +135,17 @@ def calculateRedhefferDMatrix(SA, SB):
 def calculateRedhefferFMatrix(SA, SB):
     return SB[1,0] @ inv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
 
-def calculateKz(kx, ky, er, ur):
-    return sqrt(er*ur - sq(kx) - sq(ky))
+def calculateKzBackward(kx, ky, er, ur):
+    if isinstance(kx, np.ndarray):
+        return -conj(sqrt(conj(er*ur)*complexIdentity(kx.shape[0]) - kx @ kx - ky @ ky))
+    else:
+        return sqrt(er*ur - sq(kx) - sq(ky))
+
+def calculateKzForward(kx, ky, er, ur):
+    if isinstance(kx, np.ndarray):
+        return conj(sqrt(conj(er*ur)*complexIdentity(kx.shape[0]) - kx @ kx - ky @ ky))
+    else:
+        return sqrt(er*ur - sq(kx) - sq(ky))
 
 def calculateKzReflected(kx, ky, er, ur):
     return -calculateKz(kx, ky, er, ur)
@@ -149,7 +163,7 @@ def calculateVWXMatrices(kx, ky, er, ur, k0=0, Li=0):
     if isinstance(kx, np.ndarray):
         return calculateVWXMatricesNHarmonics(kx, ky, er, ur, k0, Li)
     else:
-        kz = calculateKz(kx, ky, er, ur)
+        kz = calculateKzForward(kx, ky, er, ur) # This *should* work.
         return calculateVWXMatrices1Harmonic(kx, ky, kz, er, ur, k0, Li)
 
 def calculateVWXMatrices1Harmonic(kx, ky, kz, er, ur, k0, Li):
@@ -193,7 +207,7 @@ def calculateReflectionRegionSMatrix(kx, ky, er, ur, Wg, Vg):
         return calculateReflectionRegionSMatrix1Harmonic(kx, ky, er, ur, Wg, Vg)
 
 def calculateReflectionRegionSMatrix1Harmonic(kx, ky, er, ur, Wg, Vg):
-    kz = calculateKz(kx, ky, er, ur);
+    kz = calculateKzForward(kx, ky, er, ur);
     (Vi, Wi) = calculateVWXMatrices(kx, ky, er, ur);
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi);
@@ -286,6 +300,35 @@ def calculateTransmissionRegionSMatrixFromRaw(ATransmissionRegion, BTransmission
     S[1,0] = 2* AInverse;
     S[1,1] = - AInverse @ B;
     return S;
+
+def calculateReflectionCoefficient(S, WReflectionRegion, pXY, numberHarmonics):
+    incidentFieldHarmonics = calculateIncidentFieldHarmonics(pXY, numberHarmonics)
+    rTransverse = WReflectionRegion @ S[0,0] @ inv(WReflectionRegion) @ incidentFieldHarmonics
+    return rTransverse
+
+def calculateTransmissionCoefficient(S, WTransmissionRegion, pXY, numberHarmonics):
+    incidentFieldHarmonics = calculateIncidentFieldHarmonics(pXY, numberHarmonics)
+    tTransverse = WTransmissionRegion @ S[1,0] @ inv(WTransmissionRegion) @ incidentFieldHarmonics
+    return tTransverse
+
+def calculateReflectionZCoefficient(rx, ry, Kx, Ky, KzReflectionRegion):
+    rz = - inv(KzReflectionRegion) @ (Kx @ rx + Ky @ ry)
+    return rz
+
+def calculateTransmissionZCoefficient(tx, ty, Kx, Ky, KzTransmissionRegion):
+    tz = - inv(KzTransmissionRegion) @ (Kx @ tx + Ky @ ty)
+    return tz
+
+def calculateDiffractionReflectionEfficiency(rx, ry, rz, kzIncident, KzReflectionRegion, urReflectionRegion):
+    preMatrix = real(-1 /urReflectionRegion * KzReflectionRegion) / real(kzIncident / urReflectionRegion)
+    R = preMatrix @ (sq(np.abs(rx)) + sq(np.abs(ry)) + sq(np.abs(rz)))
+    return R
+
+def calculateDiffractionTransmissionEfficiency(tx, ty, tz, kzIncident, KzTransmissionRegion, urReflectionRegion,
+        urTransmissionRegion):
+    preMatrix = real(1 / urTransmissionRegion * KzTransmissionRegion) / real(kzIncident / urReflectionRegion)
+    T = preMatrix @ (sq(np.abs(tx)) + sq(np.abs(ty)) + sq(np.abs(tz)))
+    return T
 
 def calculateEz(kx, ky, kz, Ex, Ey):
     Ez = - (kx*Ex + ky*Ey) / kz

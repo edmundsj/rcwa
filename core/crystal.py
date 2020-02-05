@@ -81,26 +81,3 @@ class Crystal:
             raise NotImplementedError;
 
         return (keySymmetryPoints, keySymmetryNames);
-
-
-def generateBlochVectors(crystal, internalPointsPerWalk):
-
-    keySymmetryPoints = crystal.keySymmetryPoints
-    numberSymmetryPoints = len(keySymmetryPoints);
-
-    blochVectors = [];
-    nextSymmetryPoint = None;
-    blochVectors.append(keySymmetryPoints[0]);
-    for i in range(numberSymmetryPoints - 1):
-        currentSymmetryPoint = keySymmetryPoints[i];
-        fractionWalked = 1 / (internalPointsPerWalk + 1);
-
-        if(i + 1 < numberSymmetryPoints):
-            nextSymmetryPoint = keySymmetryPoints[i + 1];
-
-        for j in range(internalPointsPerWalk + 1):
-            deltaVector = nextSymmetryPoint - currentSymmetryPoint;
-            desiredPoint = currentSymmetryPoint + (j + 1) * fractionWalked * deltaVector;
-            blochVectors.append(desiredPoint);
-
-    return blochVectors;

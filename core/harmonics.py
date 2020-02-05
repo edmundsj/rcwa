@@ -46,21 +46,41 @@ def getYComponents(*args):
 
     return yComponents;
 
+# Unfortunately, the source we set up (which is defined by our Kx, Ky matrices or wavevector components)
+# depends on the crystal, because we need to know which modes to use. It also depends on the material
+# properties of the incident layer.
+class Source:
+    def __init__(self, wavelength, theta, phi, pTEM, numberHarmonics, crystal, incidentLayer):
+        self.wavelength = wavelength
+        self.k0 = 2*pi / wavelength
+        self.theta = theta
+        self.phi = phi
+        self.pTEM = pTEM
+        self.pXY = self.pTEM[0] * aTEM[0] + pTEM[1] * aTEM[1]
+        self.numberHarmonics = numberHarmonics
 
-def generateKxMatrix(blochVector, crystal, numberHarmonics):
+        setKxMatrix()
+
+    def setKxMatrix(incidentWaveVector, crystal, numberHarmonics):
+        if crystal.dimensions is 2:
+            self.Kx = generateKxMatrix2D(self.incidentWaveVector, crystal, numberHarmonics[0:2])
+        else:
+            raise NotImplementedError
+
+def generateKxMatrix(incidentWaveVector, crystal, numberHarmonics):
     if crystal.dimensions is 2:
-        KxMatrix = generateKxMatrix2D(blochVector, crystal, numberHarmonics[0:2])
+        KxMatrix = generateKxMatrix2D(incidentWaveVector, crystal, numberHarmonics[0:2])
         return KxMatrix
     else:
         raise NotImplementedError
 
-def generateKxMatrix2D(blochVector, crystal, numberHarmonics):
+def generateKxMatrix2D(incidentWaveVector, crystal, numberHarmonics):
     matrixSize = np.prod(numberHarmonics)
     matrixShape = (matrixSize, matrixSize);
     KxMatrix = complexZeros(matrixShape)
 
     (T1, T2) = crystal.reciprocalLatticeVectors
-    (blochVectorx, T1x, T2x) = getXComponents(blochVector, T1, T2);
+    (incidentWaveVectorx, T1x, T2x) = getXComponents(incidentWaveVector, T1, T2);
     (minHarmonicT1, minHarmonicT2) = calculateMinHarmonic(numberHarmonics)
     (maxHarmonicT1, maxHarmonicT2) = calculateMaxHarmonic(numberHarmonics)
 
@@ -68,26 +88,26 @@ def generateKxMatrix2D(blochVector, crystal, numberHarmonics):
     for desiredHarmonicT2 in range(minHarmonicT2, maxHarmonicT2 + 1):
         for desiredHarmonicT1 in range(minHarmonicT1, maxHarmonicT1 + 1):
 
-            KxMatrix[diagonalIndex][diagonalIndex] = blochVectorx - \
+            KxMatrix[diagonalIndex][diagonalIndex] = incidentWaveVectorx - \
                     desiredHarmonicT1*T1x - desiredHarmonicT2*T2x
             diagonalIndex += 1;
 
     return KxMatrix
 
-def generateKyMatrix(blochVector, crystal, numberHarmonics):
+def generateKyMatrix(incidentWaveVector, crystal, numberHarmonics):
     if crystal.dimensions is 2:
-        KyMatrix = generateKyMatrix2D(blochVector, crystal, numberHarmonics[0:2])
+        KyMatrix = generateKyMatrix2D(incidentWaveVector, crystal, numberHarmonics[0:2])
         return KyMatrix
     else:
         raise NotImplementedError
 
-def generateKyMatrix2D(blochVector, crystal, numberHarmonics):
+def generateKyMatrix2D(incidentWaveVector, crystal, numberHarmonics):
     matrixSize = np.prod(numberHarmonics)
     matrixShape = (matrixSize, matrixSize);
     KyMatrix = complexZeros(matrixShape)
 
     (T1, T2) = crystal.reciprocalLatticeVectors
-    (blochVectory, T1y, T2y) = getYComponents(blochVector, T1, T2);
+    (incidentWaveVectory, T1y, T2y) = getYComponents(incidentWaveVector, T1, T2);
     (minHarmonicT1, minHarmonicT2) = calculateMinHarmonic(numberHarmonics)
     (maxHarmonicT1, maxHarmonicT2) = calculateMaxHarmonic(numberHarmonics)
 
@@ -95,7 +115,7 @@ def generateKyMatrix2D(blochVector, crystal, numberHarmonics):
     for desiredHarmonicT2 in range(minHarmonicT2, maxHarmonicT2 + 1):
         for desiredHarmonicT1 in range(minHarmonicT1, maxHarmonicT1 + 1):
 
-            KyMatrix[diagonalIndex][diagonalIndex] = blochVectory - \
+            KyMatrix[diagonalIndex][diagonalIndex] = incidentWaveVectory - \
                     desiredHarmonicT1*T1y - desiredHarmonicT2*T2y
             diagonalIndex += 1;
 

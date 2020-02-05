@@ -33,12 +33,13 @@ class Test1x1Harmonic(unittest.TestCase):
                 self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
 
     def testCalculateKz(self):
-        KzCalculated = calculateKz(self.Kx, self.Ky, self.erReflectionRegion, self.urReflectionRegion)
+        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.erReflectionRegion, self.urReflectionRegion)
         KzActual = self.KzReflectionRegion
         assertAlmostEqual(KzActual, KzCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Kz in Reflection region not correct")
 
-        KzCalculated = calculateKz(self.Kx, self.Ky, self.erTransmissionRegion, self.urTransmissionRegion)
+        KzCalculated = calculateKzForward(self.Kx, self.Ky,
+                self.erTransmissionRegion, self.urTransmissionRegion)
         KzActual = self.KzTransmissionRegion
         assertAlmostEqual(KzActual, KzCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Kz in transmission region not correct")
@@ -46,19 +47,16 @@ class Test1x1Harmonic(unittest.TestCase):
     def testaTEM(self):
         aTEActual = complexArray([-0.39073, 0.920505])
         aTMActual = complexArray([0.50137, 0.21282])
-        (aTECalculated, aTMCalculated) = aTEMGen(self.Kx, self.Ky, self.KzReflectionRegion);
+        (aTECalculated, aTMCalculated) = aTEMGen(self.theta, self.phi)
         assertAlmostEqual(aTEActual, aTECalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Oblique incidence TE vector wrong");
         assertAlmostEqual(aTMActual, aTMCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Oblique incidence TM vector wrong");
 
         # Important corner case where the cross product fails
-        kx = 0;
-        ky = 0.0001;
-        kz = 1.5;
         aTEActual = complexArray([0,1,0])[0:2];
         aTMActual = complexArray([1,0,0])[0:2];
-        (aTECalculated, aTMCalculated) = aTEMGen(kx, ky, kz);
+        (aTECalculated, aTMCalculated) = aTEMGen(0.0001, 0)
         assertAlmostEqual(aTEActual, aTECalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Near-normal Incidence TE vector wrong");
         assertAlmostEqual(aTMActual, aTMCalculated,
@@ -337,6 +335,8 @@ class Test1x1Harmonic(unittest.TestCase):
         SiActual = self.SLayer2
         SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.erLayer2, self.urLayer2,
                 self.k0, self.thicknessLayer2, self.WGap, self.VGap)
+        assertAlmostEqual(SiActual, SiCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
     def testSReflectionRegionMatrixFromRaw(self):
         absoluteTolerance = 0.007

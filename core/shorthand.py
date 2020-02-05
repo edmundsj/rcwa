@@ -19,6 +19,8 @@ cross = np.cross;
 diag = np.diag
 diagonal = np.diagonal
 conj = np.conj
+real = np.real
+imag = np.imag
 
 def fftn(data):
     """ Return the shifted version so the zeroth-order harmonic is in the center with
@@ -58,3 +60,8 @@ def reshapeLowDimensionalData(data):
 
     return data;
 
+def kroneckerDeltaVector(size):
+    vector = complexZeros(size)
+    zeroLocation = math.floor(size/2)
+    vector[zeroLocation] = 1
+    return vector

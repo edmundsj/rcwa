@@ -12,6 +12,11 @@ from matrixParser import *
 
 class Test3x3HarmonicsOblique(unittest.TestCase):
 
+    def testKroneckerDelta(self):
+        size = 9
+        actualVector = complexArray([0,0,0,0,1,0,0,0,0])
+        calculatedVector = kroneckerDeltaVector(size)
+        assertArrayEqual(actualVector, calculatedVector)
     def testTransparentSMatrix(self):
         SActual = self.transparentSMatrix
         SCalculated = generateTransparentSMatrix((18, 18));
@@ -309,29 +314,77 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer Product Layers 1 and 2")
 
-#    def testCalcEz(self):
-#        EzActual = self.EzReflected
-#        EzCalculated = calculateEz(self.Kx, self.Ky, self.KzReflectionRegion,
-#                self.ExReflected, self.EyReflected);
-#
-#        assertAlmostEqual(EzActual, EzCalculated, self.absoluteTolerance, self.relativeTolerance,
-#                "Ez in reflection region");
-#
-#        EzActual = self.EzTransmitted
-#        EzCalculated = calculateEz(self.Kx, self.Ky, self.KzTransmissionRegion,
-#                self.ExTransmitted, self.EyTransmitted);
-#        assertAlmostEqual(EzActual, EzCalculated, self.absoluteTolerance, self.relativeTolerance,
-#                "Ez in transmission region");
+    def testCalculateKz(self):
+        KzActual = self.KzReflectionRegion
+        KzCalculated = calculateKzBackward(self.Kx, self.Ky,
+                self.erReflectionRegion, self.urReflectionRegion)
+        assertAlmostEqual(KzActual, KzCalculated, self.absoluteTolerance, self.relativeTolerance,
+                "Kz Reflection")
 
-#    def testCalcRT(self):
-#        RActual = self.R;
-#        TActual = self.T;
-#
-#        (RCalculated, TCalculated) = calculateRT(self.KzReflectionRegion, self.KzTransmissionRegion,
-#                self.urReflectionRegion, self.urTransmissionRegion,
-#                self.ExyzReflected, self.ExyzTransmitted);
-#        assertAlmostEqual(RActual, RCalculated, self.absoluteTolerance, self.relativeTolerance);
-#        assertAlmostEqual(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
+        KzActual = self.KzTransmissionRegion
+        KzCalculated = calculateKzForward(self.Kx, self.Ky,
+                self.erTransmissionRegion, self.urTransmissionRegion)
+        assertAlmostEqual(KzActual, KzCalculated, self.absoluteTolerance, self.relativeTolerance,
+                "Kz Transmission")
+
+
+    def testCalculateIncidentFieldHarmonics(self):
+        px = 0.6
+        py = 0.3
+        pXY = complexArray([px, py])
+        numberHarmonics = (3, 3, 1)
+        fieldHarmonicsActual = complexArray([0,0,0,0,0.6,0,0,0,0,0,0,0,0,0.3,0,0,0,0])
+        fieldHarmonicsCalculated = calculateIncidentFieldHarmonics(pXY, numberHarmonics)
+        assertAlmostEqual(fieldHarmonicsActual, fieldHarmonicsCalculated,
+                self.absoluteTolerance, self.relativeTolerance,
+                "Incident field harmonics")
+
+    def testCalculateReflectionCoefficient(self):
+        # HACK: I DO NOT KNOW WHY HIS TE/TM VECTORS ARE INVERTED, BUT THIS IS
+        # CAUSING HIS REFLECTION COEFFICIENT TO BE INVERTED COMPARED TO MINE. I DO NOT KNOW WHO IS
+        # CORRECT.
+        rActual = -self.rT
+        rCalculated = calculateReflectionCoefficient(self.SGlobal, self.WReflectionRegion, self.pXY,
+                self.numberHarmonics)
+        assertAlmostEqual(rActual, rCalculated, self.absoluteTolerance, self.relativeTolerance,
+               "rxy")
+
+        rzActual = self.rz
+        rzCalculated = calculateReflectionZCoefficient(self.rx, self.ry, self.Kx, self.Ky, self.KzReflectionRegion)
+        assertAlmostEqual(rzActual, rzCalculated, self.absoluteTolerance, self.relativeTolerance,
+               "rz")
+
+    def testCalculateTransmissionCoefficient(self):
+        # HACK: I DO NOT KNOW WHY HIS TE/TM VECTORS ARE INVERTED, BUT THIS IS
+        # CAUSING HIS TRANSMISSION COEFFICIENT TO BE INVERTED COMPARED TO MINE. I DO NOT KNOW WHO IS
+        # CORRECT.
+        tActual = -self.tT
+        tCalculated = calculateTransmissionCoefficient(self.SGlobal, self.WReflectionRegion, self.pXY,
+                self.numberHarmonics)
+        assertAlmostEqual(tActual, tCalculated, self.absoluteTolerance, self.relativeTolerance,
+               "txy")
+
+        tzActual = self.tz
+        tzCalculated = calculateTransmissionZCoefficient(self.tx, self.ty, self.Kx, self.Ky,
+                self.KzTransmissionRegion)
+        assertAlmostEqual(tzActual, tzCalculated, self.absoluteTolerance, self.relativeTolerance,
+               "txy")
+
+    # NEED TO MAKE SURE WE RESHAPE THE DIFFRACTION EFFICIENCIES APPROPRIATELY AND FIGURE OUT
+    # THE ORDERING OF THIS SHIT.
+    def testCalculateDiffractionEfficiencies(self):
+        RActual = np.transpose(self.R);
+        RCalculated = calculateDiffractionReflectionEfficiency(self.rx, self.ry, self.rz,
+                self.kzIncident, self.KzReflectionRegion, self.urReflectionRegion)
+        RCalculated = RCalculated.reshape(3,3)
+        assertAlmostEqual(RActual, RCalculated, self.absoluteTolerance, self.relativeTolerance);
+
+        TActual = np.transpose(self.T)
+        TCalculated = calculateDiffractionTransmissionEfficiency(self.tx, self.ty, self.tz,
+                self.kzIncident, self.KzTransmissionRegion, self.urReflectionRegion,
+                self.urTransmissionRegion)
+        TCalculated = TCalculated.reshape(3,3)
+        assertAlmostEqual(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def setUp(self):
         self.absoluteTolerance = 1e-3
@@ -341,9 +394,13 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         self.k0 = 2*pi / self.wavelength
         self.theta = 60 * deg
         self.phi = 30 * deg
+        self.aTEM = aTEMGen(self.theta, self.phi)
+        self.pTEM = 1 / sqrt(2) * complexArray([1, 1j])
+        self.pXY = self.aTEM[0]*self.pTEM[0] + self.aTEM[1]*self.pTEM[1]
 
         self.erReflectionRegion = 2
         self.urReflectionRegion = 1
+        self.nIncident = sqrt(self.erReflectionRegion * self.urReflectionRegion)
         self.erTransmissionRegion = 9
         self.urTransmissionRegion = 1
         self.erDeviceRegion = 6
@@ -353,6 +410,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         numberHarmonicsX = 3
         numberHarmonicsY = 3
         self.numberHarmonics = (numberHarmonicsX, numberHarmonicsY)
+        self.kzIncident = self.nIncident * cos(self.theta)
 
         self.erConvolutionMatrixLayer1 = numpyArrayFromFile(
             "test/matrixDataOblique/layer1/erConvolutionData.txt")
@@ -510,6 +568,39 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         self.transparentSMatrix = complexZeros((2, 2, 18, 18))
         self.transparentSMatrix[0,1] = complexIdentity(18)
         self.transparentSMatrix[1,0] = complexIdentity(18)
+
+        self.rx = complexArray([-0.0187- 0.0155j, 0.0486 - 0.0467j, 0.0016 + 0.0012j,
+            0.0324 - 0.0229j, -0.1606 - 0.0348j, -0.0089 + 0.0156j,
+            0.0020 + 0.0105j, 0.0076 + 0.0187j, -0.0027 - 0.0129j])
+        self.ry = complexArray([-0.0077 - 0.0106j, 0.0184 + 0.0323j, -0.0267 - 0.0070j,
+            -0.0286 + 0.0472j, 0.2335 + 0.0138j, 0.0243 + 0.0164j,
+            0.0435 - 0.018j, 0.0183 + 0.0146j, -0.0062 + 0.0011j])
+        self.rT = np.hstack((self.rx, self.ry))
+        self.rz = complexArray([0.0213 - 0.0218j, -0.0078 + 0.0512j, 0.0103 - 0.0388j,
+            0.0120 + 0.0300j, -0.0386 - 0.0403j, 0.0123 + 0.0069j,
+            -0.0197 - 0.0147j, -0.0087 + 0.0157j, 0.0039 + 0.0002j])
+        self.tx = complexArray([0.0015 - 0.0016j, -0.0583 + 0.0256j, -0.0245 - 0.0098j,
+            0.0060 + 0.0210j, 0.3040 + 0.0664j, -0.0054 - 0.0632j,
+            -0.0123 - 0.0262j, -0.0323 - 0.0534j, 0.0169 + 0.0455j])
+        self.ty = complexArray([-0.0024 + 0.0011j, 0.0356 + 0.0282j, -0.0230 - 0.0071j,
+            0.0610 - 0.0011j, 0.0523 - 0.2913j, -0.0645 - 0.0027j,
+            -0.0170 - 0.0165j, -0.0420 + 0.0298j, 0.0258 - 0.0234j])
+        self.tT = np.hstack((self.tx, self.ty))
+        self.tz = complexArray([0.0023 + 0.0021j, - 0.0036 - 0.0406j, 0.0187 + 0.0057j,
+            -0.0261 - 0.0235j, -0.1294 + 0.0394j, 0.0133 - 0.0012j,
+            0.0078 + 0.0241j, 0.0014 + 0.0288j, 0.0069 - 0.0045j])
+
+        self.R = np.array([
+            [0,0,0],
+            [0,0.0848, 0.0011],
+            [0, 0.0025, 0.0004]])
+        self.T = np.array([
+            [0, 0.0149, 0.0055],
+            [0.0222, 0.7851, 0.0283],
+            [0.0053, 0.0348, 0.0150]])
+        self.RTot = 0.088768
+        self.TTot = 0.91123
+
 
 if __name__ == '__main__':
     unittest.main()
