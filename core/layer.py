@@ -33,7 +33,6 @@ class Layer:
         zeroHarmonicsLocation = np.array([math.floor(Nx/2), math.floor(Ny/2), math.floor(Nz/2)])
 
         cellFourierRepresentation = fftn(cellData);
-        print(P, Q, R)
         for rrow in range(R):
             for qrow in range(Q):
                 for prow in range(P):

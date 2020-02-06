@@ -156,10 +156,7 @@ def calculateVWXMatrices1Harmonic(kx, ky, kz, layer, source):
     X = matrixExponentiate(O * source.k0 * layer.L)
     V = Q @ W @ OInverse;
 
-    if(layer.L > 0):
-        return (V, W, X);
-    else:
-        return (V, W);
+    return (V, W, X);
 
 # TODO - INCORPORATE CONVOLUTION MATRIX INTO THE LAYERS
 def calculateVWXMatricesNHarmonics(Kx, Ky, layer, source):
@@ -191,7 +188,7 @@ def calculateReflectionRegionSMatrix(kx, ky, layerStack, Wg, Vg):
 
 def calculateReflectionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg):
     kz = calculateKzForward(kx, ky, layerStack.reflectionLayer);
-    (Vi, Wi) = calculateVWXMatrices(kx, ky, layerStack.reflectionLayer);
+    (Vi, Wi, X) = calculateVWXMatrices(kx, ky, layerStack.reflectionLayer);
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi);
 
@@ -223,7 +220,7 @@ def calculateTransmissionRegionSMatrix(kx, ky, layerStack, Wg, Vg):
         return calculateTransmissionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg)
 
 def calculateTransmissionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg):
-    (Vi, Wi) = calculateVWXMatrices(kx, ky, layerStack.transmissionLayer)
+    (Vi, Wi, X) = calculateVWXMatrices(kx, ky, layerStack.transmissionLayer)
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi);
 
