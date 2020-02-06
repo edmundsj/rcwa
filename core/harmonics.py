@@ -46,41 +46,20 @@ def getYComponents(*args):
 
     return yComponents;
 
-# Unfortunately, the source we set up (which is defined by our Kx, Ky matrices or wavevector components)
-# depends on the crystal, because we need to know which modes to use. It also depends on the material
-# properties of the incident layer.
-class Source:
-    def __init__(self, wavelength, theta, phi, pTEM, numberHarmonics, crystal, incidentLayer):
-        self.wavelength = wavelength
-        self.k0 = 2*pi / wavelength
-        self.theta = theta
-        self.phi = phi
-        self.pTEM = pTEM
-        self.pXY = self.pTEM[0] * aTEM[0] + pTEM[1] * aTEM[1]
-        self.numberHarmonics = numberHarmonics
-
-        setKxMatrix()
-
-    def setKxMatrix(incidentWaveVector, crystal, numberHarmonics):
-        if crystal.dimensions is 2:
-            self.Kx = generateKxMatrix2D(self.incidentWaveVector, crystal, numberHarmonics[0:2])
-        else:
-            raise NotImplementedError
-
-def generateKxMatrix(incidentWaveVector, crystal, numberHarmonics):
+def generateKxMatrix(kIncident, crystal, numberHarmonics):
     if crystal.dimensions is 2:
-        KxMatrix = generateKxMatrix2D(incidentWaveVector, crystal, numberHarmonics[0:2])
+        KxMatrix = generateKxMatrix2D(kIncident, crystal, numberHarmonics[0:2])
         return KxMatrix
     else:
         raise NotImplementedError
 
-def generateKxMatrix2D(incidentWaveVector, crystal, numberHarmonics):
+def generateKxMatrix2D(kIncident, crystal, numberHarmonics):
     matrixSize = np.prod(numberHarmonics)
     matrixShape = (matrixSize, matrixSize);
     KxMatrix = complexZeros(matrixShape)
 
     (T1, T2) = crystal.reciprocalLatticeVectors
-    (incidentWaveVectorx, T1x, T2x) = getXComponents(incidentWaveVector, T1, T2);
+    (incidentWaveVectorx, T1x, T2x) = getXComponents(kIncident, T1, T2);
     (minHarmonicT1, minHarmonicT2) = calculateMinHarmonic(numberHarmonics)
     (maxHarmonicT1, maxHarmonicT2) = calculateMaxHarmonic(numberHarmonics)
 

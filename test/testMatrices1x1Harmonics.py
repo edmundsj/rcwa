@@ -14,7 +14,7 @@ from source import *
 class Test1x1Harmonic(unittest.TestCase):
     def testCalculateKz(self):
         KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
-        KzActual = self.KzReflectionRegion
+        KzActual = np.float64(self.KzReflectionRegion)
         assertAlmostEqual(KzActual, KzCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Kz in Reflection region not correct")
 
@@ -363,7 +363,6 @@ class Test1x1Harmonic(unittest.TestCase):
         self.theta = 57 * deg
         self.phi = 23 * deg
         self.wavelength = 2.7
-        self.source = Source(self.wavelength, self.theta, self.phi)
         erReflectionRegion = 1.4
         urReflectionRegion = 1.2
         erTransmissionRegion = 1.8
@@ -372,10 +371,12 @@ class Test1x1Harmonic(unittest.TestCase):
         urLayer1 = 1.0
         erLayer2 = 1.0
         urLayer2 = 3.0
+
+        reflectionLayer = Layer(erReflectionRegion, urReflectionRegion)
+        self.source = Source(self.wavelength, self.theta, self.phi, layer=reflectionLayer)
         thicknessLayer1 = 0.25*self.source.wavelength
         thicknessLayer2 = 0.5*self.source.wavelength
 
-        reflectionLayer = Layer(erReflectionRegion, urReflectionRegion)
         transmissionLayer = Layer(erTransmissionRegion, urTransmissionRegion)
         layer1 = Layer(er=erLayer1, ur=urLayer1, L=thicknessLayer1)
         layer2 = Layer(er=erLayer2, ur=urLayer2, L=thicknessLayer2)
@@ -383,7 +384,8 @@ class Test1x1Harmonic(unittest.TestCase):
 
         self.Kx = reflectionLayer.n* sin(self.theta) * cos(self.phi)
         self.Ky = reflectionLayer.n* sin(self.theta) * sin(self.phi)
-        self.layerStack.setGapLayer(self.Kx, self.Ky)
+        self.layerStack.gapLayer.er = 1 + sq(self.Kx) + sq(self.Ky)
+        self.layerStack.gapLayer.ur = 1
         self.KzReflectionRegion = 0.705995
         self.KzTransmissionRegion = 1.3032
         self.KzLayer1 = 0.9046

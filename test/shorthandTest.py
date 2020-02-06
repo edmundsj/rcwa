@@ -2,6 +2,8 @@ import numpy as np
 
 def assertAlmostEqual(a, b, absoluteTolerance=1e-10, relativeTolerance=1e-9, errorMessage=""):
     np.testing.assert_allclose(a, b, atol=absoluteTolerance, rtol=relativeTolerance, err_msg=errorMessage);
+    if isinstance(a, np.ndarray) or isinstance(b, np.ndarray):
+        assert(a.shape == b.shape)
 
 def getUnequalIndices(a, b, absoluteTolerance=1e-10, relativeTolerance=1e-9):
     truthArray = np.greater(np.abs(a - b),

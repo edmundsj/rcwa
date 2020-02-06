@@ -9,34 +9,45 @@ from fresnel import *
 from matrixParser import *
 from source import Source
 from source import Layer
+from solver import *
+from results import *
 from crystal import Crystal
 
 
 class Test3x3HarmonicsOblique(unittest.TestCase):
 
-    def testGenerateConvolutionMatrix(self):
-        absoluteTolerance = 1e-4
-        relativeTolerance = 1e-3
-        urDeviceRegion = 1
-        numberHarmonics = (1, 1)
+    def testSetConvolutionMatrix(self):
         t1 = complexArray([1.75,0,0])
         t2 = complexArray([0, 1.5, 0])
-
-
         erData = np.transpose(np.loadtxt('test/triangleData.csv', delimiter=','))
-        urData = urDeviceRegion * complexOnes((512, 439))
+        urData = 1 * complexOnes((512, 439))
         triangleCrystal = Crystal(erData, urData, t1, t2)
         dummyLayer = Layer(crystal=triangleCrystal)
-        dummyLayer.setConvolutionMatrices(self.numberHarmonics)
+        dummyLayer.setConvolutionMatrix(self.numberHarmonics)
 
+        convolutionMatrixActual = complexIdentity(9)
         convolutionMatrixCalculated = dummyLayer.ur
-        convolutionMatrixActual = 1
         assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
                 self.relativeTolerance, "UR convolution matrices for layer 1 not equal")
 
 
         convolutionMatrixCalculated = dummyLayer.er
-        convolutionMatrixActual = 5.0449
+        convolutionMatrixActual = self.layerStack.internalLayer[0].er
+        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
+                self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
+
+    def testSetConvolutionMatrixStack(self):
+        t1 = complexArray([1.75,0,0])
+        t2 = complexArray([0, 1.5, 0])
+        erData = np.transpose(np.loadtxt('test/triangleData.csv', delimiter=','))
+        urData = 1 * complexOnes((512, 439))
+        triangleCrystal = Crystal(erData, urData, t1, t2)
+        dummyLayer = Layer(crystal=triangleCrystal)
+        dummyStack = LayerStack(freeSpaceLayer, dummyLayer, freeSpaceLayer)
+        dummyStack.setConvolutionMatrix(self.numberHarmonics)
+
+        convolutionMatrixActual = self.layerStack.internalLayer[0].er
+        convolutionMatrixCalculated = dummyStack.internalLayer[0].er
         assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
                 self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
 
@@ -45,6 +56,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         actualVector = complexArray([0,0,0,0,1,0,0,0,0])
         calculatedVector = kroneckerDeltaVector(size)
         assertArrayEqual(actualVector, calculatedVector)
+
     def testTransparentSMatrix(self):
         SActual = self.transparentSMatrix
         SCalculated = generateTransparentSMatrix((18, 18));
@@ -251,7 +263,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
     # ISSUE - NEED TO REFACTOR THIS CODE SO THAT IT WORKES WITH AND CAN DETECT
     # HOMOGENOUS LAYERS. CURRENTLY BREAKING LINEAR ALGEBRA ENGINE TRYING TO INVERT A 
-    # NONINVERTIBLE MATRIX (I think).
+    # NONINVERTIBLE MATRIX WHEN THE THING IS HOMOGENOUS
     def testReflectionRegionSMatrixFromFundamentals(self):
         SCalculated = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.layerStack,
                 self.WFreeSpace, self.VFreeSpace)
@@ -301,13 +313,13 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance, "S22 Transmission Region")
 
     def testRedhefferProduct(self):
-        # Sanity check - Redheffer product works when one matrix is the transparent matrix.
         SA = self.transparentSMatrix
         SB = self.SLayer1
         SABActual = self.SGlobalLayer1
         SABCalculated = calculateRedhefferProduct(SA, SB)
         assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer product with Layer 1 and transparent matrix")
+
         SA = self.SLayer1
         SB = self.transparentSMatrix
         SABActual = self.SGlobalLayer1
@@ -349,7 +361,6 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         numberHarmonics = (3, 3, 1)
         fieldHarmonicsActual = complexArray([0,0,0,0,-0.35355+0.306186j,0,0,0,0,0,0,0,0,0.61237+0.1767j,0,0,0,0])
         fieldHarmonicsCalculated = calculateIncidentFieldHarmonics(self.source, numberHarmonics)
-        print(fieldHarmonicsCalculated)
         assertAlmostEqual(fieldHarmonicsActual, fieldHarmonicsCalculated,
                 self.absoluteTolerance, self.relativeTolerance,
                 "Incident field harmonics")
@@ -386,7 +397,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                "txy")
 
     # NEED TO MAKE SURE WE RESHAPE THE DIFFRACTION EFFICIENCIES APPROPRIATELY AND FIGURE OUT
-    # THE ORDERING OF THIS SHIT.
+    # THE ORDERING OF THIS SHIT. CURRENTLY IT IS NOT CLEAR HOW THEY ARE ORDERED.
     def testCalculateDiffractionEfficiencies(self):
         RActual = np.transpose(self.R);
         RCalculated = calculateDiffractionReflectionEfficiency(self.rx, self.ry, self.rz,
@@ -399,6 +410,44 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 self.source, self.KzTransmissionRegion, self.layerStack)
         TCalculated = TCalculated.reshape(3,3)
         assertAlmostEqual(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
+
+    def testIntegrationFull(self):
+        # TODO: Create full integration test from the fundamentals to the diffraction efficiencies, 
+        # and see how the code should best be refactored. After that, create a Results / Plotting /
+        # Solver class so you can solve a bunch of these crystals parameterized. Then refactor once
+        # more and generate your figures. Idiot-proof your code by requiring as little input from the 
+        # user as possible so that you can actually sit down and use this in the future. You should
+        # update your netlist parser so that you can do this, and maybe add some shapes like circles / 
+        # double circles for easier parameterization.
+
+        # First, setup the device geometry. In this case, we are loading it from an external file, but
+        # in the future we can generate it ourselves. I believe the rows represent a fixed y location
+        # with varying x, as one would intuitively expect.
+        devicePermittivityCellData = np.transpose(np.loadtxt('test/triangleData.csv', delimiter=','))
+        devicePermeabilityCellData = 1 + 0 * devicePermittivityCellData
+        t1, t2 = complexArray([1.75, 0, 0]), complexArray([0, 1.5, 0])
+        deviceCrystal = Crystal(devicePermittivityCellData, devicePermeabilityCellData, t1, t2)
+
+        # Now, setup our full layer stack. This in our case, this consists of 4 layers: two semi-
+        # infinite layers on the top and the bottom, and two finite layers in between.
+        reflectionLayer = Layer(er=2.0, ur=1.0)
+        transmissionLayer = Layer(er=9.0, ur=1.0)
+        layer1 = Layer(crystal=deviceCrystal)
+        layer2 = Layer(er=6.0, ur=1.0)
+
+        # Finally, generate our layer stack. At this point this has ALL the material and device information
+        # we have entered so far. In addition to the source and the number of harmonics, this is all the
+        # information we should need to solve everything.
+        layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
+        source = Source(wavelength=0.02, theta=60*deg, phi=30*deg, pTEM=1/sqrt(2)*complexArray([1,1j]))
+        numberHarmonics = (3, 3)
+
+        # This takes in all the information we need to solve the problem, and all we need to do is invoke
+        # the Solve() command. Optionally, we can add a parameter we want to change to solve with a 
+        # different set of parameters than we initiated this with.
+        solver = RCWASolver(layerStack, source, numberHarmonics)
+        solver.Solve()
+
 
     def setUp(self):
         self.absoluteTolerance = 1e-3

@@ -2,7 +2,7 @@ from shorthand import *
 
 class Crystal:
 
-    def __init__(self, permittivityCellData, permeabilityCellData, *latticeVectors):
+    def __init__(self, permittivityCellData=1, permeabilityCellData=1, *latticeVectors):
         self.permeabilityCellData = permeabilityCellData
         self.permittivityCellData = permittivityCellData
 
@@ -11,10 +11,12 @@ class Crystal:
         if(self.dimensions == 2 and len(latticeVectors[0]) > 2):
             self.latticeVectors[0] = self.latticeVectors[0][0:2]
             self.latticeVectors[1] = self.latticeVectors[1][0:2]
-        self.reciprocalLatticeVectors = self.calculateReciprocalLatticeVectors();
-        self.crystalType = self.determineCrystalType();
-        (self.keySymmetryPoints, self.keySymmetryNames) = self.generateKeySymmetryPoints()
-        self.latticeConstant = norm(self.latticeVectors[0]) # TODO: Make this more general
+
+        if(self.dimensions > 0):
+            self.reciprocalLatticeVectors = self.calculateReciprocalLatticeVectors();
+            self.crystalType = self.determineCrystalType();
+            (self.keySymmetryPoints, self.keySymmetryNames) = self.generateKeySymmetryPoints()
+            self.latticeConstant = norm(self.latticeVectors[0]) # TODO: Make this more general
 
     def calculateReciprocalLatticeVectors(self):
         if self.dimensions is 2:

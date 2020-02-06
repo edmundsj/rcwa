@@ -21,6 +21,8 @@ diagonal = np.diagonal
 conj = np.conj
 real = np.real
 imag = np.imag
+deg = pi / 180
+prod = np.prod
 
 def fftn(data):
     """ Return the shifted version so the zeroth-order harmonic is in the center with
