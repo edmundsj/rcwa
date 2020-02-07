@@ -7,6 +7,7 @@ from shorthand import *
 from shorthandTest import *
 from harmonics import *
 from crystal import *
+from source import *
 
 class testHarmonicFunctions(unittest.TestCase):
     def testGetXComponents(self):
@@ -140,7 +141,8 @@ class testHarmonicFunctions(unittest.TestCase):
         self.UR = complexOnes((self.Nx, self.Ny));
         self.ER = (self.er-1) * np.heaviside(sq(X) + sq(Y) - sq(self.r),1)
         self.ER = self.ER + 1;
-        self.crystal = Crystal(self.ER, self.UR, self.t1, self.t2)
+        source = Source()
+        self.crystal = Crystal(source, self.ER, self.UR, self.t1, self.t2)
 
         # The data for Kx, Ky, and Kz will be re-used at each point of key symmetry
         self.KxMatrixGPoint = complexZeros(self.matrixShape);

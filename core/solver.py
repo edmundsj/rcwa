@@ -34,12 +34,16 @@ class RCWASolver:
         self.KzTransmissionRegion = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmissionLayer)
         self.KzGapRegion = calculateKzForward(self.Kx, self.Ky, self.layerStack.gapLayer)
 
-    def Solve(self):
-        self.ClearSolution()
-        self.calculateDeviceSMatrix()
-        self.calculateGlobalSMatrix()
-        self.calculateRTQuantities()
-        self.packageResults()
+    def Solve(self, wavelengths=np.array([])):
+        if wavelengths.size == 0:
+            wavelengths = np.array([self.source.wavelength])
+        for wavelength in wavelengths:
+            self.source.wavelength = wavelength
+            self.ClearSolution()
+            self.calculateDeviceSMatrix()
+            self.calculateGlobalSMatrix()
+            self.calculateRTQuantities()
+            self.packageResults()
 
     def calculateRTQuantities(self):
         self.rx, self.ry, self.rz = calculateReflectionCoefficient(self.SGlobal, self.Kx, self.Ky,

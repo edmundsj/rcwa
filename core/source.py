@@ -3,7 +3,7 @@ from layer import *
 
 # WHEN WE GET BACK - THIS IS WHERE WE SHOULD PUT OUR CONVOLUTION MATRIX.
 class Source:
-    def __init__(self, wavelength=1,theta=0, phi=0, pTEM=[1,0], layer=freeSpaceLayer):
+    def __init__(self, wavelength=2*pi,theta=0, phi=0, pTEM=[1,0], layer=freeSpaceLayer):
         self.wavelength = wavelength
         self.k0 = 2*pi / wavelength
         self.theta = theta
