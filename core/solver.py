@@ -4,6 +4,7 @@ from results import *
 from harmonics import *
 from shorthandTest import *
 from matrixParser import *
+from copy import deepcopy
 
 class RCWASolver:
     def __init__(self, layerStack, source, numberHarmonics):
@@ -15,12 +16,13 @@ class RCWASolver:
         self.baseCrystalLayer = self.layerStack.extractCrystalLayer()
         self.baseCrystal = self.layerStack.internalLayer[self.baseCrystalLayer].crystal
         self.setupKMatrices()
-        self.layerStack.setGapLayer(self.source.kIncident[1], self.source.kIncident[1])
-        self.setupGapMatrices()
-
         self.KDimension = self.Kx.shape[0]
         self.scatteringElementDimension = self.KDimension * 2
         self.scatteringElementShape = (self.scatteringElementDimension, self.scatteringElementDimension)
+        self.layerStack.setGapLayer(self.source.kIncident[1], self.source.kIncident[1])
+        self.setupGapMatrices()
+        self.setupReflectionTransmissionMatrices()
+
         self.ClearSolution()
         self.Si = [None for _ in range(len(self.layerStack.internalLayer))]
         self.results = []
@@ -40,13 +42,35 @@ class RCWASolver:
         self.packageResults()
 
     def calculateRTQuantities(self):
-        raise NotImplementedError
+        self.rx, self.ry, self.rz = calculateReflectionCoefficient(self.SGlobal, self.Kx, self.Ky,
+                self.KzReflectionRegion, self.WReflectionRegion, self.source, self.numberHarmonics)
+        self.tx, self.ty, self.tz = calculateTransmissionCoefficient(self.SGlobal, self.Kx, self.Ky,
+                self.KzTransmissionRegion, self.WTransmissionRegion, self.source, self.numberHarmonics)
+        self.R = calculateDiffractionReflectionEfficiency(self.rx, self.ry, self.rz, self.source,
+                self.KzReflectionRegion, self.layerStack)
+        self.T = calculateDiffractionTransmissionEfficiency(self.tx, self.ty, self.tz, self.source,
+                self.KzTransmissionRegion, self.layerStack)
+        self.RTot = np.sum(self.R)
+        self.TTot = np.sum(self.T)
+        self.conservation = self.RTot + self.TTot
 
     def packageResults(self):
-        raise NotImplementedError
+        tempResults = Results()
+        tempResults.rx, tempResults.ry, tempResults.rz = deepcopy((self.rx, self.ry, self.rz))
+        tempResults.tx, tempResults.ty, tempResults.tz = deepcopy((self.tx, self.ty, self.tz))
+        tempResults.R, tempResults.T = deepcopy((self.R, self.T))
+        tempResults.RTot, tempResults.TTot, tempResults.conservation = \
+                deepcopy((self.RTot, self.TTot, self.conservation))
+        tempResults.crystal = deepcopy(self.baseCrystal)
+        tempResults.source = deepcopy(self.source)
+        tempResults.SGlobal = deepcopy(self.SGlobal)
+        self.results.append(tempResults)
+
+    def setupReflectionTransmissionMatrices(self):
+        self.WReflectionRegion = complexIdentity(self.scatteringElementDimension)
+        self.WTransmissionRegion = complexIdentity(self.scatteringElementDimension)
 
     def setupGapMatrices(self):
-
         self.WGap = complexIdentity(self.Kx.shape[0]*2)
         QGap = calculateQMatrix(self.Kx, self.Ky, self.layerStack.gapLayer)
         LambdaGap = calculateLambdaMatrix(self.KzGapRegion)
@@ -77,3 +101,6 @@ class RCWASolver:
 
     def ClearSolution(self):
         self.SGlobal = generateTransparentSMatrix(self.scatteringElementShape)
+        self.rx, self.ry, self.rz = None, None, None
+        self.tx, self.ty, self.tz = None, None, None
+        self.R, self.T, self.RTot, self.TTot, self.CTot = None, None, None, None, None

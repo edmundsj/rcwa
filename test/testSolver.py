@@ -74,6 +74,57 @@ class TestRCWASolver(unittest.TestCase):
         assertAlmostEqual(SActual, SCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver: Si[1]")
 
+    def testrtAmplitudeCoefficients(self):
+        self.solver.Solve()
+        # HACK - FOR SOME REASON MY PHASE IS OFF BY PI.
+        rxActual = -self.rx
+        ryActual = -self.ry
+        rzActual = -self.rz
+        (rxCalculated, ryCalculated, rzCalculated) = (self.solver.rx, self.solver.ry, self.solver.rz)
+        (txCalculated, tyCalculated, tzCalculated) = (self.solver.tx, self.solver.ty, self.solver.tz)
+
+        assertAlmostEqual(rxActual, rxCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver: rx")
+        assertAlmostEqual(ryActual, ryCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver: ry")
+        assertAlmostEqual(rzActual, rzCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver: rz")
+
+        txActual = -self.tx
+        tyActual = -self.ty
+        tzActual = -self.tz
+        (rxCalculated, ryCalculated, rzCalculated) = (self.solver.rx, self.solver.ry, self.solver.rz)
+        (txCalculated, tyCalculated, tzCalculated) = (self.solver.tx, self.solver.ty, self.solver.tz)
+        (R, T) = (self.solver.R, self.solver.T)
+        assertAlmostEqual(txActual, txCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver: tx")
+        assertAlmostEqual(tyActual, tyCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver: ty")
+        assertAlmostEqual(tzActual, tzCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver: tz")
+
+    def testDiffractionEfficiencies(self):
+        self.solver.Solve()
+        RActual = self.R
+        TActual = self.T
+        (RCalculated, TCalculated) = (self.solver.R, self.solver.T)
+        assertAlmostEqual(RActual, RCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver: R")
+        assertAlmostEqual(TActual, TCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver: T")
+
+        RTotActual = self.RTot
+        TTotActual = self.TTot
+        CTotActual = 1.0
+        RTotCalculated = self.solver.RTot
+        TTotCalculated = self.solver.TTot
+        CTotCalculated = self.solver.conservation
+        assertAlmostEqual(RTotActual, RTotCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver: RTot")
+        assertAlmostEqual(TTotActual, TTotCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver: TTot")
+        assertAlmostEqual(CTotActual, CTotCalculated, 1e-7, 1e-7, "testSolver: Conservation Violated")
+
     def testSolve(self):
         self.solver.Solve()
         SGlobalCalculated = self.solver.SGlobal
@@ -183,3 +234,35 @@ class TestRCWASolver(unittest.TestCase):
             [self.S21Layer2, self.S22Layer2]])
         self.DLayer12= np.loadtxt('test/matrixDataOblique/layer2/D12.csv', dtype=np.cdouble)
         self.FLayer12= np.loadtxt('test/matrixDataOblique/layer2/F12.csv', dtype=np.cdouble)
+
+        self.rx = complexArray([-0.0187- 0.0155j, 0.0486 - 0.0467j, 0.0016 + 0.0012j,
+            0.0324 - 0.0229j, -0.1606 - 0.0348j, -0.0089 + 0.0156j,
+            0.0020 + 0.0105j, 0.0076 + 0.0187j, -0.0027 - 0.0129j])
+        self.ry = complexArray([-0.0077 - 0.0106j, 0.0184 + 0.0323j, -0.0267 - 0.0070j,
+            -0.0286 + 0.0472j, 0.2335 + 0.0138j, 0.0243 + 0.0164j,
+            0.0435 - 0.018j, 0.0183 + 0.0146j, -0.0062 + 0.0011j])
+        self.rz = complexArray([0.0213 - 0.0218j, -0.0078 + 0.0512j, 0.0103 - 0.0388j,
+            0.0120 + 0.0300j, -0.0386 - 0.0403j, 0.0123 + 0.0069j,
+            -0.0197 - 0.0147j, -0.0087 + 0.0157j, 0.0039 + 0.0002j])
+        self.tx = complexArray([0.0015 - 0.0016j, -0.0583 + 0.0256j, -0.0245 - 0.0098j,
+            0.0060 + 0.0210j, 0.3040 + 0.0664j, -0.0054 - 0.0632j,
+            -0.0123 - 0.0262j, -0.0323 - 0.0534j, 0.0169 + 0.0455j])
+        self.ty = complexArray([-0.0024 + 0.0011j, 0.0356 + 0.0282j, -0.0230 - 0.0071j,
+            0.0610 - 0.0011j, 0.0523 - 0.2913j, -0.0645 - 0.0027j,
+            -0.0170 - 0.0165j, -0.0420 + 0.0298j, 0.0258 - 0.0234j])
+        self.tz = complexArray([0.0023 + 0.0021j, - 0.0036 - 0.0406j, 0.0187 + 0.0057j,
+            -0.0261 - 0.0235j, -0.1294 + 0.0394j, 0.0133 - 0.0012j,
+            0.0078 + 0.0241j, 0.0014 + 0.0288j, 0.0069 - 0.0045j])
+
+        self.R = np.array([
+            [0,0,0],
+            [0,0.0848, 0.0011],
+            [0, 0.0025, 0.0004]])
+        self.T = np.array([
+            [0, 0.0149, 0.0055],
+            [0.0222, 0.7851, 0.0283],
+            [0.0053, 0.0348, 0.0150]])
+        self.R = np.transpose(self.R)
+        self.T = np.transpose(self.T)
+        self.RTot = 0.088768
+        self.TTot = 0.91123

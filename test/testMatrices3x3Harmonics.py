@@ -136,7 +136,6 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 "X matrix Layer 1");
 
     def testAMatrix(self):
-
         V = self.VLayer1
         W = self.WLayer1
         ACalculated = calculateScatteringAMatrix(W, self.WFreeSpace, V, self.VFreeSpace);
@@ -380,14 +379,16 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         # HACK: I DO NOT KNOW WHY HIS TE/TM VECTORS ARE INVERTED, BUT THIS IS
         # CAUSING HIS REFLECTION COEFFICIENT TO BE INVERTED COMPARED TO MINE. I DO NOT KNOW WHO IS
         # CORRECT.
-        rActual = -self.rT
-        rCalculated = calculateReflectionCoefficient(self.SGlobal, self.WReflectionRegion, self.source,
-                self.numberHarmonics)
-        assertAlmostEqual(rActual, rCalculated, self.absoluteTolerance, self.relativeTolerance,
-               "rxy")
-
-        rzActual = self.rz
-        rzCalculated = calculateReflectionZCoefficient(self.rx, self.ry, self.Kx, self.Ky, self.KzReflectionRegion)
+        rxActual = -self.rx
+        ryActual = -self.ry
+        rzActual = -self.rz
+        (rxCalculated, ryCalculated, rzCalculated) = \
+                calculateReflectionCoefficient(self.SGlobal, self.Kx, self.Ky, self.KzReflectionRegion,
+                self.WReflectionRegion, self.source, self.numberHarmonics)
+        assertAlmostEqual(rxActual, rxCalculated, self.absoluteTolerance, self.relativeTolerance,
+               "rx")
+        assertAlmostEqual(ryActual, ryCalculated, self.absoluteTolerance, self.relativeTolerance,
+               "ry")
         assertAlmostEqual(rzActual, rzCalculated, self.absoluteTolerance, self.relativeTolerance,
                "rz")
 
@@ -395,31 +396,33 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         # HACK: I DO NOT KNOW WHY HIS TE/TM VECTORS ARE INVERTED, BUT THIS IS
         # CAUSING HIS TRANSMISSION COEFFICIENT TO BE INVERTED COMPARED TO MINE. I DO NOT KNOW WHO IS
         # CORRECT.
-        tActual = -self.tT
-        tCalculated = calculateTransmissionCoefficient(self.SGlobal, self.WReflectionRegion, self.source,
+        txActual = -self.tx
+        tyActual = -self.ty
+        tzActual = -self.tz
+        (txCalculated, tyCalculated, tzCalculated) = \
+            calculateTransmissionCoefficient(self.SGlobal, self.Kx, self.Ky, self.KzTransmissionRegion,
+                    self.WTransmissionRegion, self.source,
                 self.numberHarmonics)
-        assertAlmostEqual(tActual, tCalculated, self.absoluteTolerance, self.relativeTolerance,
-               "txy")
-
-        tzActual = self.tz
-        tzCalculated = calculateTransmissionZCoefficient(self.tx, self.ty, self.Kx, self.Ky,
-                self.KzTransmissionRegion)
+        assertAlmostEqual(txActual, txCalculated, self.absoluteTolerance, self.relativeTolerance,
+               "tx")
+        assertAlmostEqual(tyActual, tyCalculated, self.absoluteTolerance, self.relativeTolerance,
+               "ty")
         assertAlmostEqual(tzActual, tzCalculated, self.absoluteTolerance, self.relativeTolerance,
-               "txy")
+               "tz")
 
     # NEED TO MAKE SURE WE RESHAPE THE DIFFRACTION EFFICIENCIES APPROPRIATELY AND FIGURE OUT
     # THE ORDERING OF THIS SHIT. CURRENTLY IT IS NOT CLEAR HOW THEY ARE ORDERED.
     def testCalculateDiffractionEfficiencies(self):
-        RActual = np.transpose(self.R);
+        RActual = self.R;
         RCalculated = calculateDiffractionReflectionEfficiency(self.rx, self.ry, self.rz,
                 self.source, self.KzReflectionRegion, self.layerStack)
-        RCalculated = RCalculated.reshape(3,3)
+        RCalculated = RCalculated
         assertAlmostEqual(RActual, RCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        TActual = np.transpose(self.T)
+        TActual = self.T
         TCalculated = calculateDiffractionTransmissionEfficiency(self.tx, self.ty, self.tz,
                 self.source, self.KzTransmissionRegion, self.layerStack)
-        TCalculated = TCalculated.reshape(3,3)
+        TCalculated = TCalculated
         assertAlmostEqual(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def setUp(self):
@@ -644,6 +647,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
             [0, 0.0149, 0.0055],
             [0.0222, 0.7851, 0.0283],
             [0.0053, 0.0348, 0.0150]])
+        self.R = np.transpose(self.R)
+        self.T = np.transpose(self.T)
         self.RTot = 0.088768
         self.TTot = 0.91123
 

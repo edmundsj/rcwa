@@ -8,5 +8,8 @@ SOFTWARE STATUS
 
 Whenever possible I have attempted to stay with the convention introduced in Dr. Rumpf's online class on computational electromagnetics.
 
+KNOWN ISSUES
+When computing the quantities rx, ry, rz, there appears to be an unnecessary pi phase shift due to a difference in the TE/TM vectors. It is not clear whether this is a difference in convention or an actual error.
+
 GETTING STARTED --- 
 

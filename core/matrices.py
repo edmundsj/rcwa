@@ -290,29 +290,34 @@ def calculateTransmissionRegionSMatrixFromRaw(ATransmissionRegion, BTransmission
     S[1,1] = - AInverse @ B;
     return S;
 
-def calculateReflectionCoefficient(S, WReflectionRegion, source, numberHarmonics):
+def calculateReflectionCoefficient(S, Kx, Ky, KzReflectionRegion,
+        WReflectionRegion, source, numberHarmonics):
     incidentFieldHarmonics = calculateIncidentFieldHarmonics(source, numberHarmonics)
     rTransverse = WReflectionRegion @ S[0,0] @ inv(WReflectionRegion) @ incidentFieldHarmonics
-    return rTransverse
+    maxIndex = int(rTransverse.shape[0]/2)
+    print(maxIndex)
+    rx = rTransverse[0:maxIndex]
+    ry = rTransverse[maxIndex:]
+    rz = - inv(KzReflectionRegion) @ (Kx @ rx + Ky @ ry)
+    return rx, ry, rz
 
-def calculateTransmissionCoefficient(S, WTransmissionRegion, source, numberHarmonics):
+def calculateTransmissionCoefficient(S, Kx, Ky, KzTransmissionRegion,
+        WTransmissionRegion, source, numberHarmonics):
     incidentFieldHarmonics = calculateIncidentFieldHarmonics(source, numberHarmonics)
     tTransverse = WTransmissionRegion @ S[1,0] @ inv(WTransmissionRegion) @ incidentFieldHarmonics
-    return tTransverse
-
-def calculateReflectionZCoefficient(rx, ry, Kx, Ky, KzReflectionRegion):
-    rz = - inv(KzReflectionRegion) @ (Kx @ rx + Ky @ ry)
-    return rz
-
-def calculateTransmissionZCoefficient(tx, ty, Kx, Ky, KzTransmissionRegion):
+    maxIndex = int(tTransverse.shape[0]/2)
+    tx = tTransverse[:maxIndex]
+    ty = tTransverse[maxIndex:]
     tz = - inv(KzTransmissionRegion) @ (Kx @ tx + Ky @ ty)
-    return tz
+    return tx, ty, tz
 
 def calculateDiffractionReflectionEfficiency(rx, ry, rz, source, KzReflectionRegion, layerStack):
     urReflectionRegion = layerStack.reflectionLayer.ur
     preMatrix = real(-1 /urReflectionRegion * KzReflectionRegion) / \
             real(source.kIncident[2] / urReflectionRegion)
     R = preMatrix @ (sq(np.abs(rx)) + sq(np.abs(ry)) + sq(np.abs(rz)))
+    RDimension = int(sqrt(rx.shape[0]))
+    R = R.reshape((RDimension, RDimension))
     return R
 
 def calculateDiffractionTransmissionEfficiency(tx, ty, tz, source, KzTransmissionRegion, layerStack):
@@ -321,6 +326,8 @@ def calculateDiffractionTransmissionEfficiency(tx, ty, tz, source, KzTransmissio
     preMatrix = real(1 / urTransmissionRegion * KzTransmissionRegion) / \
             real(source.kIncident[2] / urReflectionRegion)
     T = preMatrix @ (sq(np.abs(tx)) + sq(np.abs(ty)) + sq(np.abs(tz)))
+    TDimension = int(sqrt(tx.shape[0]))
+    T = T.reshape((TDimension, TDimension))
     return T
 
 def calculateEz(kx, ky, kz, Ex, Ey):
