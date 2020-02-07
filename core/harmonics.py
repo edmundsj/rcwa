@@ -48,8 +48,7 @@ def getYComponents(*args):
 
 def generateKxMatrix(kIncident, crystal, numberHarmonics):
     if crystal.dimensions is 2:
-        KxMatrix = generateKxMatrix2D(kIncident, crystal, numberHarmonics[0:2])
-        return KxMatrix
+        return generateKxMatrix2D(kIncident, crystal, numberHarmonics[0:2])
     else:
         raise NotImplementedError
 

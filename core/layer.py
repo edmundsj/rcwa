@@ -7,8 +7,12 @@ class Layer:
         self.L = L
         self.n = sqrt(er*ur)
         self.crystal = crystal
-        if (crystal is not None) and (numberHarmonics is not None):
-            self.setConvolutionMatrices(numberHarmonics)
+        if crystal is not None:
+            self.homogenous = False
+            if numberHarmonics is not None:
+                self.setConvolutionMatrix(numberHarmonics)
+        else:
+            self.homogenous = True
 
     def setConvolutionMatrix(self, numberHarmonics):
         if self.crystal is not None:

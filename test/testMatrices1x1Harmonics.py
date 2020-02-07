@@ -96,17 +96,17 @@ class Test1x1Harmonic(unittest.TestCase):
         assertAlmostEqual(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q matrix layer 2")
 
-    def testOmegaMatrix(self):
+    def testLambdaMatrix(self):
         OActual = complexArray([[0 + 0.9046j, 0+0j],[0+0j,0+0.9046j]]);
-        OCalculated = calculateOmegaMatrix(self.KzLayer1);
+        OCalculated = calculateLambdaMatrix(self.KzLayer1);
         assertAlmostEqual(OActual, OCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         OActual = complexArray([[0 + 1.3485j, 0+0j],[0+0j,0+1.3485j]]);
-        OCalculated = calculateOmegaMatrix(self.KzLayer2);
+        OCalculated = calculateLambdaMatrix(self.KzLayer2);
         assertAlmostEqual(OActual, OCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testVMatrix(self):
-        (VCalculated, W) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.gapLayer)
+        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.gapLayer)
         VActual = complexArray([[0 - 0.4250j, 0 - 1.1804j], [0 + 2.0013j, 0 + 0.4250j]]);
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
@@ -118,7 +118,7 @@ class Test1x1Harmonic(unittest.TestCase):
         VActual = complexArray([[0-0.1051j,0-0.4941j],[0+0.6970j,0+0.1051j]]);
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W_ref) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.reflectionLayer)
+        (VCalculated, W_ref, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.reflectionLayer)
         VActual = complexArray([
             [0 - 0.5017j, 0 - 0.8012j],
             [0 + 1.7702j, 0 + 0.5017j]]);

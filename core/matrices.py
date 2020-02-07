@@ -1,12 +1,6 @@
 from shorthand import *
 from source import *
 
-OUTER_BLOCK_SHAPE = (2,2);
-scatteringElementShape = (2,2); # The shape of our core PQ matrices.
-scatteringMatrixShape = OUTER_BLOCK_SHAPE + scatteringElementShape;
-scatteringElementShape = (2,2);
-scatteringElementSize = scatteringElementShape[0];
-
 def calculateIncidentFieldHarmonics(source, numberHarmonics):
     totalNumberHarmonics = np.prod(numberHarmonics)
     return np.hstack((source.pX * kroneckerDeltaVector(totalNumberHarmonics),
@@ -32,7 +26,6 @@ def calculateRedhefferProduct(SA, SB):
 def calculatePMatrix(kx, ky, layer):
     if isinstance(kx, np.ndarray):
         return calculatePMatrixNHarmonics(kx, ky, layer)
-
     else:
         return calculatePMatrix1Harmonic(kx, ky, layer)
 
@@ -68,7 +61,7 @@ def calculateQMatrix(kx, ky, layer):
         return calculateQMatrix1Harmonic(kx, ky, layer)
 
 def calculateQMatrix1Harmonic(kx, ky, layer):
-    Q = complexZeros(scatteringElementShape);
+    Q = complexZeros((2,2));
 
     Q[0,0] = kx * ky;
     Q[0,1] = layer.er*layer.ur- sq(kx);
@@ -99,8 +92,16 @@ def calculateQReflectionTransmissionMatrix(Kx, Ky, layer):
     Q /= layer.ur
     return Q
 
-def calculateOmegaMatrix(kz):
-    return complexIdentity(2)* (0 + 1j)*kz;
+def calculateLambdaMatrix(kz):
+    if isinstance(kz, np.ndarray):
+        KzDimension = kz.shape[0]
+        LambdaShape = (KzDimension*2, KzDimension*2)
+        Lambda = complexZeros(LambdaShape)
+        Lambda[:KzDimension, :KzDimension] = 1j*kz
+        Lambda[KzDimension:, KzDimension:] = 1j*kz
+        return Lambda
+    else:
+        return complexIdentity(2)* (0 + 1j)*kz;
 
 def calculateOmegaSquaredMatrix(P, Q):
     return P @ Q
@@ -150,9 +151,9 @@ def calculateVWXMatrices(kx, ky, layer, source=zeroSource):
 
 def calculateVWXMatrices1Harmonic(kx, ky, kz, layer, source):
     Q = calculateQMatrix(kx, ky, layer);
-    O = calculateOmegaMatrix(kz);
+    O = calculateLambdaMatrix(kz);
     OInverse = inv(O);
-    W = complexIdentity(scatteringElementShape[0]);
+    W = complexIdentity(2)
     X = matrixExponentiate(O * source.k0 * layer.L)
     V = Q @ W @ OInverse;
 
@@ -163,13 +164,22 @@ def calculateVWXMatricesNHarmonics(Kx, Ky, layer, source):
     P = calculatePMatrix(Kx, Ky, layer)
     Q = calculateQMatrix(Kx, Ky, layer)
     OmegaSquared = calculateOmegaSquaredMatrix(P, Q)
-    eigenValues, W = eig(OmegaSquared)
-    Lambda = np.diag(sqrt(eigenValues))
-    LambdaInverse = np.diag(np.reciprocal(sqrt(eigenValues)))
-    V = Q @ W @ LambdaInverse
-    X = matrixExponentiate( - Lambda * source.k0 * layer.L)
 
-    return (V, W, X)
+    if layer.homogenous is False:
+        eigenValues, W = eig(OmegaSquared)
+        Lambda = np.diag(sqrt(eigenValues))
+        LambdaInverse = np.diag(np.reciprocal(sqrt(eigenValues)))
+        V = Q @ W @ LambdaInverse
+        X = matrixExponentiate( -Lambda * source.k0 * layer.L)
+        return (V, W, X)
+    else:
+        Kz = calculateKzForward(Kx, Ky, layer)
+        Lambda = calculateLambdaMatrix(Kz)
+        LambdaInverse = inv(Lambda)
+        W = complexIdentity(2*Kz.shape[0])
+        V = Q @ W @ LambdaInverse
+        X = matrixExponentiate( -Lambda * source.k0 * layer.L)
+        return (V, W, X)
 
 def calculateInternalSMatrix(kx, ky, layer, source, Wg, Vg):
     (Vi, Wi, Xi) = calculateVWXMatrices(kx, ky, layer, source);

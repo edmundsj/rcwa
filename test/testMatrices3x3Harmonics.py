@@ -97,6 +97,13 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         assertAlmostEqual(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer 1");
 
+        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[1],
+                self.source)
+        WActual = self.WLayer2
+        assertAlmostEqual(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
+                "W matrix Layer 2");
+
+
     def testVMatrix(self):
         (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0],
                 self.source)
@@ -109,6 +116,13 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "V matrix Layer 1");
+
+        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[1],
+                self.source)
+        VActual = self.VLayer2
+        assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance,
+                "V matrix Layer 2");
+
 
     def testXMatrix(self):
         (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0], self.source)
@@ -261,9 +275,6 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         assertAlmostEqual(S22TransmissionRegionActual, S22TransmissionRegionCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "S22 layer 1")
 
-    # ISSUE - NEED TO REFACTOR THIS CODE SO THAT IT WORKES WITH AND CAN DETECT
-    # HOMOGENOUS LAYERS. CURRENTLY BREAKING LINEAR ALGEBRA ENGINE TRYING TO INVERT A 
-    # NONINVERTIBLE MATRIX WHEN THE THING IS HOMOGENOUS
     def testReflectionRegionSMatrixFromFundamentals(self):
         SCalculated = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.layerStack,
                 self.WFreeSpace, self.VFreeSpace)
@@ -411,44 +422,6 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         TCalculated = TCalculated.reshape(3,3)
         assertAlmostEqual(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-    def testIntegrationFull(self):
-        # TODO: Create full integration test from the fundamentals to the diffraction efficiencies, 
-        # and see how the code should best be refactored. After that, create a Results / Plotting /
-        # Solver class so you can solve a bunch of these crystals parameterized. Then refactor once
-        # more and generate your figures. Idiot-proof your code by requiring as little input from the 
-        # user as possible so that you can actually sit down and use this in the future. You should
-        # update your netlist parser so that you can do this, and maybe add some shapes like circles / 
-        # double circles for easier parameterization.
-
-        # First, setup the device geometry. In this case, we are loading it from an external file, but
-        # in the future we can generate it ourselves. I believe the rows represent a fixed y location
-        # with varying x, as one would intuitively expect.
-        devicePermittivityCellData = np.transpose(np.loadtxt('test/triangleData.csv', delimiter=','))
-        devicePermeabilityCellData = 1 + 0 * devicePermittivityCellData
-        t1, t2 = complexArray([1.75, 0, 0]), complexArray([0, 1.5, 0])
-        deviceCrystal = Crystal(devicePermittivityCellData, devicePermeabilityCellData, t1, t2)
-
-        # Now, setup our full layer stack. This in our case, this consists of 4 layers: two semi-
-        # infinite layers on the top and the bottom, and two finite layers in between.
-        reflectionLayer = Layer(er=2.0, ur=1.0)
-        transmissionLayer = Layer(er=9.0, ur=1.0)
-        layer1 = Layer(crystal=deviceCrystal)
-        layer2 = Layer(er=6.0, ur=1.0)
-
-        # Finally, generate our layer stack. At this point this has ALL the material and device information
-        # we have entered so far. In addition to the source and the number of harmonics, this is all the
-        # information we should need to solve everything.
-        layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
-        source = Source(wavelength=0.02, theta=60*deg, phi=30*deg, pTEM=1/sqrt(2)*complexArray([1,1j]))
-        numberHarmonics = (3, 3)
-
-        # This takes in all the information we need to solve the problem, and all we need to do is invoke
-        # the Solve() command. Optionally, we can add a parameter we want to change to solve with a 
-        # different set of parameters than we initiated this with.
-        solver = RCWASolver(layerStack, source, numberHarmonics)
-        solver.Solve()
-
-
     def setUp(self):
         self.absoluteTolerance = 1e-3
         self.relativeTolerance = 1e-3
@@ -472,6 +445,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         reflectionLayer = Layer(erReflectionRegion, urReflectionRegion)
         transmissionLayer = Layer(erTransmissionRegion, urTransmissionRegion)
         layer1 = Layer(erDeviceRegion, urDeviceRegion, thicknessLayer1)
+        layer1.homogenous = False
         layer2 = Layer(erDeviceRegion, urDeviceRegion, thicknessLayer2)
 
         self.layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
@@ -546,9 +520,9 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         self.PLayer2 = numpyArrayFromFile("test/matrixDataOblique/layer2/PLayer2.txt")
         self.QLayer2 = numpyArrayFromFile("test/matrixDataOblique/layer2/QLayer2.txt")
         self.OmegaSquaredLayer2 = numpyArrayFromFile("test/matrixDataOblique/layer2/OmegaSquaredLayer2.txt")
-        self.WLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/WLayer2.txt")
+        self.WLayer2 = complexIdentity(18)
         self.LambdaLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/LambdaLayer2.txt")
-        self.VLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/VLayer2.txt")
+        self.VLayer2 = np.loadtxt("test/matrixDataOblique/layer2/VLayer2MYSELF.csv", dtype=np.cdouble)
         self.ALayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/ALayer2.txt")
         self.BLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/BLayer2.txt")
         self.XLayer2 = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/layer2/XLayer2.txt")
