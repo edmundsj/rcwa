@@ -21,9 +21,7 @@ def calculateMaxHarmonic(numberHarmonics):
             maxHarmonics.append(math.floor(num / 2) - 1);
         else:
             maxHarmonics.append(math.floor(num / 2));
-
     return maxHarmonics;
-
 
 def getXComponents(*args):
     xComponents = [];
@@ -46,19 +44,19 @@ def getYComponents(*args):
 
     return yComponents;
 
-def generateKxMatrix(kIncident, crystal, numberHarmonics):
+def generateKxMatrix(source, crystal, numberHarmonics):
     if crystal.dimensions is 2:
-        return generateKxMatrix2D(kIncident, crystal, numberHarmonics[0:2])
+        return generateKxMatrix2D(source, crystal, numberHarmonics[0:2])
     else:
         raise NotImplementedError
 
-def generateKxMatrix2D(kIncident, crystal, numberHarmonics):
+def generateKxMatrix2D(source, crystal, numberHarmonics):
     matrixSize = np.prod(numberHarmonics)
     matrixShape = (matrixSize, matrixSize);
     KxMatrix = complexZeros(matrixShape)
 
-    (T1, T2) = crystal.reciprocalLatticeVectors
-    (incidentWaveVectorx, T1x, T2x) = getXComponents(kIncident, T1, T2);
+    (T1, T2) = np.array(crystal.reciprocalLatticeVectors) / source.k0
+    (incidentWaveVectorx, T1x, T2x) = getXComponents(source.kIncident, T1, T2);
     (minHarmonicT1, minHarmonicT2) = calculateMinHarmonic(numberHarmonics)
     (maxHarmonicT1, maxHarmonicT2) = calculateMaxHarmonic(numberHarmonics)
 
@@ -72,20 +70,20 @@ def generateKxMatrix2D(kIncident, crystal, numberHarmonics):
 
     return KxMatrix
 
-def generateKyMatrix(incidentWaveVector, crystal, numberHarmonics):
+def generateKyMatrix(kIncident, crystal, numberHarmonics):
     if crystal.dimensions is 2:
-        KyMatrix = generateKyMatrix2D(incidentWaveVector, crystal, numberHarmonics[0:2])
+        KyMatrix = generateKyMatrix2D(kIncident, crystal, numberHarmonics[0:2])
         return KyMatrix
     else:
         raise NotImplementedError
 
-def generateKyMatrix2D(incidentWaveVector, crystal, numberHarmonics):
+def generateKyMatrix2D(source, crystal, numberHarmonics):
     matrixSize = np.prod(numberHarmonics)
     matrixShape = (matrixSize, matrixSize);
     KyMatrix = complexZeros(matrixShape)
 
-    (T1, T2) = crystal.reciprocalLatticeVectors
-    (incidentWaveVectory, T1y, T2y) = getYComponents(incidentWaveVector, T1, T2);
+    (T1, T2) = np.array(crystal.reciprocalLatticeVectors) / source.k0
+    (incidentWaveVectory, T1y, T2y) = getYComponents(source.kIncident, T1, T2);
     (minHarmonicT1, minHarmonicT2) = calculateMinHarmonic(numberHarmonics)
     (maxHarmonicT1, maxHarmonicT2) = calculateMaxHarmonic(numberHarmonics)
 

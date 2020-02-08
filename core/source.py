@@ -1,7 +1,8 @@
+# TODO: Turn the wavelength, theta, phi, etc. into properties so that when one is changed, the rest of the 
+# source changes too.
 from shorthand import *
 from layer import *
 
-# WHEN WE GET BACK - THIS IS WHERE WE SHOULD PUT OUR CONVOLUTION MATRIX.
 class Source:
     def __init__(self, wavelength=2*pi,theta=0, phi=0, pTEM=[1,0], layer=freeSpaceLayer):
         self.wavelength = wavelength

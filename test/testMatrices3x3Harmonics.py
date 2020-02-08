@@ -21,7 +21,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         t2 = complexArray([0, 1.5, 0])
         erData = np.transpose(np.loadtxt('test/triangleData.csv', delimiter=','))
         urData = 1 * complexOnes((512, 439))
-        triangleCrystal = Crystal(self.source, erData, urData, t1, t2)
+        triangleCrystal = Crystal(erData, urData, t1, t2)
         dummyLayer = Layer(crystal=triangleCrystal)
         dummyLayer.setConvolutionMatrix(self.numberHarmonics)
 
@@ -41,7 +41,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         t2 = complexArray([0, 1.5, 0])
         erData = np.transpose(np.loadtxt('test/triangleData.csv', delimiter=','))
         urData = 1 * complexOnes((512, 439))
-        triangleCrystal = Crystal(self.source, erData, urData, t1, t2)
+        triangleCrystal = Crystal(erData, urData, t1, t2)
         dummyLayer = Layer(crystal=triangleCrystal)
         dummyStack = LayerStack(freeSpaceLayer, dummyLayer, freeSpaceLayer)
         dummyStack.setConvolutionMatrix(self.numberHarmonics)

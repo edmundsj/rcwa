@@ -28,8 +28,8 @@ class RCWASolver:
         self.results = []
 
     def setupKMatrices(self):
-        self.Kx = generateKxMatrix(self.source.kIncident, self.baseCrystal, self.numberHarmonics)
-        self.Ky = generateKyMatrix(self.source.kIncident, self.baseCrystal, self.numberHarmonics)
+        self.Kx = generateKxMatrix(self.source, self.baseCrystal, self.numberHarmonics)
+        self.Ky = generateKyMatrix(self.source, self.baseCrystal, self.numberHarmonics)
         self.KzReflectionRegion = calculateKzBackward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
         self.KzTransmissionRegion = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmissionLayer)
         self.KzGapRegion = calculateKzForward(self.Kx, self.Ky, self.layerStack.gapLayer)

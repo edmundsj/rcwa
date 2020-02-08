@@ -12,6 +12,7 @@ from source import Layer
 from solver import *
 from results import *
 from crystal import Crystal
+from plotter import Plotter
 
 
 class TestRCWASolver(unittest.TestCase):
@@ -127,6 +128,8 @@ class TestRCWASolver(unittest.TestCase):
 
     def testIntegrationMultiWavelength(self):
         testWavelengths = self.solver.source.wavelength*np.arange(0.9,1.1,0.01)
+        self.solver.Solve(testWavelengths)
+        #Plotter.plotReflectionSpectra(self.solver.results)
 
     def setUp(self):
         self.absoluteTolerance = 1e-4
@@ -150,15 +153,12 @@ class TestRCWASolver(unittest.TestCase):
         source = Source(wavelength=wavelength, theta=theta, phi=phi, pTEM=pTEM, layer=reflectionLayer)
         t1, t2 = complexArray([1.75, 0, 0]), complexArray([0, 1.5, 0])
 
-        thicknessLayer1 = 0.5
-        thicknessLayer2 = 0.3
+        thicknessLayer1 = 0.5 # should be 0.5
+        thicknessLayer2 = 0.3 # should be 0.3
 
-        # THIS IS A HACK. CRYSTAL LATTICE VECTORS NEED TO BE MULTIPLIED BY K0 IN THEIR DEFINITION.
-        #t1 = t1 * k0
-        #t2 = t2 * k0
         numberHarmonics = (3, 3)
 
-        deviceCrystal = Crystal(source, devicePermittivityCellData, devicePermeabilityCellData, t1, t2)
+        deviceCrystal = Crystal(devicePermittivityCellData, devicePermeabilityCellData, t1, t2)
         layer1 = Layer(crystal=deviceCrystal, L=thicknessLayer1, numberHarmonics=numberHarmonics)
         layer2 = Layer(er=6.0, ur=1.0, L=thicknessLayer2)
         layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)

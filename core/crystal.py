@@ -2,16 +2,13 @@ from shorthand import *
 
 class Crystal:
 
-    def __init__(self, source, permittivityCellData=1, permeabilityCellData=1, *latticeVectors):
+    def __init__(self, permittivityCellData=1, permeabilityCellData=1, *latticeVectors):
         self.permeabilityCellData = permeabilityCellData
         self.permittivityCellData = permittivityCellData
 
         self.dimensions = len(latticeVectors)
         rawLatticeVectors = np.array(latticeVectors)
         self.latticeVectors = []
-        # This is required to normalize our lattice vectors because RCWA was formulated in terms of z'
-        # which is equal to k0 * z
-        rawLatticeVectors = source.k0 * rawLatticeVectors
         if(self.dimensions == 2 and len(latticeVectors[0]) >= 2):
             self.latticeVectors.append(rawLatticeVectors[0, 0:2])
             self.latticeVectors.append(rawLatticeVectors[1, 0:2])

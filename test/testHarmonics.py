@@ -72,24 +72,37 @@ class testHarmonicFunctions(unittest.TestCase):
         maxHarmonicActual = [2, 2];
         assertAlmostEqual(maxHarmonicActual, maxHarmonicCalculated);
 
+    # ALL THESE TESTS WILL FAIL BECAUSE I NOW NEED TO PASS IN A SOURCE WHICH HAS AN UNKNOWN K0.
     def testGenerateKxMatrix(self):
         absoluteTolerance = 1e-4;
         relativeTolerance = 1e-3;
 
         # Test our KX matrix at the gamma point
         kxMatrixActual = self.KxMatrixGPoint;
-        kxMatrixCalculated = generateKxMatrix(self.incidentKVectorGPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance);
+        sourceGPoint = Source()
+        sourceGPoint.kIncident = self.incidentKVectorGPoint
+        sourceGPoint.k0 = 1
+        kxMatrixCalculated = generateKxMatrix(sourceGPoint, self.crystal, self.numberHarmonics)
+        assertAlmostEqual(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance,
+                "testHarmonics: Kx at Gamma Point");
 
         # Test our KX matrix at the X point
         kxMatrixActual = self.KxMatrixXPoint;
-        kxMatrixCalculated = generateKxMatrix(self.incidentKVectorXPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance);
+        sourceXPoint = Source()
+        sourceXPoint.kIncident = self.incidentKVectorXPoint
+        sourceXPoint.k0 = 1
+        kxMatrixCalculated = generateKxMatrix(sourceXPoint, self.crystal, self.numberHarmonics)
+        assertAlmostEqual(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance,
+                "testHarmonics: Kx at X Point");
 
         # Test our KX matrix at the M point
         kxMatrixActual = self.KxMatrixMPoint;
-        kxMatrixCalculated = generateKxMatrix(self.incidentKVectorMPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance);
+        sourceMPoint = Source()
+        sourceMPoint.kIncident = self.incidentKVectorMPoint
+        sourceMPoint.k0 = 1
+        kxMatrixCalculated = generateKxMatrix(sourceMPoint, self.crystal, self.numberHarmonics)
+        assertAlmostEqual(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance,
+                "testHarmonics: Kx at M Point");
 
     def testGenerateKyMatrix(self):
         absoluteTolerance = 1e-4;
@@ -97,18 +110,30 @@ class testHarmonicFunctions(unittest.TestCase):
 
         # Test our KY matrix at the gamma point
         kyMatrixActual = self.KyMatrixGPoint;
-        kyMatrixCalculated = generateKyMatrix(self.incidentKVectorGPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance);
+        sourceGPoint = Source()
+        sourceGPoint.kIncident = self.incidentKVectorGPoint
+        sourceGPoint.k0 = 1
+        kyMatrixCalculated = generateKyMatrix(sourceGPoint, self.crystal, self.numberHarmonics)
+        assertAlmostEqual(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance,
+                "testHarmonics: Ky at Gamma Point");
 
         # Test our KY matrix at the X point
         kyMatrixActual = self.KyMatrixXPoint;
-        kyMatrixCalculated = generateKyMatrix(self.incidentKVectorXPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance);
+        sourceXPoint = Source()
+        sourceXPoint.kIncident = self.incidentKVectorXPoint
+        sourceXPoint.k0 = 1
+        kyMatrixCalculated = generateKyMatrix(sourceXPoint, self.crystal, self.numberHarmonics)
+        assertAlmostEqual(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance,
+                "testHarmonics: Ky at X Point");
 
         # Test our KY matrix at the M point
         kyMatrixActual = self.KyMatrixMPoint;
-        kyMatrixCalculated = generateKyMatrix(self.incidentKVectorMPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance);
+        sourceMPoint = Source()
+        sourceMPoint.kIncident = self.incidentKVectorMPoint
+        sourceMPoint.k0 = 1
+        kyMatrixCalculated = generateKyMatrix(sourceMPoint, self.crystal, self.numberHarmonics)
+        assertAlmostEqual(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance,
+                "testHarmonics: Ky at M Point");
 
     def setUp(self):
         self.numberHarmonics = (3, 3, 1)
@@ -142,7 +167,7 @@ class testHarmonicFunctions(unittest.TestCase):
         self.ER = (self.er-1) * np.heaviside(sq(X) + sq(Y) - sq(self.r),1)
         self.ER = self.ER + 1;
         source = Source()
-        self.crystal = Crystal(source, self.ER, self.UR, self.t1, self.t2)
+        self.crystal = Crystal(self.ER, self.UR, self.t1, self.t2)
 
         # The data for Kx, Ky, and Kz will be re-used at each point of key symmetry
         self.KxMatrixGPoint = complexZeros(self.matrixShape);
