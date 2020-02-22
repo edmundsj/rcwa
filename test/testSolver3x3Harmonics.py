@@ -127,7 +127,7 @@ class TestRCWASolver(unittest.TestCase):
         assertAlmostEqual(CTotActual, CTotCalculated, 1e-7, 1e-7, "testSolver: Conservation Violated")
 
     def testIntegrationMultiWavelength(self):
-        testWavelengths = self.solver.source.wavelength*np.arange(0.9,1.1,0.01)
+        testWavelengths = self.solver.source.wavelength*np.arange(0.2,2,0.01)
         self.solver.Solve(testWavelengths)
         #Plotter.plotReflectionSpectra(self.solver.results)
 

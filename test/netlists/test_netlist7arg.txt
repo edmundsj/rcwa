@@ -1,0 +1,13 @@
+
+# Make sure it can handle whitespace and comments
+
+# First, define our source
+
+W0 1.4um 1.5um 1nm 45deg 30deg 1 1j
+
+LR 2
+L0 1 1.5um
+LT 3
+
+# Lastly, define that we want to use refractive index instead of permittivity
+.REFRACTIVEINDEX

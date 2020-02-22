@@ -2,7 +2,6 @@ from shorthand import *
 from matrices import *
 from results import *
 from harmonics import *
-from shorthandTest import *
 from matrixParser import *
 from copy import deepcopy
 
@@ -16,28 +15,35 @@ class RCWASolver:
         self.baseCrystalLayer = self.layerStack.extractCrystalLayer()
         self.baseCrystal = self.layerStack.internalLayer[self.baseCrystalLayer].crystal
         self.setupKMatrices()
-        self.KDimension = self.Kx.shape[0]
-        self.scatteringElementDimension = self.KDimension * 2
-        self.scatteringElementShape = (self.scatteringElementDimension, self.scatteringElementDimension)
-        self.layerStack.setGapLayer(self.source.kIncident[1], self.source.kIncident[1])
         self.setupGapMatrices()
         self.setupReflectionTransmissionMatrices()
-
-        self.ClearSolution()
-        self.Si = [None for _ in range(len(self.layerStack.internalLayer))]
         self.results = []
+        self.ClearSolution()
 
     def setupKMatrices(self):
         self.Kx = generateKxMatrix(self.source, self.baseCrystal, self.numberHarmonics)
         self.Ky = generateKyMatrix(self.source, self.baseCrystal, self.numberHarmonics)
+        if isinstance(self.Kx, np.ndarray):
+            self.KDimension = self.Kx.shape[0]
+        else:
+            self.KDimension = 1
+            # Ensure that Kz for the gap layer is 1
+            self.layerStack.gapLayer = Layer(er=1 + sq(self.Kx) + sq(self.Ky), ur=1, L=0)
         self.KzReflectionRegion = calculateKzBackward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
         self.KzTransmissionRegion = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmissionLayer)
         self.KzGapRegion = calculateKzForward(self.Kx, self.Ky, self.layerStack.gapLayer)
+
+        self.scatteringElementDimension = self.KDimension * 2
+        self.scatteringElementShape = (self.scatteringElementDimension, self.scatteringElementDimension)
 
     def Solve(self, wavelengths=np.array([])):
         if wavelengths.size == 0:
             wavelengths = np.array([self.source.wavelength])
         for wavelength in wavelengths:
+            self.source.wavelength = wavelength # Update the source wavelength and all associated things.
+            self.setupKMatrices()
+            self.setupGapMatrices()
+            self.setupReflectionTransmissionMatrices()
             self.source.wavelength = wavelength
             self.ClearSolution()
             self.calculateDeviceSMatrix()
@@ -75,7 +81,7 @@ class RCWASolver:
         self.WTransmissionRegion = complexIdentity(self.scatteringElementDimension)
 
     def setupGapMatrices(self):
-        self.WGap = complexIdentity(self.Kx.shape[0]*2)
+        self.WGap = complexIdentity(self.scatteringElementDimension)
         QGap = calculateQMatrix(self.Kx, self.Ky, self.layerStack.gapLayer)
         LambdaGap = calculateLambdaMatrix(self.KzGapRegion)
         self.VGap = QGap @ inv(LambdaGap)
@@ -86,8 +92,8 @@ class RCWASolver:
         WFreeSpace = complexIdentity(18)
         LambdaFreeSpace = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/freeSpace/LambdaFreeSpace.txt")
         VFreeSpace = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/freeSpace/VFreeSpace.txt")
-        self.WGap = WFreeSpace # HACK HACK SHOULD BE REMOVED.
-        self.VGap = VFreeSpace
+        #self.WGap = WFreeSpace # HACK HACK SHOULD BE REMOVED.
+        #self.VGap = VFreeSpace
 
     def calculateDeviceSMatrix(self):
         for i in range(len(self.layerStack.internalLayer)):
@@ -108,3 +114,4 @@ class RCWASolver:
         self.rx, self.ry, self.rz = None, None, None
         self.tx, self.ty, self.tz = None, None, None
         self.R, self.T, self.RTot, self.TTot, self.CTot = None, None, None, None, None
+        self.Si = [None for _ in range(len(self.layerStack.internalLayer))]

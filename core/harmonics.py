@@ -45,10 +45,13 @@ def getYComponents(*args):
     return yComponents;
 
 def generateKxMatrix(source, crystal, numberHarmonics):
-    if crystal.dimensions is 2:
-        return generateKxMatrix2D(source, crystal, numberHarmonics[0:2])
+    if crystal is not None:
+        if crystal.dimensions is 2:
+            return generateKxMatrix2D(source, crystal, numberHarmonics[0:2])
+        else:
+            raise NotImplementedError
     else:
-        raise NotImplementedError
+        return source.kIncident[0]
 
 def generateKxMatrix2D(source, crystal, numberHarmonics):
     matrixSize = np.prod(numberHarmonics)
@@ -70,12 +73,14 @@ def generateKxMatrix2D(source, crystal, numberHarmonics):
 
     return KxMatrix
 
-def generateKyMatrix(kIncident, crystal, numberHarmonics):
-    if crystal.dimensions is 2:
-        KyMatrix = generateKyMatrix2D(kIncident, crystal, numberHarmonics[0:2])
-        return KyMatrix
+def generateKyMatrix(source, crystal, numberHarmonics):
+    if crystal is not None:
+        if crystal.dimensions is 2:
+            return generateKyMatrix2D(source, crystal, numberHarmonics[0:2])
+        else:
+            raise NotImplementedError
     else:
-        raise NotImplementedError
+        return source.kIncident[1]
 
 def generateKyMatrix2D(source, crystal, numberHarmonics):
     matrixSize = np.prod(numberHarmonics)

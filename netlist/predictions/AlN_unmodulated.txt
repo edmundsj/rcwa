@@ -4,11 +4,12 @@
 # This is a plane-wave source of infinite extent, with angle theta and phi specified in degrees.
 # The last two numbers are the TE / TM polarization numbers. They will be normalized internally, only
 # their ratio matters.
-W0 1um 2um 10nm
+W0 300nm 700nm 1nm
 
 LR 1
-Li1 2.11 200nm
-Li2 1.45 1um
+#Li1 1.1+0.013j 50nm
+Li1 1.75 90nm
+Li2 1.45 1.5um
 LT 3.575
 
 .REFRACTIVEINDEX

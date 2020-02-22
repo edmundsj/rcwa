@@ -14,6 +14,20 @@ class Layer:
         else:
             self.homogenous = True
 
+    def __eq__(self, other):
+        if not isinstance(other, Layer):
+            return NotImplemented
+
+        return self.er == other.er and self.ur == other.ur and self.L == other.L \
+                    and self.n == other.n and self.crystal == other.crystal
+
+    def __str__(self):
+        return f'Layer with\n\ter: {self.er}\n\tur: {self.ur}\n\tL: {self.L}\n\tn: {self.n}\n\tcrystal: {self.crystal}'
+
+    def __repr__(self):
+        return f'Layer with\n\ter: {self.er}\n\tur: {self.ur}\n\tL: {self.L}\n\tn: {self.n}\n\tcrystal: {self.crystal}'
+
+
     def setConvolutionMatrix(self, numberHarmonics):
         if self.crystal is not None:
             self.er = self.generateConvolutionMatrix(self.crystal.permittivityCellData, numberHarmonics)
@@ -63,6 +77,9 @@ freeSpaceLayer = Layer(1,1)
 
 class LayerStack:
     def __init__(self, *layers):
+        if len(layers) is 1:
+            if isinstance(layers[0], list):
+                layers = layers[0]
         self.gapLayer = Layer(1,1)
         if len(layers) is 0:
             self.reflectionLayer = freeSpaceLayer
@@ -76,6 +93,39 @@ class LayerStack:
             self.reflectionLayer = layers[0]
             self.transmissionLayer = layers[-1]
             self.internalLayer = list(layers[1:-1])
+
+    def __eq__(self, other):
+        if not isinstance(other, LayerStack):
+            return NotImplemented
+
+        reflectionLayersSame = self.reflectionLayer == other.reflectionLayer
+        transmissionLayersSame = self.transmissionLayer == other.transmissionLayer
+        internalLayersSame = False
+        if(len(self.internalLayer) == len(other.internalLayer)):
+            for i in range(len(self.internalLayer)):
+                if self.internalLayer[i] != other.internalLayer[i]:
+                    break;
+            internalLayersSame = True
+
+        return internalLayersSame and reflectionLayersSame and transmissionLayersSame
+
+    def __str__(self):
+        topString= f'\nReflection Layer:\n\t' + str(self.reflectionLayer) + \
+                f'\nTransmissionLayer:\n\t' + str(self.transmissionLayer) + \
+                f'\nInternal Layer Count: {len(self.internalLayer)}\n'
+        internalString = ''
+        for layer in self.internalLayer:
+            internalString += str(layer) + '\n'
+        return topString + internalString
+
+    def __repr__(self):
+        return f'\nReflection Layer:\n\t' + str(self.reflectionLayer) + \
+                f'\nTransmissionLayer:\n\t' + str(self.transmissionLayer) + \
+                f'\nInternal Layer Count: {len(self.internalLayer)}\n'
+        internalString = ''
+        for layer in self.internalLayer:
+            internalString += str(layer) + '\n'
+        return topString + internalString
 
     def setGapLayer(self, kx, ky):
         self.gapLayer.er = 1 + sq(kx) + sq(ky)

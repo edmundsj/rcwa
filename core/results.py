@@ -1,6 +1,8 @@
 class Results:
     def __init(self):
         self.source = None
+        self.theta = None
+        self.phi = None
         self.crystal = None
         self.SGlobal = None
         self.rx = None

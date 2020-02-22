@@ -4,12 +4,14 @@ Date Started: 2020/01/05
 Title: Rigorous Coupled Wave Analysis Solver
 License: BSD
 
-SOFTWARE STATUS
+GETTING STARTED --- 
+1. Create a netlist that describes your system. This contains all the thicknesses, permittivities,
+permeabilities, crystal structure, excitation wavelength/range, and so on.
 
+SOFTWARE STATUS
 Whenever possible I have attempted to stay with the convention introduced in Dr. Rumpf's online class on computational electromagnetics.
 
 KNOWN ISSUES
 When computing the quantities rx, ry, rz, there appears to be an unnecessary pi phase shift due to a difference in the TE/TM vectors. It is not clear whether this is a difference in convention or an actual error.
 
-GETTING STARTED --- 
 

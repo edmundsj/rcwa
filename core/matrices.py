@@ -294,30 +294,47 @@ def calculateReflectionCoefficient(S, Kx, Ky, KzReflectionRegion,
         WReflectionRegion, source, numberHarmonics):
     incidentFieldHarmonics = calculateIncidentFieldHarmonics(source, numberHarmonics)
     rTransverse = WReflectionRegion @ S[0,0] @ inv(WReflectionRegion) @ incidentFieldHarmonics
-    maxIndex = int(rTransverse.shape[0]/2)
-    print(maxIndex)
-    rx = rTransverse[0:maxIndex]
-    ry = rTransverse[maxIndex:]
-    rz = - inv(KzReflectionRegion) @ (Kx @ rx + Ky @ ry)
+
+    rx, ry, rz = None, None, None
+    if isinstance(Kx, np.ndarray):
+        maxIndex = int(rTransverse.shape[0]/2)
+        rx = rTransverse[0:maxIndex]
+        ry = rTransverse[maxIndex:]
+        rz = - inv(KzReflectionRegion) @ (Kx @ rx + Ky @ ry)
+    else:
+        rx = rTransverse[0]
+        ry = rTransverse[1]
+        rz = - (Kx * rx + Ky * ry) / KzReflectionRegion
     return rx, ry, rz
 
 def calculateTransmissionCoefficient(S, Kx, Ky, KzTransmissionRegion,
         WTransmissionRegion, source, numberHarmonics):
     incidentFieldHarmonics = calculateIncidentFieldHarmonics(source, numberHarmonics)
     tTransverse = WTransmissionRegion @ S[1,0] @ inv(WTransmissionRegion) @ incidentFieldHarmonics
-    maxIndex = int(tTransverse.shape[0]/2)
-    tx = tTransverse[:maxIndex]
-    ty = tTransverse[maxIndex:]
-    tz = - inv(KzTransmissionRegion) @ (Kx @ tx + Ky @ ty)
+
+    tx, ty, tz = None, None, None
+    if isinstance(Kx, np.ndarray):
+        maxIndex = int(tTransverse.shape[0]/2)
+        tx = tTransverse[:maxIndex]
+        ty = tTransverse[maxIndex:]
+        tz = - inv(KzTransmissionRegion) @ (Kx @ tx + Ky @ ty)
+    else:
+        tx = tTransverse[0]
+        ty = tTransverse[1]
+        tz = - (Kx * tx + Ky * ty) / KzTransmissionRegion
     return tx, ty, tz
 
 def calculateDiffractionReflectionEfficiency(rx, ry, rz, source, KzReflectionRegion, layerStack):
     urReflectionRegion = layerStack.reflectionLayer.ur
     preMatrix = real(-1 /urReflectionRegion * KzReflectionRegion) / \
             real(source.kIncident[2] / urReflectionRegion)
-    R = preMatrix @ (sq(np.abs(rx)) + sq(np.abs(ry)) + sq(np.abs(rz)))
-    RDimension = int(sqrt(rx.shape[0]))
-    R = R.reshape((RDimension, RDimension))
+    R = None
+    if isinstance(KzReflectionRegion, np.ndarray):
+        R = preMatrix @ (sq(np.abs(rx)) + sq(np.abs(ry)) + sq(np.abs(rz)))
+        RDimension = int(sqrt(rx.shape[0]))
+        R = R.reshape((RDimension, RDimension))
+    else:
+        R = -preMatrix * (sq(np.abs(rx)) + sq(np.abs(ry)) + sq(np.abs(rz)))
     return R
 
 def calculateDiffractionTransmissionEfficiency(tx, ty, tz, source, KzTransmissionRegion, layerStack):
@@ -325,9 +342,13 @@ def calculateDiffractionTransmissionEfficiency(tx, ty, tz, source, KzTransmissio
     urReflectionRegion = layerStack.reflectionLayer.ur
     preMatrix = real(1 / urTransmissionRegion * KzTransmissionRegion) / \
             real(source.kIncident[2] / urReflectionRegion)
-    T = preMatrix @ (sq(np.abs(tx)) + sq(np.abs(ty)) + sq(np.abs(tz)))
-    TDimension = int(sqrt(tx.shape[0]))
-    T = T.reshape((TDimension, TDimension))
+
+    if isinstance(KzTransmissionRegion, np.ndarray):
+        T = preMatrix @ (sq(np.abs(tx)) + sq(np.abs(ty)) + sq(np.abs(tz)))
+        TDimension = int(sqrt(tx.shape[0]))
+        T = T.reshape((TDimension, TDimension))
+    else:
+        T = preMatrix * (sq(np.abs(tx)) + sq(np.abs(ty)) + sq(np.abs(tz)))
     return T
 
 def calculateEz(kx, ky, kz, Ex, Ey):
