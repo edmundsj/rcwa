@@ -1,7 +1,7 @@
 from shorthand import *
 
 class Layer:
-    def __init__(self, er=1, ur=1, L=0, crystal=None, numberHarmonics=None):
+    def __init__(self, er=1, ur=1, L=0, crystal=None, numberHarmonics=None, material=None):
         self.er = er
         self.ur = ur
         self.L = L

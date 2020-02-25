@@ -12,5 +12,5 @@ SOFTWARE STATUS
 Whenever possible I have attempted to stay with the convention introduced in Dr. Rumpf's online class on computational electromagnetics.
 
 KNOWN ISSUES
-When computing rTE / rTM for ellipsometry calculations, you must ensure there is some TM component to your incident wave, otherwise you will just get zero for everything.
+When computing rTE / rTM for ellipsometry calculations, you must ensure there is some TM component to your incident wave, otherwise you will just get NaN values for rTM. This will show up on the plot as not having a TM component.
 

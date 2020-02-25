@@ -37,13 +37,13 @@ class Source:
                 self.aTM == other.aTM
 
     def __str__(self):
-        return f'wavelength: {self.freeSpaceWavelength}, (theta, phi) = ({self.theta}, {self.phi})' + \
-                f'kIncident: {self.kIncident}, polarization: ({self.pTE}, {self.pTM})' + \
-                f'TEM vector: ({self.aTE}, {self.aTM})'
+        return f'wavelength: {self.freeSpaceWavelength:.3f}, (theta, phi) = ({self.theta:.4f}, {self.phi:.4f})\n' + \
+                f'kIncident: {self.kIncident}, polarization: ({self.pTE:.3f}, {self.pTM:.3f})\n' + \
+                f'TEM vector: ({self.aTE}, {self.aTM})\n'
 
     def __repr__(self):
-        return f'wavelength: {self.freeSpaceWavelength}, (theta, phi) = ({self.theta}, {self.phi})' + \
-                f'kIncident: {self.kIncident}, polarization: ({self.pTE}, {self.pTM})' + \
+        return f'wavelength: {self.freeSpaceWavelength:.3f}, (theta, phi) = ({self.theta:.4f}, {self.phi:.4f})' + \
+                f'kIncident: {self.kIncident}, polarization: ({self.pTE:.3f}, {self.pTM:.3f})' + \
                 f'TEM vector: ({self.aTE}, {self.aTM})'
 
     def getRepresentationVector(self):
