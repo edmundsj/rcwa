@@ -363,8 +363,11 @@ class Test1x1Harmonic(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
     def testCalculateTEMReflectionCoefficientsFromXYZ(self):
-        rTEMActual = complexArray([-0.418308+0.183386j, -0.222488 - 0.426831j])
+        #rTEMActual = complexArray([-0.418308+0.183386j, -0.222488 - 0.426831j])
+        rTEMActual = complexArray([-0.591577 + 0.259348j, -0.60363 + 0.314646j])
         rTEMCalculated = calculateTEMReflectionCoefficientsFromXYZ(self.source, self.rx, self.ry, self.rz)
+        print(self.source)
+        print(rTEMCalculated)
         assertAlmostEqual(rTEMActual, rTEMCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "TEM coefficients")
 
@@ -376,6 +379,8 @@ class Test1x1Harmonic(unittest.TestCase):
         self.relativeTolerance = 1e-3
         self.theta = 57 * deg
         self.phi = 23 * deg
+        self.pTE = 1
+        self.pTM = 1j
         self.wavelength = 2.7
         erReflectionRegion = 1.4
         urReflectionRegion = 1.2
@@ -387,7 +392,8 @@ class Test1x1Harmonic(unittest.TestCase):
         urLayer2 = 3.0
 
         reflectionLayer = Layer(erReflectionRegion, urReflectionRegion)
-        self.source = Source(self.wavelength, self.theta, self.phi, layer=reflectionLayer)
+        self.source = Source(wavelength=self.wavelength, theta=self.theta, phi=self.phi,
+                pTEM=[self.pTE, self.pTM], layer=reflectionLayer)
         thicknessLayer1 = 0.25*self.source.wavelength
         thicknessLayer2 = 0.5*self.source.wavelength
 

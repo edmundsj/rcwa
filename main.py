@@ -21,7 +21,7 @@ from plotter import Plotter
 
 arguments = len(sys.argv) - 1; # The number of arguments
 netlistDirectory = './netlist/predictions/'
-netlist1 = netlistDirectory + 'AlN_unmodulated.txt'
+netlist1 = netlistDirectory + 'aSiOnSiO2.txt'
 netlist2 = netlistDirectory + 'AlN_modulated.txt'
 netlist_location = './netlist/predictions/sample_netlist.txt';
 if(arguments > 0):
@@ -32,18 +32,17 @@ print("Parsing netlist... ");
 parser1 = NetlistParser(netlist1);
 parser1.parseNetlist();
 print("Done!")
-parser2 = NetlistParser(netlist2)
-parser2.parseNetlist();
 
 print("Solving system...")
+print(parser1.sources[0])
 TMMSolver1 = RCWASolver(parser1.layerStack, parser1.sources[0], (1, 1))
-#TMMSolver2 = RCWASolver(parser2.layerStack, parser2.sources[0], (1, 1))
 wavelengths = np.arange(parser1.startWavelength, parser1.stopWavelength + parser1.stepWavelength,
         parser1.stepWavelength)
 
 TMMSolver1.Solve(wavelengths=wavelengths)
+print(TMMSolver1.results[0])
 #TMMSolver2.Solve(wavelengths=wavelengths)
-Plotter.plotReflectionSpectra(TMMSolver1.results)
-#Plotter.plotReflectionSpectra(TMMSolver2.results)
+#Plotter.plotEllipsometrySpectra(TMMSolver1.results)
+Plotter.plotRTEMSpectra(TMMSolver1.results)
 plt.show()
 print("Done!")

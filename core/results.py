@@ -1,5 +1,5 @@
 class Results:
-    def __init(self):
+    def __init__(self):
         self.source = None
         self.theta = None
         self.phi = None
@@ -20,3 +20,9 @@ class Results:
         self.T = None
         self.RTot = None
         self.TTot = None
+    def __str__(self):
+        resultsString = f"Source ---\n \u03B8: {self.theta}, \u03C6: {self.phi}\n"
+        resultsString += f"Reflection: rx: {self.rx:.3f}, ry: {self.ry:.3f} rz: {self.rz:.3f}\n"
+        resultsString += f"Reflection: rTE: {self.rTE:.3f}, rTM: {self.rTM:.3f}\n"
+        resultsString += f"RTot: {self.RTot:.3f}, TTot: {self.TTot:.3f}"
+        return resultsString

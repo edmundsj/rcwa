@@ -297,6 +297,8 @@ def calculateTEMReflectionCoefficientsFromXYZ(source, rx, ry, rz):
     else:
         rxyz = np.array([rx, ry, rz])
         rTEM = source.ATEM @ rxyz
+        rTEM[0] = rTEM[0] / source.pTE
+        rTEM[1] = rTEM[1] / source.pTM
         return rTEM
 
 def calculateReflectionCoefficient(S, Kx, Ky, KzReflectionRegion,

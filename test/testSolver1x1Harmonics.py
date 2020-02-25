@@ -187,11 +187,13 @@ class TestRCWASolver1x1(unittest.TestCase):
         self.T = 0.5597
 
         self.tanPsi = 1.0538
-        self.cosDelta = 0.06729
-        self.delta = 1.50345
+        self.cosDelta = 0.997733
+        self.delta = -0.0673421
 
-        self.rTE = -0.418308 + 0.183386j
-        self.rTM = -0.222488 - 0.426831j
+        #self.rTE = -0.418308 + 0.183386j
+        #self.rTM = -0.222488 - 0.426831j
+        self.rTE = -0.591577 + 0.259348j
+        self.rTM = -0.60363 + 0.314646j
 
         self.KzGap = 1
         self.WGap = complexIdentity(2)

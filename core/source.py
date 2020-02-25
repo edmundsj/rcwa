@@ -5,7 +5,7 @@ from shorthand import *
 from layer import *
 
 class Source:
-    def __init__(self, wavelength=2*pi,theta=0, phi=0, pTEM=[1,0], layer=freeSpaceLayer):
+    def __init__(self, wavelength=2*pi,theta=0, phi=0, pTEM=[1,1], layer=freeSpaceLayer):
         self.freeSpaceWavelength=wavelength
         self.k0 = 2*pi / wavelength
         self.theta = theta
