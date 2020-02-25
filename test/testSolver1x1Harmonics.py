@@ -77,7 +77,6 @@ class TestRCWASolver1x1(unittest.TestCase):
 
     def testrtAmplitudeCoefficients(self):
         self.solver.Solve()
-        # HACK - FOR SOME REASON MY PHASE IS OFF BY PI.
         rxActual = self.rx
         ryActual = self.ry
         rzActual = self.rz
@@ -100,6 +99,15 @@ class TestRCWASolver1x1(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: ty")
         assertAlmostEqual(tzActual, tzCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tz")
+
+        rTEActual = self.rTE
+        rTMActual = self.rTM
+        rTECalculated = self.solver.rTEM[0]
+        rTMCalculated = self.solver.rTEM[1]
+        assertAlmostEqual(rTEActual, rTECalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rTE")
+        assertAlmostEqual(rTMActual, rTMCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rTM")
 
     def testRT(self):
         self.solver.Solve()
@@ -160,6 +168,9 @@ class TestRCWASolver1x1(unittest.TestCase):
         self.tz = -0.1343 - 0.2480j
         self.R = 0.4403
         self.T = 0.5597
+
+        self.rTE = -0.418308 + 0.183386j
+        self.rTM = -0.222488 - 0.426831j
 
         self.KzGap = 1
         self.WGap = complexIdentity(2)
