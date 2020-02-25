@@ -25,10 +25,12 @@ class RCWASolver:
         self.Ky = generateKyMatrix(self.source, self.baseCrystal, self.numberHarmonics)
         if isinstance(self.Kx, np.ndarray):
             self.KDimension = self.Kx.shape[0]
+            self.TMMSimulation = False
         else:
             self.KDimension = 1
             # Ensure that Kz for the gap layer is 1
             self.layerStack.gapLayer = Layer(er=1 + sq(self.Kx) + sq(self.Ky), ur=1, L=0)
+            self.TMMSimulation = True
         self.KzReflectionRegion = calculateKzBackward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
         self.KzTransmissionRegion = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmissionLayer)
         self.KzGapRegion = calculateKzForward(self.Kx, self.Ky, self.layerStack.gapLayer)
@@ -64,6 +66,9 @@ class RCWASolver:
         self.TTot = np.sum(self.T)
         self.conservation = self.RTot + self.TTot
 
+        if self.TMMSimulation is True:
+            self.rTEM = calculateTEMReflectionCoefficientsFromXYZ(self.source, self.rx, self.ry, self.rz)
+
     def packageResults(self):
         tempResults = Results()
         tempResults.rx, tempResults.ry, tempResults.rz = deepcopy((self.rx, self.ry, self.rz))
@@ -74,6 +79,10 @@ class RCWASolver:
         tempResults.crystal = deepcopy(self.baseCrystal)
         tempResults.source = deepcopy(self.source)
         tempResults.SGlobal = deepcopy(self.SGlobal)
+
+        if self.TMMSimulation is True:
+            tempResults.rTE = self.rTEM[0]
+            tempResults.rTM = self.rTEM[1]
         self.results.append(tempResults)
 
     def setupReflectionTransmissionMatrices(self):

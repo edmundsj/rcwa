@@ -11,6 +11,8 @@ class Results:
         self.tx = None
         self.ty = None
         self.tz = None
+        self.rTE = None
+        self.rTM = None
         self.R = None
         self.T = None
         self.RTot = None
