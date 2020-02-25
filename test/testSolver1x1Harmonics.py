@@ -109,6 +109,23 @@ class TestRCWASolver1x1(unittest.TestCase):
         assertAlmostEqual(rTMActual, rTMCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rTM")
 
+    def testEllipsometryData(self):
+        self.solver.Solve()
+        tanPsiActual = self.tanPsi
+        cosDeltaActual = self.cosDelta
+        deltaActual = self.delta
+
+        tanPsiCalculated = self.solver.results[0].tanPsi
+        deltaCalculated = self.solver.results[0].delta
+        cosDeltaCalculated = self.solver.results[0].cosDelta
+
+        assertAlmostEqual(tanPsiActual, tanPsiCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tanPsi")
+        assertAlmostEqual(deltaActual, deltaCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: delta")
+        assertAlmostEqual(cosDeltaActual, cosDeltaCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: cosDelta")
+
     def testRT(self):
         self.solver.Solve()
         RActual = self.R
@@ -168,6 +185,10 @@ class TestRCWASolver1x1(unittest.TestCase):
         self.tz = -0.1343 - 0.2480j
         self.R = 0.4403
         self.T = 0.5597
+
+        self.tanPsi = 1.0538
+        self.cosDelta = 0.06729
+        self.delta = 1.50345
 
         self.rTE = -0.418308 + 0.183386j
         self.rTM = -0.222488 - 0.426831j

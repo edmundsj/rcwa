@@ -83,6 +83,11 @@ class RCWASolver:
         if self.TMMSimulation is True:
             tempResults.rTE = self.rTEM[0]
             tempResults.rTM = self.rTEM[1]
+            rho = tempResults.rTM / tempResults.rTE
+            tempResults.tanPsi = np.abs(rho)
+            tempResults.cosDelta = cos(np.angle(rho))
+            tempResults.delta = np.angle(rho)
+
         self.results.append(tempResults)
 
     def setupReflectionTransmissionMatrices(self):
