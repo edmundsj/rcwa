@@ -77,6 +77,7 @@ class Source:
 
         self.aTM = (np.cross(self.aTE, self.kIncident));
         self.aTM = (self.aTM / norm(self.aTM));
+        self.ATEM = np.vstack((self.aTE, self.aTM)) # matrix that goes from x/y basis to TE/TM basis
 
     def setKIncident(self):
         n = sqrt(self.layer.er*self.layer.ur);

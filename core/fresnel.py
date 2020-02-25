@@ -4,7 +4,6 @@ sys.path.append('core');
 
 from matrices import *
 
-# This appears to be correct as well
 def rTE(kz1, kz2, er1, er2, ur1, ur2):
     return (ur2 * kz1 - ur1 * kz2) / (ur2 * kz1 + ur1 * kz2);
 
@@ -12,13 +11,9 @@ def rTE(kz1, kz2, er1, er2, ur1, ur2):
 def rTM(kz1, kz2, er1, er2, ur1, ur2):
     return (er1 * kz2 - er2 * kz1) / (er1 * kz2 + er2 * kz1);
 
-# This appears to be correct
 def tTE(kz1, kz2, er1, er2, ur1, ur2):
     return 1 + rTE(kz1, kz2, er1, er2, ur1, ur2);
 
-# This appears to be wrong and I have no clue as to why.
-# Either something is wrong with this (more likely) or something
-# is wrong with my matrix formalism. Let's try substituting something different.
 def tTM(kz1, kz2, er1, er2, ur1, ur2):
     eta_1 = sqrt(ur1 / er1);
     eta_2 = sqrt(ur2 / er2);
@@ -29,11 +24,6 @@ def tTM(kz1, kz2, er1, er2, ur1, ur2):
     # return n1 / n2 * (1 + rTM(kz1, kz2, er1, er2, ur1, ur2));
 
 def fresnelSMatrixInterface(kx_n, ky_n, er1, er2, ur1, ur2):
-    """
-    Calculates and tests the s-parameters matrices (S11, S12, S21, S22) for an interface using
-    fresnel's equations for TE and TM modes and the dispersion relation for LHI media. These
-    scattering matrices are diagonal in the TE/TM basis.
-    """
     n1_sq = er1 * ur1;
     n2_sq = er2 * ur2;
 

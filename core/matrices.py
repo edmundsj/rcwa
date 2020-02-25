@@ -290,6 +290,15 @@ def calculateTransmissionRegionSMatrixFromRaw(ATransmissionRegion, BTransmission
     S[1,1] = - AInverse @ B;
     return S;
 
+# NOTE - this can only be used for 1D (TMM-type) simulations. rTE/rTM are not meaningful quantities otherwise.
+def calculateTEMReflectionCoefficientsFromXYZ(source, rx, ry, rz):
+    if isinstance(rx, np.ndarray):
+        raise NotImplementedError
+    else:
+        rxyz = np.array([rx, ry, rz])
+        rTEM = source.ATEM @ rxyz
+        return rTEM
+
 def calculateReflectionCoefficient(S, Kx, Ky, KzReflectionRegion,
         WReflectionRegion, source, numberHarmonics):
     incidentFieldHarmonics = calculateIncidentFieldHarmonics(source, numberHarmonics)

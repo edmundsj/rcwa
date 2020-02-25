@@ -32,6 +32,12 @@ class Test1x1Harmonic(unittest.TestCase):
         assertAlmostEqual(aTMActual, aTMCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "Oblique incidence TM vector wrong");
 
+        ATEMActual = np.vstack((aTEActual, aTMActual))
+        ATEMCalculated = self.source.ATEM
+        assertAlmostEqual(ATEMActual, ATEMCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "Oblique incidence TM vector wrong");
+
+
         # Important corner case where the cross product fails
         aTEActual = complexArray([0,1,0]);
         aTMActual = complexArray([1,0,0]);
@@ -356,6 +362,14 @@ class Test1x1Harmonic(unittest.TestCase):
         assertAlmostEqual(SActual, SCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
+    def testCalculateTEMReflectionCoefficientsFromXYZ(self):
+        rTEMActual = complexArray([-0.418308+0.183386j, -0.222488 - 0.426831j])
+        rTEMCalculated = calculateTEMReflectionCoefficientsFromXYZ(self.source, self.rx, self.ry, self.rz)
+        assertAlmostEqual(rTEMActual, rTEMCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "TEM coefficients")
+
+        # Next we test a super-simple interface against our analytic equations.
+
     def setUp(self):
         deg = pi / 180
         self.absoluteTolerance = 1e-4
@@ -399,6 +413,13 @@ class Test1x1Harmonic(unittest.TestCase):
         self.EyTransmitted = 0.4358 - 0.0820j
         self.EzTransmitted = -0.1343 - 0.2480j
         self.ExyzTransmitted = complexArray([self.ExTransmitted, self.EyTransmitted, self.EzTransmitted])
+
+        self.rx = 0.0519 - 0.2856j
+        self.ry= -0.4324 + 0.0780j
+        self.rz = 0.1866 + 0.3580j
+        self.tx = -0.0101 + 0.3577j
+        self.ty = 0.4358 - 0.0820j
+        self.tz = -0.1343 - 0.2480j
         self.R = 0.4403
         self.T = 0.5597
 
