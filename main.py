@@ -21,7 +21,7 @@ from plotter import Plotter
 
 arguments = len(sys.argv) - 1; # The number of arguments
 netlistDirectory = './netlist/predictions/'
-netlist1 = netlistDirectory + 'aSiOnSiO2.txt'
+netlist1 = netlistDirectory + 'AlN_unmodulated.txt'
 netlist2 = netlistDirectory + 'AlN_modulated.txt'
 netlist_location = './netlist/predictions/sample_netlist.txt';
 if(arguments > 0):
@@ -40,7 +40,7 @@ wavelengths = np.arange(parser1.startWavelength, parser1.stopWavelength + parser
         parser1.stepWavelength)
 
 TMMSolver1.Solve(wavelengths=wavelengths)
-Plotter.plotEllipsometrySpectra(TMMSolver1.results)
-#Plotter.plotRTEMSpectra(TMMSolver1.results)
+#Plotter.plotEllipsometrySpectra(TMMSolver1.results)
+Plotter.plotReflectionSpectra(TMMSolver1.results)
 plt.show()
 print("Done!")

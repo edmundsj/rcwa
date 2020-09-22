@@ -1,13 +1,10 @@
 import unittest
-import sys
-sys.path.append('core')
-sys.path.append('test')
 
-from shorthand import *
-from shorthandTest import *
-from harmonics import *
-from crystal import *
-from source import *
+from RCWA.test.shorthandTest import *
+from RCWA.source.shorthand import *
+from RCWA.source.harmonics import *
+from RCWA.source.crystal import *
+from RCWA.source.source import *
 
 class testHarmonicFunctions(unittest.TestCase):
     def testGetXComponents(self):

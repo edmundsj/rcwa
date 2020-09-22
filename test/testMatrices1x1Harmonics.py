@@ -1,14 +1,13 @@
-# Tests the matrices.py file, which is responsible for the creation and manipulation of scattering matrices
-import sys
-sys.path.append('core');
-sys.path.append('test')
+"""
+Tests the matrices.py file, which is responsible for the creation and manipulation of scattering matrices
+"""
 
 import unittest
-from shorthandTest import *
-from matrices import *
-from fresnel import *
-from matrixParser import *
-from source import *
+from RCWA.test.shorthandTest import *
+from RCWA.source.matrices import *
+from RCWA.source.fresnel import *
+from RCWA.source.matrixParser import *
+from RCWA.source.source import *
 
 
 class Test1x1Harmonic(unittest.TestCase):

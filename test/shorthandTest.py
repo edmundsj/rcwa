@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 sys.path.append('core')
-from source import Source
+from RCWA.source.source import Source
 
 def assertAlmostEqual(a, b, absoluteTolerance=1e-10, relativeTolerance=1e-9, errorMessage=""):
     if isinstance(a, Source):

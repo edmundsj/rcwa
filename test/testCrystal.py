@@ -1,11 +1,7 @@
-import sys
-sys.path.append('core');
-sys.path.append('test')
-
-from source import *
-from crystal import *
 import unittest
-from shorthandTest import *
+from RCWA.test.shorthandTest import *
+from RCWA.source.source import *
+from RCWA.source.crystal import *
 
 class Test(unittest.TestCase):
 

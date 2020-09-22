@@ -1,12 +1,9 @@
-import sys
-sys.path.append('core')
-sys.path.append('test')
+from RCWA.test.shorthandTest import *
 
-from shorthand import *
-from layer import *
-from source import *
+from RCWA.source.shorthand import *
+from RCWA.source.layer import *
+from RCWA.source.source import *
 import unittest
-from shorthandTest import *
 
 
 class testSource(unittest.TestCase):

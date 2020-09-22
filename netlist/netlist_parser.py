@@ -5,13 +5,11 @@
 #   wavelength per simulation. They can still do multiple wavelengths eventually, but 
 #   for now this should be a global setting.
 
-import sys
-sys.path.append('core');
-sys.path.append('test')
-
-from crystal import *
-from layer import *
-from source import *
+from RCWA.source.crystal import *
+from RCWA.source.layer import *
+from RCWA.source.source import *
+import re
+import numpy as np
 
 # EXPECTED NETLIST FORMAT
 WAVELENGTH_POSITION = 1;
@@ -25,8 +23,6 @@ THICKNESS_POSITION = 3;
 
 DBGLVL = 2;
 
-import re
-import numpy as np
 
 class NetlistParser:
     filename = '';

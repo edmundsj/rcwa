@@ -1,17 +1,13 @@
-import sys
-sys.path.append('core');
-sys.path.append('test')
-
 import unittest
-from shorthandTest import *
-from matrices import *
-from fresnel import *
-from matrixParser import *
-from source import Source
-from source import Layer
-from solver import *
-from results import *
-from crystal import Crystal
+from RCWA.test.shorthandTest import *
+from RCWA.source.matrices import *
+from RCWA.source.fresnel import *
+from RCWA.source.matrixParser import *
+from RCWA.source.source import Source
+from RCWA.source.source import Layer
+from RCWA.source.solver import *
+from RCWA.source.results import *
+from RCWA.source.crystal import Crystal
 
 
 class Test3x3HarmonicsOblique(unittest.TestCase):

@@ -1,16 +1,12 @@
-import sys
-sys.path.append('core')
-sys.path.append('netlist')
-
 import unittest
-from shorthand import *
+from RCWA.test.shorthandTest import *
+from RCWA.source.shorthand import *
+from RCWA.source.matrices import *
+from RCWA.netlist.netlist_parser import *
 import numpy as np
 import scipy as sp
 import scipy.linalg
 import sys
-from core.matrices import *
-from netlist.netlist_parser import *
-from shorthandTest import *
 
 # 1. The class NetlistParser parses a netlist and turns everything into a "Mask" or "Field" object.
 # The masks and field are returned so that they are sorted in ascending order with

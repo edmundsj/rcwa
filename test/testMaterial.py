@@ -1,13 +1,7 @@
-import sys
-
-sys.path.append('core')
-sys.path.append('nkData')
-sys.path.append('test')
-
 import unittest
-from material import Material
-from shorthand import *
-from shorthandTest import *
+from RCWA.source.material import Material
+from RCWA.source.shorthand import *
+from RCWA.test.shorthandTest import *
 
 class TestMaterial(unittest.TestCase):
 
