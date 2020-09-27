@@ -7,6 +7,8 @@
 # ignore all log files
 *.log
 
+# Ignore all python cache files
+*.pyc
 # ignore everything in the pycache directory
-**/__pycache__/
 __pycache__/
+__pycache__
