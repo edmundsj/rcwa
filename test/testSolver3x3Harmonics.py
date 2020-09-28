@@ -166,6 +166,11 @@ class TestRCWASolver(unittest.TestCase):
 
         self.solver = RCWASolver(layerStack, source, numberHarmonics)
 
+    @classmethod
+    def setUpClass(self):
+        """
+        Test fixture for loading in all the external test data.
+        """
         self.Kx = np.diag(complexArray(
             [2.2035, 1.0607, -0.0822, 2.2035, 1.0607, -0.0822, 2.2035, 1.0607, -0.0822]))
         self.Ky = np.diag(complexArray(
