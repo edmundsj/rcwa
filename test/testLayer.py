@@ -10,7 +10,7 @@ from shorthandTest import *
 
 class Test(unittest.TestCase):
     def testExtractCrystal(self):
-        t1 = np.array([1,0,0])
+        t1 = np.array([1,0,500])
         t2 = np.array([0,1,0])
         testCrystal = Crystal(t1, t2)
         testLayer = Layer(crystal=testCrystal)
