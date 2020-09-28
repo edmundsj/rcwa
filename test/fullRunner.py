@@ -27,6 +27,7 @@ suite.addTests(loader.loadTestsFromModule(testMatrices1x1Harmonics))
 suite.addTests(loader.loadTestsFromModule(testMatrices3x3Harmonics))
 suite.addTests(loader.loadTestsFromModule(testNetlistParser))
 suite.addTests(loader.loadTestsFromModule(testSolver1x1Harmonics))
+suite.addTests(loader.loadTestsFromModule(testSolver3x3Harmonics))
 
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)
