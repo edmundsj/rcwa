@@ -29,3 +29,6 @@ suite.addTests(loader.loadTestsFromModule(testSolver1x1Harmonics))
 
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)
+numberFailures = len(result.errors)
+numberErrors= len(result.failures)
+numberIssues = numberFailures + numberErrors

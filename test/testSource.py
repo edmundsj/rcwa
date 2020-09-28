@@ -11,7 +11,7 @@ from shorthandTest import *
 
 class testSource(unittest.TestCase):
     def testKIncident(self):
-        kIncidentActual = complexArray([1.0607, 0.61237, 5.70711])
+        kIncidentActual = complexArray([1.0607, 0.61237, 0.70711])
         kIncidentCalculated = self.source.kIncident
         assertAlmostEqual(kIncidentActual, kIncidentCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "kIncident in testSource")
