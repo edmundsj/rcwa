@@ -107,6 +107,12 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
 
     def testVMatrix(self):
+        """
+        NOTE: Depending on the version of numpy/scipy used, the eigenvectors columns may be swapped, and
+        so the test suite will fail. I may want to fix this in a future version. I am currently ignoring
+        the phase of the columns (just taking absolute value) because the phase is not physically
+        significant.
+        """
         (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0],
                 self.source)
         VActual = self.VLayer1
