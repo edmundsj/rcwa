@@ -3,7 +3,9 @@ Run all the core unit tests, not the lengthy and major integration tests
 """
 import unittest
 import sys
-sys.path.append('source')
+print(sys.path)
+sys.path.append('test')
+sys.path.append('RCWA')
 
 import test.testCrystal as testCrystal
 import test.testHarmonics as testHarmonics
