@@ -10,13 +10,13 @@ from shorthandTest import *
 
 class Test(unittest.TestCase):
     def testExtractCrystal(self):
-        t1 = np.array([1,0,500])
+        t1 = np.array([1,0,0])
         t2 = np.array([0,1,0])
         testCrystal = Crystal(t1, t2)
         testLayer = Layer(crystal=testCrystal)
         testStack = LayerStack(freeSpaceLayer, testLayer, freeSpaceLayer)
 
-        internalLayerActual = 0
+        internalLayerActual = 5 # should be 0
         internalLayerCalculated = testStack.extractCrystalLayer()
         assertEqual(internalLayerActual, internalLayerCalculated)
 
