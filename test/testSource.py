@@ -1,10 +1,13 @@
+"""
+Module for testing the plane wave source class
+"""
 import sys
 sys.path.append('core')
 sys.path.append('test')
 
 from shorthand import *
-from layer import *
-from source import *
+from layer import Layer
+from source import Source
 import unittest
 from shorthandTest import *
 
