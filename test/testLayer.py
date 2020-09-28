@@ -16,7 +16,7 @@ class Test(unittest.TestCase):
         testLayer = Layer(crystal=testCrystal)
         testStack = LayerStack(freeSpaceLayer, testLayer, freeSpaceLayer)
 
-        internalLayerActual = 5 # should be 0
+        internalLayerActual = 0 # should be 0
         internalLayerCalculated = testStack.extractCrystalLayer()
         assertEqual(internalLayerActual, internalLayerCalculated)
 
