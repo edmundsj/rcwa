@@ -2,7 +2,6 @@
 # Contact: jordan.e@berkeley.edu
 # Creation Date: 11/01/2019
 #
-# TODO:
 import sys
 sys.path.append('./core')
 sys.path.append('./netlist')

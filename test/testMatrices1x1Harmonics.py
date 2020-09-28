@@ -366,14 +366,13 @@ class Test1x1Harmonic(unittest.TestCase):
         #rTEMActual = complexArray([-0.418308+0.183386j, -0.222488 - 0.426831j])
         rTEMActual = complexArray([-0.591577 + 0.259348j, -0.60363 + 0.314646j])
         rTEMCalculated = calculateTEMReflectionCoefficientsFromXYZ(self.source, self.rx, self.ry, self.rz)
-        print(self.source)
-        print(rTEMCalculated)
         assertAlmostEqual(rTEMActual, rTEMCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "TEM coefficients")
 
         # Next we test a super-simple interface against our analytic equations.
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         deg = pi / 180
         self.absoluteTolerance = 1e-4
         self.relativeTolerance = 1e-3

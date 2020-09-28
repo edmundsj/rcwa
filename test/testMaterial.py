@@ -98,5 +98,6 @@ class TestMaterial(unittest.TestCase):
         urCalculated = self.silicon.ur(wavelength)
         assertAlmostEqual(urCalculated, urDesired, absoluteTolerance = 1e-5,errorMessage="material: testnk: ur4")
 
-    def setUp(self):
-        self.silicon = Material('nkData/Si_Schinke.csv')
+    @classmethod
+    def setUpClass(cls):
+        cls.silicon = Material('nkData/Si_Schinke.csv')

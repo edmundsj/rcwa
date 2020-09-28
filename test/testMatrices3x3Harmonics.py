@@ -425,7 +425,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         TCalculated = TCalculated
         assertAlmostEqual(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self): # NOTE - self here refers to class
         self.absoluteTolerance = 1e-3
         self.relativeTolerance = 1e-3
         deg = pi / 180
