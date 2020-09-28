@@ -32,3 +32,5 @@ result = runner.run(suite)
 numberFailures = len(result.errors)
 numberErrors= len(result.failures)
 numberIssues = numberFailures + numberErrors
+
+sys.exit(numberIssues)
