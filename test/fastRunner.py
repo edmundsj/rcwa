@@ -3,7 +3,6 @@ Run all the core unit tests, not the lengthy and major integration tests
 """
 import unittest
 import sys
-print(sys.path)
 sys.path.append('test')
 
 import testCrystal as testCrystal

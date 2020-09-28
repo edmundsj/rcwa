@@ -1,15 +1,16 @@
 import sys
+print(sys.path)
 sys.path.append('core')
 sys.path.append('netlist')
+print(sys.path)
 
 import unittest
 from shorthand import *
 import numpy as np
 import scipy as sp
 import scipy.linalg
-import sys
-from core.matrices import *
-from netlist.netlist_parser import *
+from matrices import *
+from netlist_parser import *
 from shorthandTest import *
 
 # 1. The class NetlistParser parses a netlist and turns everything into a "Mask" or "Field" object.
