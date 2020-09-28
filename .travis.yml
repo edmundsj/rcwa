@@ -1,1 +1,21 @@
 language: python
+
+cache: conda
+
+python: 
+    - "3.6"
+    - "3.7"
+    - "3.8"
+    - "nightly"
+
+matrix:
+    allow_failures:
+        - python: "nightly"
+
+install:
+    - conda install numpy
+    - conda install unittest
+    - conda install scipy
+
+script:
+    - python test/fastRunner.py
