@@ -12,3 +12,7 @@
 # ignore everything in the pycache directory
 __pycache__/
 __pycache__
+
+_build/
+_templates/
+_static/
