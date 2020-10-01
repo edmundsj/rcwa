@@ -100,15 +100,6 @@ class RCWASolver:
         LambdaGap = calculateLambdaMatrix(self.KzGapRegion)
         self.VGap = QGap @ inv(LambdaGap)
 
-        #KzFreeSpace = numpyArrayFromFile(
-                #"test/matrixDataOblique/freeSpace/KzFreeSpace.txt")
-        #QFreeSpace = numpyArrayFromFile("test/matrixDataOblique/freeSpace/QFreeSpace.txt")
-        #WFreeSpace = complexIdentity(18)
-        #LambdaFreeSpace = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/freeSpace/LambdaFreeSpace.txt")
-        #VFreeSpace = numpyArrayFromSeparatedColumnsFile("test/matrixDataOblique/freeSpace/VFreeSpace.txt")
-        #self.WGap = WFreeSpace # HACK HACK SHOULD BE REMOVED.
-        #self.VGap = VFreeSpace
-
     def calculateDeviceSMatrix(self):
         for i in range(len(self.layerStack.internalLayer)):
             self.Si[i] = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[i],

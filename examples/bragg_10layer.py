@@ -16,15 +16,28 @@ from matplotlib import pyplot as plt
 #from RCWA import RCWASolver # this is the syntax I want
 from solver import RCWASolver # This is the syntax I currently have
 
-layer0 = Layer(n=3.5)
-layer1 = Layer(n=1.45, L=0.94)
-layer2 = Layer(n=3.5, L=0.001)
-layer3 = Layer(n=1)
-stack = LayerStack(layer0, layer1, layer2, layer3)
+lambda0 = 1.3
+nSi = 3.5
+nSiO2 = 1.45
+tSi = lambda0/4/nSi
+tSiO2 = lambda0/4/nSiO2
+layer0 = Layer(n=nSi)
+layer1 = Layer(n=nSiO2, L=tSiO2)
+layer2 = Layer(n=nSi, L=tSi)
+layer3 = Layer(n=nSiO2, L=tSiO2)
+layer4 = Layer(n=nSi, L=tSi)
+layer5 = Layer(n=nSiO2, L=tSiO2)
+layer6 = Layer(n=nSi, L=tSi)
+layer7 = Layer(n=nSiO2, L=tSiO2)
+layer8 = Layer(n=nSi, L=tSi)
+layer9 = Layer(n=nSiO2, L=tSiO2)
+layer10 = Layer(n=nSi, L=tSi)
+layer11 = Layer(n=1)
+stack = LayerStack(layer0, layer1, layer2, layer3, layer4, layer5, layer6, layer7, layer8, layer9, layer10, layer11)
 source = Source(wavelength=0.4)
 
 startWavelength = 0.4
-stopWavelength = 1
+stopWavelength = 1.5
 stepWavelength = 0.002
 
 print("Solving system...")
