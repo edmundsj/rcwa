@@ -27,5 +27,4 @@ jobs:
         $CONDA/bin/flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with unittest using full test suite
       run: |
-        $CONDA/bin/conda install unittest
-        python test/fullRunner.py
+        coverage run test/fullRunner.py
