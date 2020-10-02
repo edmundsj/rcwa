@@ -20,9 +20,9 @@ class Crystal:
             self.latticeConstant = norm(self.latticeVectors[0]) # TODO: Make this more general
 
     def calculateReciprocalLatticeVectors(self):
-        if self.dimensions is 2:
+        if self.dimensions == 2:
             return self.calculateReciprocalLatticeVectors2D();
-        elif self.dimensions is 3:
+        elif self.dimensions == 3:
             return self.calculateReciprocalLatticeVectors3D();
         else:
             raise NotImplementedError(f"Cannot calculate reciprocal lattice for {self.dimensions}D." +

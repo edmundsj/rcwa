@@ -21,7 +21,7 @@ class Material:
                     self.name = row
                 else:
                     self.wavelengths = np.append(self.wavelengths, float(row[0]))
-                    if len(row) is 2:
+                    if len(row) == 2:
                         self.nkData = np.append(self.nkData, float(row[1]))
                     else:
                         self.nkData = np.append(self.nkData, float(row[1]) + float(row[2])*1j)

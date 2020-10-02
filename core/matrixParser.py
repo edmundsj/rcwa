@@ -19,13 +19,13 @@ def numpyArrayFromFile(filename):
     i = 0
     for line in fileLines:
         line = line.replace(" ", "")
-        if line is not "":
+        if line != "":
             rowOfStrings = line.split(delimiter)
             rowOfStrings = [elem + "j" for elem in rowOfStrings]
             rowOfStrings.remove("\nj")
             rowOfStrings = np.array(rowOfStrings)
             rowOfComplexNumbers = rowOfStrings.astype(np.cdouble)
-            if i is 0:
+            if i == 0:
                 data = rowOfComplexNumbers
             else:
                 data = np.vstack((data, rowOfComplexNumbers))
@@ -46,16 +46,16 @@ def numpyArrayFromSeparatedColumnsFile(filename):
     for line in fileLines:
         line = line.replace(" ", "")
         line = line.replace("\n", "")
-        if line is not "":
+        if line != "":
             rowOfComplexNumbers = complexNumberArrayFromString(line)
 
-            if rowNumber is 0:
+            if rowNumber == 0:
                 data[columnNumber] = rowOfComplexNumbers
             else:
                 data[columnNumber] = np.vstack((data[columnNumber], rowOfComplexNumbers))
             rowNumber += 1
 
-        if line is "": # This indicates we should start a new set of columns and append it to the old one
+        if line == "": # This indicates we should start a new set of columns and append it to the old one
             columnNumber += 1
             rowNumber = 0
 

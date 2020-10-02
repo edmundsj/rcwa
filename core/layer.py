@@ -83,15 +83,15 @@ freeSpaceLayer = Layer(1,1)
 
 class LayerStack:
     def __init__(self, *layers):
-        if len(layers) is 1:
+        if len(layers) == 1:
             if isinstance(layers[0], list):
                 layers = layers[0]
         self.gapLayer = Layer(1,1)
-        if len(layers) is 0:
+        if len(layers) == 0:
             self.reflectionLayer = freeSpaceLayer
             self.transmissionLayer = freeSpaceLayer
             self.internalLayer = []
-        elif len(layers) is 1:
+        elif len(layers) == 1:
             self.reflectionLayer = layers[0]
             self.transmissionLayer = layers[0]
             self.internalLayer = []
