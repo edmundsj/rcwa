@@ -20,6 +20,7 @@
 project = 'Rigorous Coupled Wave Analysis'
 copyright = '2020, Jordan Edmunds'
 author = 'Jordan Edmunds'
+master_doc = 'index'
 
 # The full version, including alpha/beta/rc tags
 release = '1.0'
