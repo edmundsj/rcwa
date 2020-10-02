@@ -24,8 +24,9 @@ install:
     - conda info -a
 
   # Replace dep1 dep2 ... with your dependencies
-    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib coverage
+    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib coverage coveralls
     - conda activate test-environment
 
 script:
-    - python test/fastRunner.py
+    - coverage run test/fullRunner.py
+    - COVERALLS_REPO_TOKEN=tGSdG5Qcd2dcQa2oQN9GlJkL50wFZPv1j coveralls
