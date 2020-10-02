@@ -29,4 +29,4 @@ install:
 
 script:
     - coverage run test/fullRunner.py
-    - COVERALLS_REPO_TOKEN=EfcMykhUnxL3E7vb598Mqim0X0KNXLFJY coveralls
+    - COVERALLS_REPO_TOKEN=XVZ3lTLL3h1sOQzBcGOcK4nMjyW61egej coveralls
