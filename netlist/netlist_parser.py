@@ -57,7 +57,7 @@ class NetlistParser:
     def extractDirectives(self):
         linesToDelete = []
         for i in range(len(self.processedLines)):
-            if self.processedLines[i][0] is '.':
+            if self.processedLines[i][0] == '.':
                 directiveLine = self.processedLines[i]
 
                 if directiveLine.upper() == '.REFRACTIVEINDEX':
@@ -72,14 +72,14 @@ class NetlistParser:
     def extractLayers(self):
         linesToDelete = []
         for i in range(len(self.processedLines)):
-            if self.processedLines[i][0] is 'L':
+            if self.processedLines[i][0] == 'L':
                 layerLine = self.processedLines[i]
                 er = 0
                 ur = 0
                 thickness = 0
                 lineChunks = self.processedLines[i].split(' ');
                 numberChunks = len(lineChunks)
-                if self.useRefractiveIndex is True:
+                if self.useRefractiveIndex == True:
                     er = sq(self.stripUnits(lineChunks[PERMITTIVITY_POSITION]))
                     ur = 1
                     if numberChunks >= 3:
@@ -103,7 +103,7 @@ class NetlistParser:
     def extractSources(self):
         linesToDelete = []
         for i in range(len(self.processedLines)):
-            if self.processedLines[i][0] is 'W':
+            if self.processedLines[i][0] == 'W':
                 lineChunks = self.processedLines[i].split(' ');
                 numberArguments = len(lineChunks) - 1
                 self.startWavelength = self.stripUnits(lineChunks[WAVELENGTH_POSITION]);
@@ -114,25 +114,25 @@ class NetlistParser:
                 pTE = 1
                 pTM = 0
 
-                if numberArguments is 3:
+                if numberArguments == 3:
                     self.stopWavelength = self.stripUnits(lineChunks[WAVELENGTH_POSITION + 1])
                     self.stepWavelength = self.stripUnits(lineChunks[WAVELENGTH_POSITION + 2])
-                elif numberArguments is 4:
+                elif numberArguments == 4:
                     theta = self.stripUnits(lineChunks[WAVELENGTH_POSITION + 1])
                     pTE = self.stripUnits(lineChunks[WAVELENGTH_POSITION + 2])
                     pTM = self.stripUnits(lineChunks[WAVELENGTH_POSITION + 3])
-                elif numberArguments is 5:
+                elif numberArguments == 5:
                     theta = self.stripUnits(lineChunks[WAVELENGTH_POSITION +1])
                     phi = self.stripUnits(lineChunks[WAVELENGTH_POSITION +2])
                     pTE = self.stripUnits(lineChunks[WAVELENGTH_POSITION +3])
                     pTM = self.stripUnits(lineChunks[WAVELENGTH_POSITION +4])
-                elif numberArguments is 6:
+                elif numberArguments == 6:
                     self.stopWavelength = self.stripUnits(lineChunks[WAVELENGTH_POSITION + 1])
                     self.stepWavelength = self.stripUnits(lineChunks[WAVELENGTH_POSITION + 2])
                     theta = self.stripUnits(lineChunks[WAVELENGTH_POSITION +3])
                     pTE = self.stripUnits(lineChunks[WAVELENGTH_POSITION +4])
                     pTM = self.stripUnits(lineChunks[WAVELENGTH_POSITION +5])
-                elif numberArguments is 7:
+                elif numberArguments == 7:
                     self.stopWavelength = self.stripUnits(lineChunks[WAVELENGTH_POSITION + 1])
                     self.stepWavelength = self.stripUnits(lineChunks[WAVELENGTH_POSITION + 2])
                     theta = self.stripUnits(lineChunks[WAVELENGTH_POSITION +3])
