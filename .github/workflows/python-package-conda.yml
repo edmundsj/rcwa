@@ -28,5 +28,6 @@ jobs:
     - name: Test with unittest using full test suite
       run: |
         $CONDA/bin/coverage run test/fullRunner.py
-    - name: Coveralls Finished
-      uses: AndreMiras/coveralls-python-action@develop
+        # Github actions does not currently have a good solution for python test coverage
+        #- name: Coveralls Finished
+        #uses: AndreMiras/coveralls-python-action@develop
