@@ -28,3 +28,6 @@ jobs:
     - name: Test with unittest using full test suite
       run: |
         $CONDA/bin/coverage run test/fullRunner.py
+    - name: Send test coverage to coveralls.io
+      uses: coverallsapp/github-action@v1.1.2
+
