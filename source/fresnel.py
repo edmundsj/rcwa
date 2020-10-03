@@ -1,7 +1,5 @@
 # Fresnel equations definitions for TE and TM modes
-import sys
-sys.path.append('core');
-
+import context
 from matrices import *
 
 def rTE(kz1, kz2, er1, er2, ur1, ur2):

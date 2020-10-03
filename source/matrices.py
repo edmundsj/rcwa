@@ -1,5 +1,6 @@
+import context
 from shorthand import *
-from source import *
+from source import Source, zeroSource
 
 def calculateIncidentFieldHarmonics(source, numberHarmonics):
     totalNumberHarmonics = np.prod(numberHarmonics)

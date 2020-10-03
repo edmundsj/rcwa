@@ -1,2 +1,3 @@
-from RCWA.core.source import Source
-from RCWA.core.layer import LayerStack
+import context
+import source
+from layer import LayerStack, Layer

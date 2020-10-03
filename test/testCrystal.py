@@ -1,7 +1,4 @@
-import sys
-sys.path.append('core');
-sys.path.append('test')
-
+import context
 from source import *
 from crystal import *
 import unittest

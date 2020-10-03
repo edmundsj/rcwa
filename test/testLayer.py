@@ -1,6 +1,4 @@
-import sys
-sys.path.append('core');
-sys.path.append('test')
+import context
 
 from crystal import *
 from layer import *

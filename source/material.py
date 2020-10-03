@@ -1,6 +1,7 @@
+import context
+import csv
 import numpy as np
 from shorthand import *
-import csv
 
 class Material:
 

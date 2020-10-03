@@ -1,7 +1,5 @@
 # DATA FOR THIS FILE TAKEN FROM THE TMM BENCHMARKING DATA PROVIDED BY RUMPF.
-import sys
-sys.path.append('core');
-sys.path.append('test')
+import context
 
 import unittest
 from shorthandTest import *

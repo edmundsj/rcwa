@@ -1,9 +1,10 @@
-from RCWA.core.shorthand import *
-from RCWA.core.matrices import *
-from RCWA.core.results import *
-from RCWA.core.harmonics import *
-from RCWA.core.matrixParser import *
-from RCWA.core.layer import Layer, LayerStack
+import context
+from shorthand import *
+from matrices import *
+from results import *
+from harmonics import *
+from matrixParser import *
+from layer import Layer, LayerStack
 from copy import deepcopy
 
 class RCWASolver:

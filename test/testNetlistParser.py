@@ -1,8 +1,4 @@
-import sys
-print(sys.path)
-sys.path.append('core')
-sys.path.append('netlist')
-print(sys.path)
+import context
 
 import unittest
 from shorthand import *

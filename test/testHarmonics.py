@@ -1,7 +1,5 @@
+import context
 import unittest
-import sys
-sys.path.append('core')
-sys.path.append('test')
 
 from shorthand import *
 from shorthandTest import *

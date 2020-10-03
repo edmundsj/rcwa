@@ -1,9 +1,7 @@
 """
 Module for testing the plane wave source class
 """
-import sys
-sys.path.append('core')
-sys.path.append('test')
+import context
 
 from shorthand import *
 from layer import Layer

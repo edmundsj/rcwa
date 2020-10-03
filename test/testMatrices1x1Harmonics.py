@@ -1,8 +1,5 @@
 # Tests the matrices.py file, which is responsible for the creation and manipulation of scattering matrices
-import sys
-sys.path.append('core');
-sys.path.append('test')
-
+import context
 import unittest
 from shorthandTest import *
 from matrices import *

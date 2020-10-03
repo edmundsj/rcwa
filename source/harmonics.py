@@ -1,3 +1,4 @@
+import context
 from shorthand import *
 
 def calculateZeroHarmonicLocation(numberHarmonics):

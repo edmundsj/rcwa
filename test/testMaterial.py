@@ -1,8 +1,4 @@
-import sys
-
-sys.path.append('core')
-sys.path.append('nkData')
-sys.path.append('test')
+import context
 
 import unittest
 from material import Material

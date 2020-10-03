@@ -1,15 +1,12 @@
-import sys
+import context
 import numpy as np
-sys.path.append('core');
-sys.path.append('test')
-
 import unittest
 from shorthandTest import *
 from matrices import *
 from fresnel import *
 from matrixParser import *
 from source import Source
-from layer import Layer
+from layer import Layer, freeSpaceLayer
 from solver import *
 from results import *
 from crystal import Crystal
