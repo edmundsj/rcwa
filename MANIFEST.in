@@ -1,0 +1,6 @@
+recursive-include rcwa/source *
+recursive-include rcwa/test *
+recursive-include rcwa/nkData *
+recursive-include rcwa/netlist *
+recursive-include rcwa/docs *
+recursive-include rcwa/examples *
