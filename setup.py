@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="RCWATest", # Replace with your own username
-    version="0.0.1",
+    version="0.0.2",
     author="Jordan Edmunds",
     author_email="jordan.e@berkeley.edu",
     description="Python Implementation of Rigorous Coupled Wave Analysis",
