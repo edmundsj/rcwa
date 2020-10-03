@@ -1,11 +1,12 @@
 import setuptools
+import os
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="RCWATest", # Replace with your own username
-    version="0.0.2",
+    version="0.1." + str(os.environ['GITHUB_RUN_ID']),
     author="Jordan Edmunds",
     author_email="jordan.e@berkeley.edu",
     description="Python Implementation of Rigorous Coupled Wave Analysis",
