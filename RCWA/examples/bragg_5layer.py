@@ -2,14 +2,13 @@
 # Contact: jordan.e@berkeley.edu
 # Creation Date: 11/01/2019
 #
-import sys
+import context
 import RCWA
 
 import numpy as np
 import scipy as sp
 import scipy.linalg
 from matplotlib import pyplot as plt
-#from RCWA import RCWASolver # this is the syntax I want
 
 lambda0 = 1.3
 nSi = 3.5

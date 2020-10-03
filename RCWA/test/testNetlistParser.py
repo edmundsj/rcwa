@@ -14,12 +14,12 @@ from shorthandTest import *
 # respect to their coordinate on the optical axis.
 class TestNetlistParser(unittest.TestCase):
     def setUp(self):
-        self.netlist1arg = './test/netlists/test_netlist1arg.txt'
-        self.netlist3arg =  './test/netlists/test_netlist3arg.txt'
-        self.netlist4arg =  './test/netlists/test_netlist4arg.txt'
-        self.netlist5arg =  './test/netlists/test_netlist5arg.txt'
-        self.netlist6arg =  './test/netlists/test_netlist6arg.txt'
-        self.netlist7arg =  './test/netlists/test_netlist7arg.txt'
+        self.netlist1arg = context.testLocation + '/netlists/test_netlist1arg.txt'
+        self.netlist3arg =  context.testLocation + '/netlists/test_netlist3arg.txt'
+        self.netlist4arg =  context.testLocation + '/netlists/test_netlist4arg.txt'
+        self.netlist5arg =  context.testLocation + '/netlists/test_netlist5arg.txt'
+        self.netlist6arg =  context.testLocation + '/netlists/test_netlist6arg.txt'
+        self.netlist7arg =  context.testLocation + '/netlists/test_netlist7arg.txt'
 
     def testStripUnits(self):
         # First, test some simple real numbers
