@@ -1,0 +1,5 @@
+## Requirements not in the standard library
+numpy
+scipy
+matplotlib
+pandas
