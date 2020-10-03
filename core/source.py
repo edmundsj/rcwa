@@ -1,8 +1,8 @@
 # TODO: Turn the wavelength, theta, phi, etc. into properties so that when one is changed, the rest of the 
 # TODO: change the wavelength setter so that it also sets kIncident. This could cause problems in the future.
 # source changes too.
-from shorthand import *
-from layer import *
+from RCWA.core.shorthand import *
+from RCWA.core.layer import freeSpaceLayer as freeSpaceLayer
 
 class Source:
     def __init__(self, wavelength=2*pi,theta=0, phi=0, pTEM=[1,1], layer=freeSpaceLayer):

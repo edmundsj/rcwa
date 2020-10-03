@@ -8,7 +8,8 @@ from shorthandTest import *
 from matrices import *
 from fresnel import *
 from matrixParser import *
-from source import *
+from source import Source
+from layer import Layer, LayerStack
 
 
 class Test1x1Harmonic(unittest.TestCase):

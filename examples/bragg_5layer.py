@@ -3,6 +3,7 @@
 # Creation Date: 11/01/2019
 #
 import sys
+import RCWA
 
 import numpy as np
 import scipy as sp
@@ -28,8 +29,8 @@ layer3 = Layer(n=nSiO2, L=tSiO2)
 layer4 = Layer(n=nSi, L=tSi)
 layer5 = Layer(n=nSiO2, L=tSiO2)
 layer6 = Layer(n=1)
-stack = LayerStack(layer0, layer1, layer2, layer3, layer4, layer5, layer6)
-source = Source(wavelength=0.4)
+stack = RCWA.LayerStack(layer0, layer1, layer2, layer3, layer4, layer5, layer6)
+source = RCWA.Source(wavelength=0.4)
 
 startWavelength = 0.4
 stopWavelength = 1.5

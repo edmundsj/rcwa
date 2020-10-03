@@ -8,7 +8,7 @@ from matrices import *
 from fresnel import *
 from matrixParser import *
 from source import Source
-from source import Layer
+from layer import Layer
 from solver import *
 from results import *
 from crystal import Crystal

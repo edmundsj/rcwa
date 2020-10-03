@@ -1,4 +1,4 @@
-from shorthand import *
+from RCWA.core.shorthand import *
 
 class Layer:
     def __init__(self, er=1, ur=1, L=0, n=None, crystal=None, numberHarmonics=None, material=None):
