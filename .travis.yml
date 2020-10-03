@@ -28,5 +28,5 @@ install:
     - conda activate test-environment
 
 script:
-    - coverage run RCWA/test/fullRunner.py
+    - coverage run rcwa/test/fullRunner.py
     - COVERALLS_REPO_TOKEN=XVZ3lTLL3h1sOQzBcGOcK4nMjyW61egej coveralls
