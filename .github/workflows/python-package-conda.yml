@@ -31,3 +31,12 @@ jobs:
         # Github actions does not currently have a good solution for python test coverage
         #- name: Coveralls Finished
         #uses: AndreMiras/coveralls-python-action@develop
+    - name: Build python package tarball
+        run:
+          $CONDA/bin/python setup.py sdist bdist_wheel
+    - name: Publish distribution to test PyPi
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+          user: __token__
+          password: ${{ secrets.pypi_password_test }}
+          repository_url: https://test.pypi.org/legacy/

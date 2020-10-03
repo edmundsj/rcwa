@@ -16,3 +16,5 @@ dependencies:
   - sphinx
   - sphinx_rtd_theme
   - sphinxcontrib-jsmath
+  - setuptools
+  - wheel
