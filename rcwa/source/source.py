@@ -17,8 +17,8 @@ class Source:
         self.pTE /= normalizationFactor
         self.pTM /= normalizationFactor
         self.layer = layer
-        self.setKIncident()
         self.setTEMVectors()
+        self.setKIncident()
         self.pX = (self.pTE*self.aTE + self.pTM*self.aTM)[0]
         self.pY = (self.pTE*self.aTE + self.pTM*self.aTM)[1]
 
@@ -69,14 +69,18 @@ class Source:
     def setTEMVectors(self):
         deviceNormalUnitVector = complexArray([0,0,-1]);
         epsilon = 1e-3;
+        xComponent=  sin(self.theta) * cos(self.phi);
+        yComponent = sin(self.theta) * sin(self.phi);
+        zComponent = cos(self.theta);
+        incidentVector = np.array([xComponent, yComponent, zComponent])
 
-        if(abs(self.kIncident[0]) < epsilon and abs(self.kIncident[1]) < epsilon):
+        if(abs(xComponent) < epsilon and abs(yComponent) < epsilon):
             self.aTE = np.array([0,1,0]);
         else:
-            self.aTE = - np.cross(deviceNormalUnitVector, self.kIncident);
+            self.aTE = - np.cross(deviceNormalUnitVector, incidentVector);
             self.aTE = self.aTE / norm(self.aTE);
 
-        self.aTM = (np.cross(self.aTE, self.kIncident));
+        self.aTM = (np.cross(self.aTE, incidentVector));
         self.aTM = (self.aTM / norm(self.aTM));
         self.ATEM = np.vstack((self.aTE, self.aTM)) # matrix that goes from x/y basis to TE/TM basis
 

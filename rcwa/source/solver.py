@@ -12,6 +12,7 @@ class RCWASolver:
         self.layerStack = layerStack
         self.layerStack.setConvolutionMatrix(numberHarmonics)
         self.source = source
+        self.source.layer = layerStack.reflectionLayer
 
         self.baseCrystalLayer = self.layerStack.extractCrystalLayer()
         self.baseCrystal = self.layerStack.internalLayer[self.baseCrystalLayer].crystal
@@ -43,11 +44,11 @@ class RCWASolver:
         if wavelengths.size == 0:
             wavelengths = np.array([self.source.wavelength])
         for wavelength in wavelengths:
+            self.source.layer = self.layerStack.reflectionLayer
             self.source.wavelength = wavelength # Update the source wavelength and all associated things.
             self.setupKMatrices()
             self.setupGapMatrices()
             self.setupReflectionTransmissionMatrices()
-            self.source.wavelength = wavelength
             self.ClearSolution()
             self.calculateDeviceSMatrix()
             self.calculateGlobalSMatrix()
