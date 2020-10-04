@@ -2,7 +2,13 @@ import context
 from shorthand import *
 
 class Crystal:
+    """
+    Class used for defining periodic structures in x and y
 
+    :param permittivityCellData: 2D numpy array of permittivity values
+    :param permeabilityCellData: 2D numpy array of permeability values
+    :param latticeVectors: Real-space lattice vectors
+    """
     def __init__(self, permittivityCellData=1, permeabilityCellData=1, *latticeVectors):
         self.permeabilityCellData = permeabilityCellData
         self.permittivityCellData = permittivityCellData

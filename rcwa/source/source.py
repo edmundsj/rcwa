@@ -6,6 +6,15 @@ from shorthand import *
 from layer import freeSpaceLayer
 
 class Source:
+    """
+    Class for defining monochromatic excitation source
+
+    :param wavelength: The wavelength (in microns, or your preferred length unit due to the scale-invariance of Maxwell's equations.
+    :param theta: Angle with respect to the vector normal to the layer stack
+    :param phi: Rotation angle amount the vector normal to the layer stack
+    :param pTEM: Polarization vector for TE/TM polarization fraction (can be complex)
+    :param layer: Layer source is located in
+    """
     def __init__(self, wavelength=2*pi,theta=0, phi=0, pTEM=[1,1], layer=freeSpaceLayer):
         self.freeSpaceWavelength=wavelength
         self.k0 = 2*pi / wavelength
@@ -16,7 +25,7 @@ class Source:
         normalizationFactor = norm(np.array([self.pTE, self.pTM]))
         self.pTE /= normalizationFactor
         self.pTM /= normalizationFactor
-        self.layer = layer
+        self.layer=layer
         self.setTEMVectors()
         self.setKIncident()
         self.pX = (self.pTE*self.aTE + self.pTM*self.aTM)[0]

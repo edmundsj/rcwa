@@ -13,7 +13,7 @@ from crystal import Crystal
 from plotter import Plotter
 
 
-class TestRCWASolver1x1(unittest.TestCase):
+class TestSolver1x1(unittest.TestCase):
 
     def testSetupSource(self):
         kIncidentActual = self.kIncident
@@ -178,7 +178,7 @@ class TestRCWASolver1x1(unittest.TestCase):
         layer2 = Layer(er=1.0, ur=3.0, L=thicknessLayer2)
         layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
 
-        self.solver = RCWASolver(layerStack, source, numberHarmonics)
+        self.solver = Solver(layerStack, source, numberHarmonics)
 
         self.Kx = 1.0006
         self.Ky = 0.4247

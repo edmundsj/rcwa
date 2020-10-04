@@ -2,6 +2,17 @@ import context
 from shorthand import *
 
 class Layer:
+    """
+    Class for defining a single layer of a layer stack used in a simulation
+
+    :param er: Permittivity of the layer
+    :param ur: Permeability of the layer
+    :param L: Thickness of the layer
+    :param n: Refractive index of the layer
+    :param crystal: Crystal object if the layer is periodic in x/y
+    :param material: Material object containing the material's permittivity and permeability as a function of wavelength/angle.
+
+    """
     def __init__(self, er=1, ur=1, L=0, n=None, crystal=None, numberHarmonics=None, material=None):
         if n == None:
             self.er = er

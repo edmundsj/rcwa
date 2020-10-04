@@ -4,6 +4,11 @@ import numpy as np
 from shorthand import *
 
 class Material:
+    """
+    Material class for defining materials permittivity / permeability / refractive index as a function of wavelength / angle.
+
+    :param filename: File containing n/k data for the material in question
+    """
 
     def __init__(self, filename):
         self.name = ''

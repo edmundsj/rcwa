@@ -6,8 +6,14 @@ from matrixParser import *
 from layer import Layer, LayerStack
 from copy import deepcopy
 
-class RCWASolver:
-    def __init__(self, layerStack, source, numberHarmonics):
+class Solver:
+    """ Main class that invokes all methods necessary to solve an RCWA/TMM simulation
+
+    :param layerStack: layerStack: Stack of layers to simulate
+    :param source: Source object which includes wavelength and direction information
+    :param numberHarmonics: The number of harmonics in x, y to simulate (number of Fourier components). Defaults to (1, 1). Should be a 2-dimensional tuple.
+    """
+    def __init__(self, layerStack, source, numberHarmonics=(1,1)):
         self.numberHarmonics = numberHarmonics
         self.layerStack = layerStack
         self.layerStack.setConvolutionMatrix(numberHarmonics)
@@ -23,6 +29,10 @@ class RCWASolver:
         self.ClearSolution()
 
     def setupKMatrices(self):
+        """
+        Sets up the Kx, Ky, and Kz matrices for solving the simulation once the source, crystal, and
+        number harmonics are known.
+        """
         self.Kx = generateKxMatrix(self.source, self.baseCrystal, self.numberHarmonics)
         self.Ky = generateKyMatrix(self.source, self.baseCrystal, self.numberHarmonics)
         if isinstance(self.Kx, np.ndarray):
@@ -41,6 +51,11 @@ class RCWASolver:
         self.scatteringElementShape = (self.scatteringElementDimension, self.scatteringElementDimension)
 
     def Solve(self, wavelengths=np.array([])):
+        """
+        Solves the simulation or performs a simulation sweep of the desired parameters
+
+        :param wavelengths: list of wavelengths to simulate (can be a single number)
+        """
         if wavelengths.size == 0:
             wavelengths = np.array([self.source.wavelength])
         for wavelength in wavelengths:
