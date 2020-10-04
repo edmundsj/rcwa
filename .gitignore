@@ -21,3 +21,4 @@ _static/
 
 build/
 dist/
+rcwa.egg-info/
