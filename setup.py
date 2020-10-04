@@ -40,7 +40,7 @@ setuptools.setup(
     python_requires='>=3.6',
     install_requires=[
             'numpy>=1.14.5',
-            'matplotlib>=2.2.0',
+            'matplotlib>=2.0.0',
             'pandas>=0.24.0',
             'scipy>=1.2.2',
         ],
