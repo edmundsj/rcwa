@@ -1,7 +1,6 @@
 import context
 from shorthand import *
 from matrices import *
-from results import *
 from harmonics import *
 from matrixParser import *
 from layer import Layer, LayerStack
@@ -72,23 +71,26 @@ class RCWASolver:
             self.rTEM = calculateTEMReflectionCoefficientsFromXYZ(self.source, self.rx, self.ry, self.rz)
 
     def packageResults(self):
-        tempResults = Results()
-        tempResults.rx, tempResults.ry, tempResults.rz = deepcopy((self.rx, self.ry, self.rz))
-        tempResults.tx, tempResults.ty, tempResults.tz = deepcopy((self.tx, self.ty, self.tz))
-        tempResults.R, tempResults.T = deepcopy((self.R, self.T))
-        tempResults.RTot, tempResults.TTot, tempResults.conservation = \
+        """
+        Packages the results from the simulation into a dictionary
+        """
+        tempResults = {}
+        tempResults['rx'], tempResults['ry'], tempResults['rz'] = deepcopy((self.rx, self.ry, self.rz))
+        tempResults['tx'], tempResults['ty'], tempResults['tz'] = deepcopy((self.tx, self.ty, self.tz))
+        tempResults['R'], tempResults['T'] = deepcopy((self.R, self.T))
+        tempResults['RTot'], tempResults['TTot'], tempResults['conservation'] = \
                 deepcopy((self.RTot, self.TTot, self.conservation))
-        tempResults.crystal = deepcopy(self.baseCrystal)
-        tempResults.source = deepcopy(self.source)
-        tempResults.SGlobal = deepcopy(self.SGlobal)
+        tempResults['crystal'] = deepcopy(self.baseCrystal)
+        tempResults['source'] = deepcopy(self.source)
+        tempResults['S'] = deepcopy(self.SGlobal)
 
         if self.TMMSimulation is True:
-            tempResults.rTE = self.rTEM[0]
-            tempResults.rTM = self.rTEM[1]
-            rho = tempResults.rTM / tempResults.rTE
-            tempResults.tanPsi = np.abs(rho)
-            tempResults.cosDelta = cos(np.angle(rho))
-            tempResults.delta = np.angle(rho)
+            tempResults['rTE'] = self.rTEM[0]
+            tempResults['rTM'] = self.rTEM[1]
+            rho = tempResults['rTM'] / tempResults['rTE']
+            tempResults['tanPsi'] = np.abs(rho)
+            tempResults['cosDelta'] = cos(np.angle(rho))
+            tempResults['delta'] = np.angle(rho)
 
         self.results.append(tempResults)
 

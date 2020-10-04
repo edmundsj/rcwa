@@ -30,8 +30,8 @@ layer8 = rcwa.Layer(n=n1, L=t1)
 layer9 = rcwa.Layer(n=n2, L=t2)
 layer10 = rcwa.Layer(n=n1, L=t1)
 layer11 = rcwa.Layer(n=1) # top-most layer
-stack = rcwa.LayerStack(layer0, layer1, layer2, layer3, layer4, layer5, layer6, layer7,
-        layer8, layer9, layer10, layer11)
+stack = rcwa.LayerStack(layer0, layer1, layer2, layer3, layer4, layer5,
+        layer11)
 source = rcwa.Source(wavelength=designWavelength)
 
 print("Solving system...")
@@ -41,5 +41,5 @@ wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
 
 TMMSolver.Solve(wavelengths=wavelengths)
 #Plotter.plotEllipsometrySpectra(TMMSolver1.results)
-rcwa.Plotter.plotRTEMSpectra(TMMSolver.results)
+rcwa.Plotter.plotRTSpectra(TMMSolver.results)
 plt.show()

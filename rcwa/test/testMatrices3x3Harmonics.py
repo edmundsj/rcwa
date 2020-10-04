@@ -8,7 +8,6 @@ from matrixParser import *
 from source import Source
 from layer import Layer, freeSpaceLayer
 from solver import *
-from results import *
 from crystal import Crystal
 
 np.set_printoptions(threshold=sys.maxsize)

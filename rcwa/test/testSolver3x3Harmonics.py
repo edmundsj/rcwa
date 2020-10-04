@@ -8,7 +8,6 @@ from matrixParser import *
 from source import Source
 from layer import Layer
 from solver import *
-from results import *
 from crystal import Crystal
 from plotter import Plotter
 

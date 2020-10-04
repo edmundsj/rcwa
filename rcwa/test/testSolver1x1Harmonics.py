@@ -9,7 +9,6 @@ from matrixParser import *
 from source import Source
 from layer import Layer
 from solver import *
-from results import *
 from crystal import Crystal
 from plotter import Plotter
 
@@ -113,9 +112,9 @@ class TestRCWASolver1x1(unittest.TestCase):
         cosDeltaActual = self.cosDelta
         deltaActual = self.delta
 
-        tanPsiCalculated = self.solver.results[0].tanPsi
-        deltaCalculated = self.solver.results[0].delta
-        cosDeltaCalculated = self.solver.results[0].cosDelta
+        tanPsiCalculated = self.solver.results[0]['tanPsi']
+        deltaCalculated = self.solver.results[0]['delta']
+        cosDeltaCalculated = self.solver.results[0]['cosDelta']
 
         assertAlmostEqual(tanPsiActual, tanPsiCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tanPsi")
@@ -134,10 +133,23 @@ class TestRCWASolver1x1(unittest.TestCase):
         assertAlmostEqual(TActual, TCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: T")
 
+        RTotActual= self.R
+        TTotActual = self.T
+        (RTotCalculated, TTotCalculated) = (self.solver.RTot, self.solver.TTot)
+        assertAlmostEqual(RTotActual, RTotCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: R")
+        assertAlmostEqual(TTotActual, TTotCalculated,
+                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: T")
+
+    def testPackageResults(self):
+        """ UNFINISHED """
+        self.solver.Solve()
+        RActual = self.R
+        TActual = self.T
+
     def testIntegrationMultiWavelength(self):
         testWavelengths = self.solver.source.wavelength*np.arange(0.2,2,0.01)
         self.solver.Solve(testWavelengths)
-        #Plotter.plotReflectionSpectra(self.solver.results)
 
     def setUp(self):
         self.absoluteTolerance = 1e-4
