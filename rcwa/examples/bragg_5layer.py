@@ -3,7 +3,7 @@
 # Creation Date: 11/01/2019
 #
 import context
-import RCWA
+import rcwa
 
 import numpy as np
 import scipy as sp
@@ -15,26 +15,26 @@ nSi = 3.5
 nSiO2 = 1.45
 tSi = lambda0/4/nSi
 tSiO2 = lambda0/4/nSiO2
-layer0 = RCWA.Layer(n=nSi)
-layer1 = RCWA.Layer(n=nSiO2, L=tSiO2)
-layer2 = RCWA.Layer(n=nSi, L=tSi)
-layer3 = RCWA.Layer(n=nSiO2, L=tSiO2)
-layer4 = RCWA.Layer(n=nSi, L=tSi)
-layer5 = RCWA.Layer(n=nSiO2, L=tSiO2)
-layer6 = RCWA.Layer(n=1)
-stack = RCWA.LayerStack(layer0, layer1, layer2, layer3, layer4, layer5, layer6)
-source = RCWA.Source(wavelength=0.4)
+layer0 = rcwa.Layer(n=nSi)
+layer1 = rcwa.Layer(n=nSiO2, L=tSiO2)
+layer2 = rcwa.Layer(n=nSi, L=tSi)
+layer3 = rcwa.Layer(n=nSiO2, L=tSiO2)
+layer4 = rcwa.Layer(n=nSi, L=tSi)
+layer5 = rcwa.Layer(n=nSiO2, L=tSiO2)
+layer6 = rcwa.Layer(n=1)
+stack = rcwa.LayerStack(layer0, layer1, layer2, layer3, layer4, layer5, layer6)
+source = rcwa.Source(wavelength=0.4)
 
 startWavelength = 0.4
 stopWavelength = 1.5
 stepWavelength = 0.002
 
 print("Solving system...")
-TMMSolver = RCWA.Solver(stack, source, (1, 1))
+TMMSolver = rcwa.Solver(stack, source, (1, 1))
 wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
         stepWavelength)
 
 TMMSolver.Solve(wavelengths=wavelengths)
 #Plotter.plotEllipsometrySpectra(TMMSolver1.results)
-RCWA.Plotter.plotRTEMSpectra(TMMSolver.results)
+rcwa.Plotter.plotRTEMSpectra(TMMSolver.results)
 plt.show()
