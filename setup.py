@@ -27,9 +27,10 @@ setuptools.setup(
             'test/matrixDataNormal/layer2/*',
             'test/matrixDataNormal/reflectionRegion/*',
             'test/matrixDataNormal/transmissionRegion/*',
-            'test/matrixDataNormal/*.txt',
-            'test/matrixDataOblique/*.txt',
-            'test/netlists/*'],
+            'test/matrixDataNormal/*',
+            'test/matrixDataOblique/*',
+            'test/netlists/*',
+            'test/*.csv'],
         },
     classifiers=[
         "Programming Language :: Python :: 3",

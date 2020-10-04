@@ -41,7 +41,9 @@ jobs:
         password: ${{ secrets.pypi_test_password2 }}
         repository_url: https://test.pypi.org/legacy/
         verbose: true
-    - name: Download from test PyPi and run full test suite
+    - name: Download and install from testPyPi
       run:
-        pip install -i https://test.pypi.org/simple/ rcwa
+        pip install -i https://test.pypi.org/simple/ rcwa;
+    - name: Run full test suite from installed package
+      run:
         python -m rcwa.test.fullRunner
