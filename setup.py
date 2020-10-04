@@ -17,8 +17,6 @@ setuptools.setup(
     include_package_data=True,
     package_data={
         "rcwa": ['source/*.py', 'netlist/*', 'nkData/*.csv', 'docs/*', 'examples/*',
-            'test/matrixDataNormal/*',
-            'test/matrixDataOblique/*',
             'test/matrixDataOblique/freeSpace/*',
             'test/matrixDataOblique/layer1/*',
             'test/matrixDataOblique/layer2/*',
@@ -29,6 +27,8 @@ setuptools.setup(
             'test/matrixDataNormal/layer2/*',
             'test/matrixDataNormal/reflectionRegion/*',
             'test/matrixDataNormal/transmissionRegion/*',
+            'test/matrixDataNormal/*.txt',
+            'test/matrixDataOblique/*.txt',
             'test/netlists/*'],
         },
     classifiers=[
