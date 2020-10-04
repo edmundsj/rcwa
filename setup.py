@@ -16,7 +16,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={
-        "rcwa": ['source/*.py', 'netlist/*', 'nkData/*.csv', 'docs/*', 'examples/*'],
+        "rcwa": ['source/*.py', 'netlist/*', 'nkData/*.csv', 'docs/*', 'examples/*', 'test/matrixDataNormal/*',
+            'test/matrixDataOblique/*', 'test/netlists/*'],
         },
     classifiers=[
         "Programming Language :: Python :: 3",
