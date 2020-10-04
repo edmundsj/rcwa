@@ -47,9 +47,9 @@ jobs:
         user: __token__
         password: ${{ secrets.pypi_password2 }}
         verbose: true
-   - name: Download from PyPi
-     run:
-       pip install rcwa
-   - name: Run full test suite of downloaded package
-     run:
-       python -m rcwa.test.fullRunner
+    - name: Download from PyPi
+      run:
+        pip install rcwa
+    - name: Run full test suite of downloaded package
+      run:
+        python -m rcwa.test.fullRunner
