@@ -32,6 +32,6 @@ setuptools.setup(
             'matplotlib>=2.2.0',
             'pandas>=0.24.0',
             'scipy>=1.2.2',
-        ]
+        ],
     license=license,
 )
