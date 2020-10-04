@@ -41,10 +41,12 @@ jobs:
         password: ${{ secrets.pypi_test_password2 }}
         repository_url: https://test.pypi.org/legacy/
         verbose: true
-    - name: Publish distribution 📦 to PyPI
+    - name: Publish distribution to PyPi
       uses: pypa/gh-action-pypi-publish@master
       with:
-        password: ${{ secrets.PYPI_PASSWORD2 }}
+        user: __token__
+        password: ${{ secrets.pypi_password2 }}
+        verbose: true
    - name: Download from PyPi
      run:
        pip install rcwa
