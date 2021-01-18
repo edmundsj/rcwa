@@ -32,6 +32,7 @@ Features
 - Compute reflected power, transmitted power, and S-parameters
 - Easy to use class-based syntax 
 - Large, fast-to-run test suite
+- Extremely fast narrowband, rigorously correct simulations well suited for resonant devices
 
 Documentation
 ================
