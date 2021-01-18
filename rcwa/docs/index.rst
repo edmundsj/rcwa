@@ -32,7 +32,12 @@ To run a simple example, run:
 python -m rcwa.examples.bragg_mirror
 ```
 
+
 This should run an example with a 10-layer bragg mirror (also known as a [dielectric mirror](https://en.wikipedia.org/wiki/Dielectric_mirror)), which can have very high reflectance near its design wavelength, and output the reflectance and transmission as a function of wavelength.
+
+2D Photonic Crystal Example
+------------------------------
+The examples folder also contains a 2D photonic crystal example called `triangular_photonic_crystal.py`. Running it will print the reflection and transmission coefficients, but diving into the example you can extract any quantities of interest: amplitude reflection coefficients, diffraction efficiencies for each harmonic, etc.
 
 Features
 ==========
