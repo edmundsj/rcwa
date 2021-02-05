@@ -96,4 +96,4 @@ class TestMaterial(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.silicon = Material(str(context.nkLocation) + '/Si_Schinke.csv')
+        cls.silicon = Material(material_name='Si')

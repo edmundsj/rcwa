@@ -15,3 +15,4 @@ from layer import LayerStack, Layer
 from source import Source
 from solver import Solver
 from plotter import Plotter
+from material import Material

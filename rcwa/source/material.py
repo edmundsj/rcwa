@@ -11,14 +11,17 @@ class Material:
 	:param filename: File containing n/k data for the material in question
 	"""
 
-	def __init__(self, filename):
+	def __init__(self, material_name='', filename=''):
 		self.name = ''
 		self.wavelengths = np.array([])
 		self.nkData = complexArray([])
 		self.erData = complexArray([])
 		self.urData = complexArray([])
 
-		self.parseCSV(filename)
+		if material_name != '':
+			filename = context.nkLocation + '/' + material_name + '.csv'
+		if filename != '':
+			self.parseCSV(filename)
 
 	"""
 	Parses data from a CSV file into a set of numpy arrays.
@@ -27,7 +30,7 @@ class Material:
 	"""
 	def parseCSV(self, filename):
 
-		data = pd.read_csv(filename, skiprows=1)
+		data = pd.read_csv(filename, skiprows=2)
 		self.wavelengths = data['Wavelength (um)'].to_numpy()
 		self.nkData = (data['n'] + 1j*data['k']).to_numpy()
 
