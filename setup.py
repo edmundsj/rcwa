@@ -43,7 +43,7 @@ setuptools.setup(
             'matplotlib>=2.0.0',
             'pandas>=0.24.0',
             'scipy>=1.2.2',
-			'yaml'
+			'pyyaml>=5.4.1'
         ],
     license="MIT",
 )
