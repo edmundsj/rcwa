@@ -41,10 +41,9 @@ jobs:
         password: ${{ secrets.pypi_test_password2 }}
         repository_url: https://test.pypi.org/legacy/
         verbose: true
-	steps:
     - name: Publish distribution to PyPi
       uses: pypa/gh-action-pypi-publish@master
-	  if: steps.extract_branch.outputs.branch == 'master'
+	  if: ${GITHUB_REF##*/} == 'refs/heads/develop'
       with:
         user: __token__
         password: ${{ secrets.pypi_password2 }}
