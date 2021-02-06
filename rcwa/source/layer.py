@@ -1,5 +1,6 @@
 import context
 from shorthand import *
+from material import Material
 
 class Layer:
 	"""
@@ -13,18 +14,16 @@ class Layer:
 	:param material: Material object containing the material's permittivity and permeability as a function of wavelength/angle.
 
 	"""
-	def __init__(self, er=1.0, ur=1.0, L=0.0, n=None, crystal=None, numberHarmonics=None, material=None):
-		if n == None:
-			self._er = er
-			self._ur = ur
-			self._n = sqrt(er*ur)
+	def __init__(self, er=1.0, ur=1.0, L=0.0, n=None, crystal=None, numberHarmonics=None, material=None, source=None):
+		if material == None:
+			self.material = Material(er=er, ur=ur, n=n)
 		else:
-			self._er = sq(n)
-			self._ur = 1
-			self._n = n
+			self.material = material
 
 		self.L = L
 		self.crystal = crystal
+		self.source = source # For wavelength-dependent materials this is required.
+
 		if crystal is not None:
 			self.homogenous = False
 			if numberHarmonics is not None:
@@ -32,36 +31,31 @@ class Layer:
 		else:
 			self.homogenous = True
 
+	# Note: these are all just transparent wrappers for underlying material
+
 	@property
 	def er(self):
-		return self._er
+		return self.material.er
 
 	@er.setter
 	def er(self, er):
-		self._er = er
-		self._n = np.sqrt(self._er*self._ur)
+		self.material.er = er
 
 	@property
 	def ur(self):
-		return self._ur
+		return self.material.ur
 
 	@ur.setter
 	def ur(self, ur):
-		self._ur = ur
-		self._n = np.sqrt(self._er*self._ur)
+		self.material.ur = ur
 
-	"""
-	Sets the refractive index - puts everything into the permittivity term and makes the permeability unity.
-	"""
 	@property
 	def n(self):
-		return self._n
+		return self.material.n
 
 	@n.setter
 	def n(self, n):
-		self._n = n
-		self._er = np.square(n)
-		self._ur = 1
+		self.material.n = n
 
 	def setConvolutionMatrix(self, numberHarmonics):
 		if self.crystal is not None:
