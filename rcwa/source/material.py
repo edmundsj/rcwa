@@ -14,14 +14,13 @@ class Material:
 	def __init__(self, material_name='', er=1, ur=1, n=None, filename='', source=None):
 		self.name = ''
 		self.source=source
-		filename=filename
-
 		filename = context.nkLocation + '/' + material_name + '.csv'
 
 		if material_name != '':
 			self.parseCSV(filename)
 
 		elif material_name == '':
+			self.dispersive = False
 			if n == None: # If the refractive index is not defined, go with the permittivity
 				self._er = er
 				self._ur = ur
@@ -45,10 +44,11 @@ class Material:
 		data_size = len(self._n)
 		self._er = sq(self._n)
 		self._ur = np.ones(data_size)
+		self.dispersive = True
 
 	@property
 	def n(self):
-		if self.source == None:
+		if self.dispersive == False:
 			return self._n
 		else:
 			return self.lookupParameter(self._n)
@@ -58,10 +58,11 @@ class Material:
 		self._n = n
 		self._er = np.square(n)
 		self._ur = 1
+		self.dispersive = False
 
 	@property
 	def er(self):
-		if self.source == None:
+		if self.dispersive == False:
 			return self._er
 		else:
 			return self.lookupParameter(self._er)
@@ -70,10 +71,11 @@ class Material:
 	def er(self, er):
 		self._er = er
 		self._n = np.sqrt(self._er * self._ur)
+		self.dispersive = False
 
 	@property
 	def ur(self):
-		if self.source == None:
+		if self.dispersive == False:
 			return self._ur
 		else:
 			return self.lookupParameter(self._ur)
@@ -82,6 +84,7 @@ class Material:
 	def ur(self, ur):
 		self._ur = ur
 		self._n = np.sqrt(self._ur*self._er)
+		self.dispersive = False
 
 	def lookupParameter(self, parameter):
 		wavelength = self.source.wavelength
@@ -99,9 +102,11 @@ class Material:
 			return_value = parameter[0] - slope * deltaWavelength
 
 		else: # Our wavelength is in the range over which we have data
-			if wavelength == self.wavelengths[indexOfWavelength]:
+			if wavelength == self.wavelengths[indexOfWavelength]: # We found the EXACT wavelength
 				return_value = parameter[indexOfWavelength]
-			else:
-				return_value = parameter[indexOfWavelength - 1]
+			else: # We need to interpolate the wavelength
+				slope = (parameter[indexOfWavelength] - parameter[indexOfWavelength-1]) / (self.wavelengths[1] - self.wavelengths[0]) # wavelength spacing between two points
+				deltaWavelength = wavelength - self.wavelengths[indexOfWavelength]
+				return_value = parameter[indexOfWavelength] + slope * deltaWavelength
 
 		return return_value

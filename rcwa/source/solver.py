@@ -20,9 +20,7 @@ class Solver:
 		self.source = source
 		self.source.layer = layerStack.reflectionLayer
 
-		self.base_crystal_layer = self.layerStack.extractCrystalLayer()
-		print(self.base_crystal_layer)
-		self.baseCrystal = self.layerStack.internalLayer[self.base_crystal_layer].crystal
+		self.baseCrystal = self.layerStack.extractCrystal()
 		self.setupKMatrices()
 		self.setupGapMatrices()
 		self.setupReflectionTransmissionMatrices()

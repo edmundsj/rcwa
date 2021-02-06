@@ -177,10 +177,10 @@ class LayerStack:
 		for layer in self.internalLayer:
 			layer.setConvolutionMatrix(numberHarmonics)
 
-	def extractCrystalLayer(self):
+	def extractCrystal(self):
 		for i in range(len(self.internalLayer)):
 			if self.internalLayer[i].crystal is not None:
-				return i
-		return 0
+				return self.internalLayer[i].crystal
+		return None
 
 emptyStack = LayerStack()
