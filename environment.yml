@@ -18,3 +18,4 @@ dependencies:
   - sphinxcontrib-jsmath
   - setuptools
   - wheel
+  - yaml
