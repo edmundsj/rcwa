@@ -16,7 +16,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={
-        "rcwa": ['source/*.py', 'netlist/*', 'nkData/*.csv', 'docs/*', 'examples/*',
+        "rcwa": ['source/*.py', 'netlist/*', 'nkData/*', 'docs/*', 'examples/*',
             'test/matrixDataOblique/freeSpace/*',
             'test/matrixDataOblique/layer1/*',
             'test/matrixDataOblique/layer2/*',
