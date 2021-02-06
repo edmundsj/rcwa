@@ -26,6 +26,7 @@ Features
 ==========
 - Implements 1D Transfer Matrix Method for homogenous layers
 - Implements full rectangular 2D RCWA for periodic layers
+- Huge material database built-in based on [refractiveindex.info](https://refractiveindex.info/), including metals, plastics, glass, and ceramics
 - Arbitrary incident wave polarization (circular, linear, elliptical)
 - Arbitrary incident wave angle of incidence
 - Exactly solves Maxwell's Equations for arbitrary layer stacks of any thickness
@@ -33,6 +34,14 @@ Features
 - Easy to use class-based syntax 
 - Large, fast-to-run test suite
 - Extremely fast narrowband, rigorously correct simulations well suited for resonant devices
+
+Example Uses
+==============
+- Compute reflected and transmitted power from a thin film stack
+- Determine resonant frequency of a VCSEL
+- Determine reflectance of a bragg mirror, on or off-axis
+- Find diffraction efficiencies for a 1D or 2D diffraction grating
+- Compute reflected power from a metallic mirror
 
 Documentation
 ================
