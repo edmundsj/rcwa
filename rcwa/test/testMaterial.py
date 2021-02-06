@@ -18,33 +18,33 @@ class TestMaterial(unittest.TestCase):
 		urDesired = complexArray([1, 1, 1])
 		erCalculated = self.silicon._er[0:3]
 		urCalculated = self.silicon._ur[0:3]
-		assertAlmostEqual(erDesired, erCalculated, errorMessage = "material: er")
-		assertAlmostEqual(urDesired, urCalculated, errorMessage = "material: ur")
+		assertAlmostEqual(erDesired, erCalculated, errorMessage = "material: er", absoluteTolerance=1e-3)
+		assertAlmostEqual(urDesired, urCalculated, errorMessage = "material: ur", absoluteTolerance=1e-3)
 
 	def testnk(self):
 		# Case 1: wavelength is exactly identical to one we have in database
 		nDesired = 1.737 + 3.99j
 		self.silicon.source.wavelength = 0.26
 		nCalculated = self.silicon.n
-		assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n1")
+		assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n1", absoluteTolerance=1e-3)
 
 		# Case 2: wavelength interpolated between two points in the database
 		nDesired = 1.8542+4.234j
 		self.silicon.source.wavelength = 0.264
 		nCalculated = self.silicon.n
-		assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n2")
+		assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n2", absoluteTolerance=1e-3)
 
 		# Case 3: wavelength is larger than one we have in database - extrapolate linearly
 		self.silicon.source.wavelength = 1.47
 		nDesired = 3.485 + 1.09e-13j
 		nCalculated = self.silicon.n
-		assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n3")
+		assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n3", absoluteTolerance=1e-3)
 
 		# Case 4: wavelength is smaller than one we have in database
 		self.silicon.source.wavelength = 0.23
 		nDesired = 1.437 + 2.79j
 		nCalculated = self.silicon.n
-		assertEqual(nCalculated, nDesired, errorMessage="material: testnk: n4")
+		assertEqual(nCalculated, nDesired, errorMessage="material: testnk: n4", absoluteTolerance=1e-3)
 
 	def testEr(self):
 		# Case 1: wavelength is exactly identical to one we have in database
@@ -63,13 +63,13 @@ class TestMaterial(unittest.TestCase):
 		self.silicon.source.wavelength = 1.47
 		erDesired = sq(3.487 + 1.09e-13j) - 0.01395
 		erCalculated = self.silicon.er
-		assertAlmostEqual(erCalculated, erDesired, absoluteTolerance=1e-5, errorMessage="material: testnk: er3")
+		assertAlmostEqual(erCalculated, erDesired, absoluteTolerance=1e-5, errorMessage="material: testnk: er3", absoluteTolerance=1e-5, relativeTolerance=1e-4)
 
 		# Case 4: wavelength is smaller than one we have in database
 		self.silicon.source.wavelength = 0.23
 		erDesired = sq(1.637 + 3.59j) + 5.3892 - 4.2152j
 		erCalculated = self.silicon.er
-		assertAlmostEqual(erCalculated, erDesired, absoluteTolerance = 1e-5,errorMessage="material: testnk: er4")
+		assertAlmostEqual(erCalculated, erDesired, absoluteTolerance = 1e-5,errorMessage="material: testnk: er4", absoluteTolerance=1e-5, relativeTolerance=1e-4)
 
 	def testUr(self):
 		# Case 1: wavelength is exactly identical to one we have in database
