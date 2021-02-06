@@ -12,7 +12,7 @@ class TestMaterial(unittest.TestCase):
 		wavelengthsToTest = np.array([0.25, 0.26, 0.27])
 		nkDesired = complexArray([1.637 + 3.59j, 1.737 + 3.99j, 2.03 + 4.60j])
 		nkCalculated = self.silicon._n[0:3]
-		assertEqual(nkDesired, nkCalculated, errorMessage = "material: nk")
+		assertAlmostEqual(nkDesired, nkCalculated, errorMessage = "material: nk", absoluteTolerance=1e-5)
 
 		erDesired = complexArray([-10.208331+11.75366j, -12.902931 + 13.86126j, -17.0391 + 18.676j])
 		urDesired = complexArray([1, 1, 1])
