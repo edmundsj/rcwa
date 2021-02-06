@@ -43,7 +43,7 @@ jobs:
         verbose: true
     - name: Download and install from TestPyPi
       run:
-        pip install -i https://test.pypi.org/simple/ rcwa
+        pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple rcwa
     - name: Run full testPyPi test suite
       run:
         python -m rcwa.test.fullRunner
