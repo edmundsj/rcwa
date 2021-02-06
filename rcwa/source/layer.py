@@ -22,7 +22,7 @@ class Layer:
 
 		self.L = L
 		self.crystal = crystal
-		self.source = source # For wavelength-dependent materials this is required.
+		self._source = source # For wavelength-dependent materials this is required.
 
 		if crystal is not None:
 			self.homogenous = False
@@ -56,6 +56,14 @@ class Layer:
 	@n.setter
 	def n(self, n):
 		self.material.n = n
+
+	@property
+	def source(self):
+		return self.material.source
+
+	@source.setter
+	def source(self, source):
+		self.material.source = source
 
 	def setConvolutionMatrix(self, numberHarmonics):
 		if self.crystal is not None:
@@ -167,6 +175,18 @@ class LayerStack:
 		for layer in self.internalLayer:
 			internalString += str(layer) + '\n'
 		return topString + internalString
+
+	@property
+	def source(self):
+		return self._source
+
+	@source.setter
+	def source(self, source):
+		self._source = source
+		for layer in self.internalLayer:
+			layer.source = self.source
+		self.reflectionLayer.source = source
+		self.transmissionLayer.source = source
 
 	def setGapLayer(self, kx, ky):
 		self.gapLayer.er = 1 + sq(kx) + sq(ky)

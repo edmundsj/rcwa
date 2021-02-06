@@ -16,10 +16,11 @@ class Solver:
 	def __init__(self, layerStack, source, numberHarmonics=(1,1)):
 		self.numberHarmonics = numberHarmonics
 		self.layerStack = layerStack
-		self.layerStack.setConvolutionMatrix(numberHarmonics)
 		self.source = source
 		self.source.layer = layerStack.reflectionLayer
+		self.layerStack.source = source
 
+		self.layerStack.setConvolutionMatrix(numberHarmonics)
 		self.baseCrystal = self.layerStack.extractCrystal()
 		self.setupKMatrices()
 		self.setupGapMatrices()

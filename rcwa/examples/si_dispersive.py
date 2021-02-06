@@ -14,7 +14,7 @@ stopWavelength = 0.85
 stepWavelength = 0.005
 
 source = Source(wavelength=designWavelength)
-si = Material('Si', source=source)
+si = Material('Si')
 
 reflectionLayer = Layer(n=1) # Free space
 transmissionLayer = Layer(material=si)
@@ -26,6 +26,6 @@ wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
         stepWavelength)
 
 TMMSolver.Solve(wavelengths=wavelengths)
-#Plotter.plotEllipsometrySpectra(TMMSolver1.results)
-Plotter.plotRTSpectra(TMMSolver.results)
+Plotter.plotEllipsometrySpectra(TMMSolver.results)
+#Plotter.plotRTSpectra(TMMSolver.results)
 plt.show()
