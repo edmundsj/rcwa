@@ -56,7 +56,7 @@ jobs:
         verbose: true
     - name: Download from PyPi
       run:
-        pip uninstall rcwa
+        pip uninstall rcwa;
         pip install rcwa
     - name: Run full PyPi Test Suite
       run:
