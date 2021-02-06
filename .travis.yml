@@ -5,7 +5,7 @@ cache: conda
 python: 
     - "3.6"
     - "3.8"
-    - "nightly"
+    - "latest"
 
 matrix:
     allow_failures:
