@@ -41,15 +41,23 @@ jobs:
         password: ${{ secrets.pypi_test_password2 }}
         repository_url: https://test.pypi.org/legacy/
         verbose: true
+    - name: Download and install from TestPyPi
+      run:
+        pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple rcwa
+    - name: Run full testPyPi test suite
+      run:
+        python -m rcwa.test.fullRunner
     - name: Publish distribution to PyPi
       uses: pypa/gh-action-pypi-publish@master
+      if: env.GITHUB_REF == 'refs/heads/master'
       with:
         user: __token__
         password: ${{ secrets.pypi_password2 }}
         verbose: true
     - name: Download from PyPi
       run:
+        pip uninstall -y rcwa;
         pip install rcwa
-    - name: Run full test suite of downloaded package
+    - name: Run full PyPi Test Suite
       run:
         python -m rcwa.test.fullRunner
