@@ -19,4 +19,3 @@ dependencies:
   - setuptools
   - wheel
   - pyyaml
-  - glob
