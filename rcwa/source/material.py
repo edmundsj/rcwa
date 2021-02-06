@@ -11,18 +11,17 @@ class Material:
 	:param filename: File containing n/k data for the material in question
 	"""
 
-	def __init__(self, er=1, ur=1, n=None, material_name='', filename='', source=None):
+	def __init__(self, material_name='', er=1, ur=1, n=None, filename='', source=None):
 		self.name = ''
 		self.source=source
 		filename=filename
 
-		if material_name != '':
-			filename = context.nkLocation + '/' + material_name + '.csv'
+		filename = context.nkLocation + '/' + material_name + '.csv'
 
-		if filename != '':
+		if material_name != '':
 			self.parseCSV(filename)
 
-		elif filename == '':
+		elif material_name == '':
 			if n == None: # If the refractive index is not defined, go with the permittivity
 				self._er = er
 				self._ur = ur
