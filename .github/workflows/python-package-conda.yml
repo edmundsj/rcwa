@@ -48,7 +48,7 @@ jobs:
       run:
         python -m rcwa.test.fullRunner
     - name: Find me my branch name
-	  run: echo "github ref is $ {{ GITHUB_REF }}"
+      run: echo "github ref is $ {{ GITHUB_REF }}"
     - name: Publish distribution to PyPi
       uses: pypa/gh-action-pypi-publish@master
       if: $ {{ GITHUB_REF }} == 'refs/heads/master'
