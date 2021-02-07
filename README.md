@@ -27,8 +27,8 @@ Features
 - Implements 1D Transfer Matrix Method for homogenous layers
 - Implements full rectangular 2D RCWA for periodic layers
 - Huge material database built-in based on [refractiveindex.info](https://refractiveindex.info/), including metals, plastics, glass, and ceramics
-- Arbitrary incident wave polarization (circular, linear, elliptical)
-- Arbitrary incident wave angle of incidence
+- Compute reflection and transmission spectra at arbitrary incidence and polarization
+- Compute spectroscopic ellipsometry curves
 - Exactly solves Maxwell's Equations for arbitrary layer stacks of any thickness
 - Compute reflected power, transmitted power, and S-parameters
 - Easy to use class-based syntax 
