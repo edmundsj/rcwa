@@ -1,0 +1,225 @@
+Ag:
+    plasma_frequency: 9.01
+    oscillator_strengths:
+    - 0.845
+    - 0.065
+    - 0.124
+    - 0.065
+    - 0.840
+    - 5.646
+    damping_coefficients:
+    - 0.048
+    - 3.886
+    - 0.452
+    - 0.065
+    - 0.916
+    - 5.646
+    offset_frequencies:
+    - 0.816
+    - 4.481
+    - 8.815
+    - 9.083
+    - 20.29
+
+Au:
+    plasma_frequency: 9.03
+    oscillator_strengths:
+    - 0.760
+    - 0.024
+    - 0.010
+    - 0.071
+    - 0.061
+    - 4.384
+    damping_coefficients:
+    - 0.053
+    - 0.241
+    - 0.345
+    - 0.870
+    - 2.494
+    - 2.214
+    offset_frequencies:
+    - 0.415
+    - 0.830
+    - 2.969
+    - 4.304
+    - 13.32
+
+Cu:
+    plasma_frequency: 10.83
+    oscillator_strengths:
+    - 0.575
+    - 0.061
+    - 0.104
+    - 0.723
+    - 0.638
+    damping_coefficients:
+    - 0.030
+    - 0.378
+    - 1.056
+    - 3.213
+    - 4.305
+    offset_frequencies:
+    - 0.291
+    - 2.957
+    - 5.300
+    - 11.18
+
+Al:
+    plasma_frequency: 14.98
+    oscillator_strengths:
+    - 0.523
+    - 0.227
+    - 0.050
+    - 0.166
+    - 0.030
+    damping_coefficients:
+    - 0.047
+    - 0.333
+    - 0.312
+    - 1.351
+    - 3.382
+    offset_frequencies:
+    - 0.162
+    - 1.544
+    - 1.808
+    - 3.473
+
+Be:
+    plasma_frequency: 18.51
+    oscillator_strengths:
+    - 0.084
+    - 0.031
+    - 0.140
+    - 0.530
+    - 0.130
+    damping_coefficients:
+    - 0.035
+    - 1.664
+    - 3.395
+    - 4.454
+    - 1.802
+    offset_frequencies:
+    - 0.100
+    - 1.032
+    - 3.183
+    - 4.604
+
+Cr:
+    plasma_frequency: 10.75
+    oscillator_strengths:
+    - 0.168
+    - 0.151
+    - 0.150
+    - 1.149
+    - 0.825
+    damping_coefficients:
+    - 0.047
+    - 3.175
+    - 1.305
+    - 2.676
+    - 1.335
+    offset_frequencies:
+    - 0.121
+    - 0.543
+    - 1.970
+    - 8.775
+
+Ni:
+    plasma_frequency: 15.92
+    oscillator_strengths:
+    - 0.096
+    - 0.100
+    - 0.135
+    - 0.106
+    - 0.729
+    damping_coefficients:
+    - 0.048
+    - 4.511
+    - 1.334
+    - 2.178
+    - 6.292
+    offset_frequencies:
+    - 0.174
+    - 0.582
+    - 1.597
+    - 6.089
+
+Pd:
+    plasma_frequency: 9.72
+    oscillator_strengths:
+    - 0.330
+    - 0.649
+    - 0.121
+    - 0.638
+    - 0.453
+    damping_coefficients:
+    - 0.008
+    - 2.950
+    - 0.555
+    - 4.621
+    - 3.236
+    offset_frequencies:
+    - 0.336
+    - 0.501
+    - 1.659
+    - 5.715
+
+Pt:
+    plasma_frequency: 9.59
+    oscillator_strengths:
+    - 0.333
+    - 0.191
+    - 0.659
+    - 0.547
+    - 3.576
+    damping_coefficients:
+    - 0.080
+    - 0.517
+    - 1.838
+    - 3.668
+    - 8.517
+    offset_frequencies:
+    - 0.780
+    - 1.314
+    - 3.141
+    - 9.249
+
+Ti:
+    plasma_frequency: 7.29
+    oscillator_strengths:
+    - 0.148
+    - 0.899
+    - 0.393
+    - 0.187
+    - 0.001
+    damping_coefficients:
+    - 0.082
+    - 2.276
+    - 2.518
+    - 1.663
+    - 1.762
+    offset_frequencies:
+    - 0.777
+    - 1.545
+    - 2.509
+    - 19.43
+
+W:
+    plasma_frequency: 13.22
+    oscillator_strengths:
+    - 0.206
+    - 0.054
+    - 0.166
+    - 0.706
+    - 2.590
+    damping_coefficients:
+    - 0.064
+    - 0.530
+    - 1.281
+    - 3.332
+    - 5.836
+    offset_frequencies:
+    - 1.004
+    - 1.917
+    - 3.580
+    - 7.498
