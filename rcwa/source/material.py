@@ -53,11 +53,6 @@ class Material:
 		self.dispersive = True
 
 	def loadFromDatabase(self, material_name):
-#si_filename = context.nkLocation + '/' + 'Si.csv'
-#data = pd.read_csv(si_filename, skiprows=1)
-#self.wavelengths = data['Wavelength (um)'].to_numpy()
-#self._n = (data['n'] + 1j*data['k']).to_numpy()
-#data_size = len(self._n)
 
 		# First, oad the database of materials
 		database_list = yaml.load(open(context.nkLocation + '/library.yml'), Loader=yaml.FullLoader)
