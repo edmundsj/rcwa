@@ -151,9 +151,9 @@ class Material:
 				(frequency * (frequency - 1j*damping_coefficients[0]))
 		er_bound = 0
 		for i in range(len(damping_coefficients - 1)):
-		er_bound += oscillator_amplitudes[i] * plasma_frequency * plasma_frequency / \
-				(offset_coefficients*offset_coefficients - \
-				frequency*frequency + 1j*frequency*damping_coefficients[i])
+			er_bound += oscillator_amplitudes[i] * plasma_frequency * plasma_frequency / \
+					(offset_coefficients*offset_coefficients - \
+					frequency*frequency + 1j*frequency*damping_coefficients[i])
 		er = er_free + er_bound
 		ur = 1
 		return (er, ur)
