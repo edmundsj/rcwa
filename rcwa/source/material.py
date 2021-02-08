@@ -172,7 +172,6 @@ class Material:
 			if wavelength == self.wavelengths[indexOfWavelength]: # We found the EXACT wavelength
 				return_value = parameter[indexOfWavelength]
 			else: # We need to interpolate the wavelength. The indexOfWavelength is pointing to the *next* value
-				print(f'wavelength: {wavelength}, param: {parameter[indexOfWavelength]}')
 				slope = (parameter[indexOfWavelength] - parameter[indexOfWavelength-1]) / (self.wavelengths[indexOfWavelength] - self.wavelengths[indexOfWavelength-1]) # wavelength spacing between two points
 				deltaWavelength = wavelength - self.wavelengths[indexOfWavelength]
 				return_value = parameter[indexOfWavelength] + slope * deltaWavelength
