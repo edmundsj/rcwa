@@ -10,7 +10,7 @@ class Source:
     Class for defining monochromatic excitation source
 
     :param wavelength: The wavelength (in microns, or your preferred length unit due to the scale-invariance of Maxwell's equations.
-    :param theta: Angle with respect to the vector normal to the layer stack
+    :param theta: Angle with respect to the vector normal to the layer stack, in radians
     :param phi: Rotation angle amount the vector normal to the layer stack
     :param pTEM: Polarization vector for TE/TM polarization fraction (can be complex)
     :param layer: Layer source is located in

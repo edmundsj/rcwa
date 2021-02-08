@@ -22,3 +22,5 @@ _static/
 build/
 dist/
 rcwa.egg-info/
+
+debugging_notes

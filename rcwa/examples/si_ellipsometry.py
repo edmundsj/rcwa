@@ -6,18 +6,16 @@ import context
 from rcwa import Material, Layer, LayerStack, Source, Solver, Plotter
 
 import numpy as np
-import pandas as pd
 from matplotlib import pyplot as plt
 
 designWavelength = 1.3
 startWavelength = 0.25
 stopWavelength = 0.85
-stepWavelength = 0.001
+stepWavelength = 0.01
+incident_angle = np.radians(75)
 
-source = Source(wavelength=designWavelength)
+source = Source(wavelength=designWavelength, theta=incident_angle)
 si = Material('Si')
-data = pd.DataFrame({'Wavelength (um):': si.wavelengths, 'er': si._er, 'n': si._n})
-print(data)
 
 reflectionLayer = Layer(n=1) # Free space
 transmissionLayer = Layer(material=si)

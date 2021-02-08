@@ -26,7 +26,7 @@ Features
 ==========
 - Implements 1D Transfer Matrix Method for homogenous layers
 - Implements full rectangular 2D RCWA for periodic layers
-- Huge material database built-in based on [refractiveindex.info](https://refractiveindex.info/), including metals, plastics, glass, and ceramics
+- Huge material database for n/k values in optical range built-in based on [refractiveindex.info](https://refractiveindex.info/), including metals, plastics, glass, and ceramics
 - Compute reflection and transmission spectra at arbitrary incidence and polarization
 - Compute spectroscopic ellipsometry curves
 - Exactly solves Maxwell's Equations for arbitrary layer stacks of any thickness
@@ -55,3 +55,6 @@ License
 =========
 This project is distributed under the [MIT license](https://mit-license.org/).
 
+References
+===========
+[1] Rakić, Aleksandar D., Aleksandra B. Djurišić, Jovan M. Elazar, and Marian L. Majewski. "Optical properties of metallic films for vertical-cavity optoelectronic devices." Applied optics 37, no. 22 (1998): 5271-5283.
