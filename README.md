@@ -20,7 +20,9 @@ To run a simple example, run:
 python -m rcwa.examples.bragg_mirror
 ```
 
-This should run an example with a 10-layer bragg mirror (also known as a [dielectric mirror](https://en.wikipedia.org/wiki/Dielectric_mirror)), which can have very high reflectance near its design wavelength, and output the reflectance as a function of wavelength.
+This should run an example with a 10-layer bragg mirror (also known as a [dielectric mirror](https://en.wikipedia.org/wiki/Dielectric_mirror)), which can have very high reflectance near its design wavelength, and output the reflectance as a function of wavelength, as seen below:
+
+![Bragg Mirror Plot](/images/rcwa_example_plot.png)
 
 Features
 ==========
