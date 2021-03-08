@@ -58,3 +58,10 @@ This project is distributed under the [MIT license](https://mit-license.org/).
 References
 ===========
 [1] Rakić, Aleksandar D., Aleksandra B. Djurišić, Jovan M. Elazar, and Marian L. Majewski. "Optical properties of metallic films for vertical-cavity optoelectronic devices." Applied optics 37, no. 22 (1998): 5271-5283.
+
+Acknowledgements
+==================
+This work is based primarily on a set of lectures and associated course
+material by Professor [Raymond Rumpf](http://emlab.utep.edu/team.htm)  at
+the University of Texas, El Paso. 
+
