@@ -1,6 +1,5 @@
 # Fresnel equations definitions for TE and TM modes
-import context
-from matrices import *
+from rcwa.source.matrices import *
 
 def rTE(kz1, kz2, er1, er2, ur1, ur2):
     return (ur2 * kz1 - ur1 * kz2) / (ur2 * kz1 + ur1 * kz2);

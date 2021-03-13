@@ -1,6 +1,5 @@
-import context
-from shorthand import *
-from source import Source, zeroSource
+from rcwa.source.shorthand import *
+from rcwa import Source, zeroSource
 
 def calculateIncidentFieldHarmonics(source, numberHarmonics):
     totalNumberHarmonics = np.prod(numberHarmonics)

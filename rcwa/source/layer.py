@@ -1,6 +1,5 @@
-import context
-from shorthand import *
-from material import Material
+from rcwa.source.shorthand import *
+from rcwa import Material
 
 class Layer:
 	"""

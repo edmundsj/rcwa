@@ -1,8 +1,7 @@
-import context
-from shorthand import *
-from matrices import *
-from harmonics import *
-from matrixParser import *
+from rcwa.source.shorthand import *
+from rcwa.source.matrices import *
+from rcwa.source.harmonics import *
+from rcwa.source.matrixParser import *
 from layer import Layer, LayerStack
 from copy import deepcopy
 
