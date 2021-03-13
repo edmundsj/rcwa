@@ -57,13 +57,18 @@ License
 =========
 This project is distributed under the [MIT license](https://mit-license.org/).
 
-References
-===========
-[1] Rakić, Aleksandar D., Aleksandra B. Djurišić, Jovan M. Elazar, and Marian L. Majewski. "Optical properties of metallic films for vertical-cavity optoelectronic devices." Applied optics 37, no. 22 (1998): 5271-5283.
+Dependencies
+=============
+Dependencies are comprehensively covered by the setup.py file, and the most
+recent set of dependencies can be found there. Currently, this requires numpy,
+scipy, pandas, matplotlib, and pyyaml. The documentation is built using Sphinx
+and hosted on readthedocs.io.
 
-Acknowledgements
-==================
+Acknowledgements / References
+===============================
 This work is based primarily on a set of lectures and associated course
 material by Professor [Raymond Rumpf](http://emlab.utep.edu/team.htm)  at
 the University of Texas, El Paso. 
+
+[1] Rakić, Aleksandar D., Aleksandra B. Djurišić, Jovan M. Elazar, and Marian L. Majewski. "Optical properties of metallic films for vertical-cavity optoelectronic devices." Applied optics 37, no. 22 (1998): 5271-5283.
 

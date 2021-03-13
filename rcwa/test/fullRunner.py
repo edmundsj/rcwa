@@ -1,20 +1,19 @@
 """
 Run all the core unit tests, not the lengthy and major integration tests
 """
-import unittest
 import sys
-sys.path.append('test')
+import unittest
 
-import testCrystal as testCrystal
-import testHarmonics as testHarmonics
-import testLayer as testLayer
-import testMaterial as testMaterial
-import testMatrices1x1Harmonics as testMatrices1x1Harmonics
-import testMatrices3x3Harmonics as testMatrices3x3Harmonics
-import testNetlistParser as testNetlistParser
-import testSolver1x1Harmonics as testSolver1x1Harmonics
-import testSolver3x3Harmonics as testSolver3x3Harmonics
-import testSource as testSource
+import rcwa.test.testCrystal as testCrystal
+import rcwa.test.testHarmonics as testHarmonics
+import rcwa.test.testLayer as testLayer
+import rcwa.test.testMaterial as testMaterial
+import rcwa.test.testMatrices1x1Harmonics as testMatrices1x1Harmonics
+import rcwa.test.testMatrices3x3Harmonics as testMatrices3x3Harmonics
+import rcwa.test.testNetlistParser as testNetlistParser
+import rcwa.test.testSolver1x1Harmonics as testSolver1x1Harmonics
+import rcwa.test.testSolver3x3Harmonics as testSolver3x3Harmonics
+import rcwa.test.testSource as testSource
 
 loader = unittest.TestLoader()
 suite = unittest.TestSuite()

@@ -1,5 +1,4 @@
-import context
-from shorthand import *
+from rcwa.source.shorthand import *
 
 class Crystal:
     """

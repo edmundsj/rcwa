@@ -1,9 +1,9 @@
-import context
 import csv
 import numpy as np
 import pandas as pd
 import yaml
-from shorthand import *
+import rcwa
+from rcwa.source.shorthand import *
 
 class Material:
 	"""
@@ -40,10 +40,10 @@ class Material:
 		self.extractMaterialDatabase()
 
 		if filename != None:
-			file_to_load = context.nkLocation + '/data/' + filename
+			file_to_load = rcwa.nkLocation + '/data/' + filename
 
 		if material_name in self.materials.keys():
-			file_to_load = context.nkLocation + '/data/' + self.materials[material_name]
+			file_to_load = rcwa.nkLocation + '/data/' + self.materials[material_name]
 
 		self.loadMaterialFile(file_to_load)
 
@@ -52,7 +52,7 @@ class Material:
 		self.dispersive = True
 
 	def extractMaterialDatabase(self):
-		database_filename = context.nkLocation + '/library.yml'
+		database_filename = rcwa.nkLocation + '/library.yml'
 		self.materials = {}
 		with open(database_filename) as database_file:
 			database_list = yaml.load(database_file, Loader=yaml.FullLoader)

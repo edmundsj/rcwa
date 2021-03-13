@@ -1,6 +1,5 @@
-import context
-from crystal import *
 import numpy as np
+from rcwa import Crystal
 import matplotlib.pyplot as plt
 
 class Plotter:
