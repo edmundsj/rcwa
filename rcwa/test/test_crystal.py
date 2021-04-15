@@ -1,3 +1,5 @@
+import sys
+print(sys.path)
 from rcwa import Source, Crystal
 from rcwa import complexArray, complexOnes, assertAlmostEqual, pi, sq, complexZeros, assertArrayEqual, assertStringEqual
 import unittest
