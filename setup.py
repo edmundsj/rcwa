@@ -40,7 +40,7 @@ with open("README.md", "r") as fh:
 				'matplotlib>=2.0.0',
 				'pandas>=0.24.0',
 				'scipy>=1.2.2',
-				'pyyaml>=5.4.1',
+				'pyyaml>=5.0.0',
 		],
 	license="MIT",
 	)
