@@ -1,17 +1,10 @@
 # DATA FOR THIS FILE TAKEN FROM THE TMM BENCHMARKING DATA PROVIDED BY RUMPF.
-import context
-
 import unittest
-from shorthandTest import *
-from matrices import *
-from fresnel import *
-from matrixParser import *
-from source import Source
-from layer import Layer
-from solver import *
-from crystal import Crystal
-from plotter import Plotter
-
+from rcwa import Source, Layer, Plotter, Crystal, Solver, LayerStack
+from rcwa import pi, sq, deg, sqrt, complexArray, complexOnes, complexIdentity, complexZeros
+from rcwa import assertAlmostEqual, assertEqual
+from rcwa import calculateVWXMatrices, generateTransparentSMatrix, calculateTransmissionRegionSMatrix, calculateInternalSMatrixFromRaw, calculateTransmissionRegionSMatrixFromRaw, calculateReflectionRegionSMatrixFromRaw, calculateInternalSMatrix, calculateReflectionRegionSMatrix, calculateRedhefferProduct, calculateQMatrix, calculatePMatrix, calculateLambdaMatrix, calculateRedhefferFMatrix, calculateScatteringDMatrix, calculateRedhefferDMatrix, calculateTEMReflectionCoefficientsFromXYZ, calculateKzForward, calculateKVector, calculateRT, calculateEz, calculateScatteringBMatrix, calculateScatteringAMatrix
+import numpy as np
 
 class TestSolver1x1(unittest.TestCase):
 

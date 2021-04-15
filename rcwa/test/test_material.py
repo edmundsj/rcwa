@@ -1,10 +1,6 @@
-import context
-
 import unittest
-from material import Material
-from source import Source
-from shorthand import *
-from shorthandTest import *
+from rcwa import Material, Source
+from rcwa import assertAlmostEqual, complexArray, sq
 
 class TestMaterial(unittest.TestCase):
 	def testExtractMaterialDatabase(self):

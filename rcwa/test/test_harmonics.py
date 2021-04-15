@@ -1,11 +1,8 @@
-import context
 import unittest
-
-from shorthand import *
-from shorthandTest import *
-from harmonics import *
-from crystal import *
-from source import *
+from rcwa import Crystal, Source
+from rcwa import complexArray, complexOnes, assertAlmostEqual, pi, sq, complexZeros
+from rcwa import getXComponents, getYComponents, calculateZeroHarmonicLocation, generateKxMatrix, generateKyMatrix, calculateMinHarmonic, calculateMaxHarmonic
+import numpy as np
 
 class testHarmonicFunctions(unittest.TestCase):
     def testGetXComponents(self):

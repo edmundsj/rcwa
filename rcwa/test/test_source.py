@@ -1,10 +1,9 @@
 """
 Module for testing the plane wave source class
 """
-from shorthand import *
-from rcwa import Layer, Source
+from rcwa import Layer, Source, complexArray
+from rcwa import deg, assertAlmostEqual, complexArray, sqrt
 import unittest
-from shorthandTest import *
 
 
 class testSource(unittest.TestCase):

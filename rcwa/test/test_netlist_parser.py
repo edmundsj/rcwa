@@ -1,5 +1,3 @@
-import context
-
 import unittest
 from shorthand import *
 import numpy as np

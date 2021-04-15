@@ -1,8 +1,6 @@
-import context
-from source import *
-from crystal import *
+from rcwa import Source, Crystal
+from rcwa import complexArray, complexOnes, assertAlmostEqual, pi, sq, complexZeros, assertArrayEqual, assertStringEqual
 import unittest
-from shorthandTest import *
 
 class Test(unittest.TestCase):
 

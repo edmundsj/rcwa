@@ -1,10 +1,7 @@
-import context
-
-from crystal import *
-from layer import *
-from source import *
+from rcwa import Crystal, Layer, LayerStack, Source, freeSpaceLayer
+from rcwa import assertEqual, assertAlmostEqual
+import numpy as np
 import unittest
-from shorthandTest import *
 
 class Test(unittest.TestCase):
 	def testExtractCrystal(self):
