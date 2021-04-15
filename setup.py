@@ -3,7 +3,7 @@ import os
 import glob
 
 nk_data = glob.glob('rcwa/nkData/**', recursive=True)
-test_data = glob.glob('rcwa/test/**')
+test_data = glob.glob('rcwa/test/**', recursive=True)
 docs_data = glob.glob('rcwa/docs/*')
 example_data = glob.glob('rcwa/examples/*')
 source_data = glob.glob('rcwa/source/*.py')
