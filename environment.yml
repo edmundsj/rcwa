@@ -1,4 +1,4 @@
-name: base
+name: anaconda-client-env
 channels:
   - anaconda
   - conda-forge
