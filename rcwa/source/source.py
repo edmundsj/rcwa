@@ -1,8 +1,4 @@
-# TODO: Turn the wavelength, theta, phi, etc. into properties so that when one is changed, the rest of the 
-# TODO: change the wavelength setter so that it also sets kIncident. This could cause problems in the future.
-# source changes too.
-import context
-from shorthand import *
+from rcwa.shorthand import *
 from rcwa import freeSpaceLayer
 
 class Source:

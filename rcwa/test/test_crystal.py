@@ -1,5 +1,6 @@
 from rcwa import Source, Crystal
-from rcwa import complexArray, complexOnes, assertAlmostEqual, pi, sq, complexZeros, assertArrayEqual, assertStringEqual
+from rcwa.shorthand import *
+from rcwa.testing import *
 import unittest
 
 class Test(unittest.TestCase):

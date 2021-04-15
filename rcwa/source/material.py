@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import yaml
 import rcwa
-from rcwa.source.shorthand import *
+from rcwa.shorthand import *
 
 class Material:
 	"""

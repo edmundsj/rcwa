@@ -1,4 +1,4 @@
-from rcwa.source.shorthand import *
+from rcwa.shorthand import *
 from rcwa import Material
 
 class Layer:

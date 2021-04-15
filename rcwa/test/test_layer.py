@@ -1,5 +1,5 @@
 from rcwa import Crystal, Layer, LayerStack, Source, freeSpaceLayer
-from rcwa import assertEqual, assertAlmostEqual
+from rcwa.testing import *
 import numpy as np
 import unittest
 

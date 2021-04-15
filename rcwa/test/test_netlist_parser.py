@@ -1,23 +1,24 @@
 import unittest
-from shorthand import *
+from rcwa.shorthand import *
+from rcwa.matrices import *
+from rcwa.testing import *
+from rcwa.source.netlist_parser import *
+from rcwa import testLocation, Layer, LayerStack
 import numpy as np
 import scipy as sp
 import scipy.linalg
-from matrices import *
-from netlist_parser import *
-from shorthandTest import *
 
 # 1. The class NetlistParser parses a netlist and turns everything into a "Mask" or "Field" object.
 # The masks and field are returned so that they are sorted in ascending order with
 # respect to their coordinate on the optical axis.
 class TestNetlistParser(unittest.TestCase):
     def setUp(self):
-        self.netlist1arg = context.testLocation + '/netlists/test_netlist1arg.txt'
-        self.netlist3arg =  context.testLocation + '/netlists/test_netlist3arg.txt'
-        self.netlist4arg =  context.testLocation + '/netlists/test_netlist4arg.txt'
-        self.netlist5arg =  context.testLocation + '/netlists/test_netlist5arg.txt'
-        self.netlist6arg =  context.testLocation + '/netlists/test_netlist6arg.txt'
-        self.netlist7arg =  context.testLocation + '/netlists/test_netlist7arg.txt'
+        self.netlist1arg = testLocation + '/netlists/test_netlist1arg.txt'
+        self.netlist3arg = testLocation + '/netlists/test_netlist3arg.txt'
+        self.netlist4arg = testLocation + '/netlists/test_netlist4arg.txt'
+        self.netlist5arg = testLocation + '/netlists/test_netlist5arg.txt'
+        self.netlist6arg = testLocation + '/netlists/test_netlist6arg.txt'
+        self.netlist7arg = testLocation + '/netlists/test_netlist7arg.txt'
 
     def testStripUnits(self):
         # First, test some simple real numbers

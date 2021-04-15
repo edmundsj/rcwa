@@ -1,10 +1,10 @@
 # Tests the matrices.py file, which is responsible for the creation and manipulation of scattering matrices
 import unittest
-from rcwa import assertAlmostEqual, assertArrayEqual, complexArray, pi, sqrt, sq, complexOnes, complexZeros, sin, cos, complexIdentity
+from rcwa.testing import *
+from rcwa.shorthand import *
 from rcwa import Source, Layer, LayerStack
 import numpy as np
-from rcwa import calculateVWXMatrices, generateTransparentSMatrix, calculateTransmissionRegionSMatrix, calculateInternalSMatrixFromRaw, calculateTransmissionRegionSMatrixFromRaw, calculateReflectionRegionSMatrixFromRaw, calculateInternalSMatrix, calculateReflectionRegionSMatrix, calculateRedhefferProduct, calculateQMatrix, calculatePMatrix, calculateLambdaMatrix, calculateRedhefferFMatrix, calculateScatteringDMatrix, calculateRedhefferDMatrix, calculateTEMReflectionCoefficientsFromXYZ, calculateKzForward, calculateKVector, calculateRT, calculateEz, calculateScatteringBMatrix, calculateScatteringAMatrix
-
+from rcwa.matrices import *
 
 class Test1x1Harmonic(unittest.TestCase):
     def testCalculateKz(self):

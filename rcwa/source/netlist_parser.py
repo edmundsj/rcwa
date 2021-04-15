@@ -1,17 +1,7 @@
-# This is a parser for our simple netlists.
-# TODO:
-# 1. Incorporate phase information into Gaussian wave based on the beam waist.
-# 2. Switch wavelength to a global property, and only allow people to define a single
-#   wavelength per simulation. They can still do multiple wavelengths eventually, but 
-#   for now this should be a global setting.
-
-import sys
-sys.path.append('core');
-sys.path.append('test')
-
-from crystal import *
-from layer import *
-from source import *
+from rcwa import Crystal, Layer, LayerStack, Source
+from rcwa.shorthand import *
+import re
+import numpy as np
 
 # EXPECTED NETLIST FORMAT
 WAVELENGTH_POSITION = 1;
@@ -25,8 +15,6 @@ THICKNESS_POSITION = 3;
 
 DBGLVL = 2;
 
-import re
-import numpy as np
 
 class NetlistParser:
     filename = '';

@@ -1,9 +1,9 @@
 import unittest
 from rcwa import Source, Layer, Plotter, Crystal, Solver, LayerStack
-from rcwa import pi, sq, deg, sqrt, complexArray, complexOnes, complexIdentity, complexZeros
+from rcwa.shorthand import *
+from rcwa.testing import *
+from rcwa.matrices import *
 from rcwa import numpyArrayFromFile, testLocation, numpyArrayFromSeparatedColumnsFile
-from rcwa import assertAlmostEqual, assertEqual, assertArrayEqual
-from rcwa import calculateVWXMatrices, generateTransparentSMatrix, calculateTransmissionRegionSMatrix, calculateInternalSMatrixFromRaw, calculateTransmissionRegionSMatrixFromRaw, calculateReflectionRegionSMatrixFromRaw, calculateInternalSMatrix, calculateReflectionRegionSMatrix, calculateRedhefferProduct, calculateQMatrix, calculatePMatrix, calculateLambdaMatrix, calculateRedhefferFMatrix, calculateScatteringDMatrix, calculateRedhefferDMatrix, calculateTEMReflectionCoefficientsFromXYZ, calculateKzForward, calculateKVector, calculateRT, calculateEz, calculateScatteringBMatrix, calculateScatteringAMatrix
 import numpy as np
 
 

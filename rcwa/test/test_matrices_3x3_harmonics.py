@@ -1,12 +1,12 @@
 import numpy as np
 import sys
 import unittest
-from rcwa import pi, cos, sin, deg, sqrt
-from rcwa import testLocation
-from rcwa import complexArray, complexOnes, complexZeros, complexIdentity, numpyArrayFromFile, numpyArrayFromSeparatedColumnsFile
-from rcwa import assertEqual, assertAlmostEqual, assertArrayEqual
+from rcwa.shorthand import *
+from rcwa.testing import *
+from rcwa.matrices import *
+from rcwa.harmonics import *
+from rcwa import testLocation, numpyArrayFromFile, numpyArrayFromSeparatedColumnsFile
 from rcwa import Layer, LayerStack, freeSpaceLayer, Solver, Crystal, Source
-from rcwa import calculateVWXMatrices, generateTransparentSMatrix, calculateTransmissionRegionSMatrix, calculateInternalSMatrixFromRaw, calculateTransmissionRegionSMatrixFromRaw, calculateReflectionRegionSMatrixFromRaw, calculateInternalSMatrix, calculateReflectionRegionSMatrix, calculateRedhefferProduct, calculateQMatrix, calculatePMatrix, calculateLambdaMatrix, calculateRedhefferFMatrix, calculateScatteringDMatrix, calculateRedhefferDMatrix, calculateTEMReflectionCoefficientsFromXYZ, calculateKzForward, calculateKVector, calculateRT, calculateEz, calculateScatteringBMatrix, calculateScatteringAMatrix, calculateOmegaSquaredMatrix, kroneckerDeltaVector, calculateTransmissionCoefficient, calculateReflectionCoefficient, calculateKzBackward, calculateIncidentFieldHarmonics, calculateDiffractionReflectionEfficiency, calculateDiffractionTransmissionEfficiency
 
 np.set_printoptions(threshold=sys.maxsize)
 

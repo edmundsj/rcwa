@@ -1,7 +1,6 @@
-from rcwa.source.shorthand import *
-from rcwa.source.matrices import *
-from rcwa.source.harmonics import *
-from rcwa.source.matrixParser import *
+from rcwa.shorthand import *
+from rcwa.matrices import *
+from rcwa.harmonics import *
 from rcwa import Layer, LayerStack
 from copy import deepcopy
 

@@ -1,7 +1,8 @@
 import unittest
 from rcwa import Crystal, Source
-from rcwa import complexArray, complexOnes, assertAlmostEqual, pi, sq, complexZeros
-from rcwa import getXComponents, getYComponents, calculateZeroHarmonicLocation, generateKxMatrix, generateKyMatrix, calculateMinHarmonic, calculateMaxHarmonic
+from rcwa.shorthand import *
+from rcwa.testing import *
+from rcwa.harmonics import *
 import numpy as np
 
 class testHarmonicFunctions(unittest.TestCase):

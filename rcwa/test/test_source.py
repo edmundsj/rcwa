@@ -1,8 +1,9 @@
 """
 Module for testing the plane wave source class
 """
-from rcwa import Layer, Source, complexArray
-from rcwa import deg, assertAlmostEqual, complexArray, sqrt
+from rcwa import Layer, Source
+from rcwa.shorthand import *
+from rcwa.testing import *
 import unittest
 
 

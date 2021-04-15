@@ -1,6 +1,7 @@
 import unittest
 from rcwa import Material, Source
-from rcwa import assertAlmostEqual, complexArray, sq
+from rcwa.testing import *
+from rcwa.shorthand import *
 
 class TestMaterial(unittest.TestCase):
 	def testExtractMaterialDatabase(self):
