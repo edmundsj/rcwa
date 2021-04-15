@@ -14,8 +14,6 @@ __pycache__/
 __pycache__
 
 _build/
-_templates/
-_static/
 
 .coverage
 
