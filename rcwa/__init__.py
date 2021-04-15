@@ -8,7 +8,7 @@ nkLocation = os.path.join(file_location, 'nkData/')
 
 from rcwa.source.material import Material
 from rcwa.source.crystal import Crystal
-from rcwa.source.layer import LayerStack, Layer
+from rcwa.source.layer import LayerStack, Layer, freeSpaceLayer
 from rcwa.source.source import Source, zeroSource
 from rcwa.source.solver import Solver
 from rcwa.source.plotter import Plotter

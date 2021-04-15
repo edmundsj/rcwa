@@ -19,3 +19,6 @@ dependencies:
   - setuptools
   - wheel
   - pyyaml
+  - flake8
+  - pytest
+  - pytest-cov

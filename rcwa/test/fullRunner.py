@@ -3,6 +3,7 @@ Run all the core unit tests, not the lengthy and major integration tests
 """
 import sys
 import unittest
+import rcwa
 
 import rcwa.test.testCrystal as testCrystal
 import rcwa.test.testHarmonics as testHarmonics

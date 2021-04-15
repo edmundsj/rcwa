@@ -3,7 +3,7 @@
 # source changes too.
 import context
 from shorthand import *
-from layer import freeSpaceLayer
+from rcwa import freeSpaceLayer
 
 class Source:
     """
