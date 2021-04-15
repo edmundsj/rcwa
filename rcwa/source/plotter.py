@@ -35,8 +35,8 @@ class Plotter:
     @staticmethod
     def plotRTEMSpectra(resultsList):
         xData = np.array([result.source.wavelength for result in resultsList])
-        RTEData = np.array([sq(np.abs(result.rTE)) for result in resultsList])
-        RTMData = np.array([sq(np.abs(result.rTM)) for result in resultsList])
+        RTEData = np.array([np.sq(np.abs(result.rTE)) for result in resultsList])
+        RTMData = np.array([np.sq(np.abs(result.rTM)) for result in resultsList])
         fig, ax = plt.subplots(2, 1)
         ax[0].plot(xData, RTEData)
         ax[1].plot(xData, RTMData)
