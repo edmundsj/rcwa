@@ -1,11 +1,8 @@
 """
 Module for testing the plane wave source class
 """
-import context
-
 from shorthand import *
-from layer import Layer
-from source import Source
+from rcwa import Layer, Source
 import unittest
 from shorthandTest import *
 
