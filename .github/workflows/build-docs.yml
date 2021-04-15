@@ -54,7 +54,7 @@ jobs:
 
         # Optional branch name where commit should be pushed to
         # Defaults to the current branch
-        branch: main
+        branch: master
 
         # Optional options appended to `git-commit`
         # See https://git-scm.com/docs/git-commit for a list of available options

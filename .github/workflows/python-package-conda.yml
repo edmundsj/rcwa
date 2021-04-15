@@ -1,4 +1,4 @@
-name: Python Package using Conda
+name: build
 
 on: [push]
 
@@ -27,7 +27,7 @@ jobs:
 
     - name: Test with pytest, generate coverage report
       run: |
-        $CONDA/envs/anaconda-client-env/bin/pytest --cov=./rcwa/source --cov-report xml
+        $CONDA/envs/base/bin/pytest --cov=./rcwa/source --cov-report xml
 
     - name: Upload coverage report to codecov
       uses: codecov/codecov-action@v1
