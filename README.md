@@ -47,7 +47,7 @@ Example Uses
 
 Documentation
 ================
-This  project is documented on [Read The Docs](https://rcwa.readthedocs.io/en/latest/). For additional information, including downloading examples, you can view this project on [github](https://github.com/edmundsj/RCWA). 
+This  project is documented on [Github Pages](https://edmundsj.github.io/rcwa/). For additional information, including downloading examples, you can view this project on [github](https://github.com/edmundsj/RCWA). 
 
 Author: Jordan Edmunds, UC Irvine Alumnus, UC Berkeley Ph.D. Student
 
