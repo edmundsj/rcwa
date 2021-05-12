@@ -12,21 +12,21 @@ The :code:`Source` class is used to define the excitation source - the wavelengt
 
 Once the user has created a :code:`Source` and :code:`LayerStack` class, these are passed into the :code:`Solver` class, which then runs the simulation, and makes the results available as a dictionary :code:`Solver.results`.
 
-.. autoclass:: solver.Solver
+.. autoclass:: rcwa.Solver
     :members: Solve
 
-.. autoclass:: layer.Layer
+.. autoclass:: rcwa.Layer
 
-.. autoclass:: layer.LayerStack
+.. autoclass:: rcwa.LayerStack
 
-.. autoclass:: plotter.Plotter
+.. autoclass:: rcwa.Source
+
+.. autoclass:: rcwa.Crystal
+
+.. autoclass:: rcwa.Material
+
+.. autoclass:: rcwa.Plotter
     :members: plotRTSpectra
-
-.. autoclass:: source.Source
-
-.. autoclass:: crystal.Crystal
-
-.. autoclass:: material.Material
 
 Indices and tables
 ==================
