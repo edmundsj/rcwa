@@ -15,12 +15,10 @@ stopWavelength = 0.85
 stepWavelength = 0.001
 
 source = Source(wavelength=designWavelength)
-si = Material(material_name='Si')
-data = pd.DataFrame({'Wavelength (um):': si.wavelengths, 'er': si._er, 'n': si._n})
-print(data)
+siO2 = Material(material_name='SiO2')
 
 reflectionLayer = Layer(n=1) # Free space
-transmissionLayer = Layer(material=si)
+transmissionLayer = Layer(material=siO2)
 stack = LayerStack(reflectionLayer, transmissionLayer)
 
 print("Solving system...")
