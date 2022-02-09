@@ -11,6 +11,7 @@ Documentation for Rigorous Coupled Wave Analysis
    :caption: Contents:
 
    api
+   examples
 
 Getting Started
 ------------------

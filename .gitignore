@@ -21,6 +21,7 @@ _build/
 build/
 dist/
 rcwa.egg-info/
+**/_sources
 
 debugging_notes
 
