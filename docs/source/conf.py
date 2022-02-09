@@ -14,6 +14,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../../rcwa/source'))
 sys.path.insert(0, os.path.abspath('../../rcwa/test'))
+sys.path.insert(0, os.path.abspath('../../')) # rcwa package location
 
 
 # -- Project information -----------------------------------------------------

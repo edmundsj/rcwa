@@ -4,11 +4,10 @@ import glob
 
 nk_data = glob.glob('rcwa/nkData/**', recursive=True)
 test_data = glob.glob('rcwa/test/**', recursive=True)
-docs_data = glob.glob('rcwa/docs/*')
 example_data = glob.glob('rcwa/examples/*')
 source_data = glob.glob('rcwa/source/*.py')
 netlist_data = glob.glob('rcwa/netlist/*')
-total_data = nk_data + test_data + docs_data + example_data + source_data + netlist_data
+total_data = nk_data + test_data + example_data + source_data + netlist_data
 package_data = [x.strip('rcwa/') for x in total_data]
 
 

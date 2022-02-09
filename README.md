@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/edmundsj/RCWA.svg?branch=master)](https://travis-ci.com/edmundsj/RCWA) [![Coverage Status](https://coveralls.io/repos/github/edmundsj/RCWA/badge.svg?branch=master)](https://coveralls.io/github/edmundsj/RCWA?branch=master) [![Documentation Status](https://readthedocs.org/projects/rcwa/badge/?version=latest)](https://rcwa.readthedocs.io/en/latest/?badge=latest)[![PyPI version](https://badge.fury.io/py/rcwa.svg)](https://badge.fury.io/py/rcwa)
+[![Build](https://github.com/edmundsj/rcwa/actions/workflows/python-package-conda.yml/badge.svg)](https://github.com/edmundsj/rcwa/actions/workflows/python-package-conda.yml) [![codecov](https://codecov.io/gh/edmundsj/rcwa/branch/master/graph/badge.svg?token=UDJ1TUESG3)](https://codecov.io/gh/edmundsj/rcwa) [![docs](https://github.com/edmundsj/rcwa/actions/workflows/build-docs.yml/badge.svg)](https://github.com/edmundsj/rcwa/actions/workflows/build-docs.yml) [![PyPI version](https://badge.fury.io/py/rcwa.svg)](https://badge.fury.io/py/rcwa)
 
 Getting Started
 ================
@@ -47,7 +47,7 @@ Example Uses
 
 Documentation
 ================
-This  project is documented on [Read The Docs](https://rcwa.readthedocs.io/en/latest/). For additional information, including downloading examples, you can view this project on [github](https://github.com/edmundsj/RCWA). 
+This  project is documented on [Github Pages](https://edmundsj.github.io/rcwa/). For additional information, including downloading examples, you can view this project on [github](https://github.com/edmundsj/RCWA). 
 
 Author: Jordan Edmunds, UC Irvine Alumnus, UC Berkeley Ph.D. Student
 
