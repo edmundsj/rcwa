@@ -37,7 +37,7 @@ jobs:
 
     - name: Test with pytest, generate coverage report
       run: |
-        $CONDA/envs/anaconda-client-env/bin/pytest -s --cov=./rcwa --cov-report xml
+        $CONDA/envs/anaconda-client-env/bin/pytest -s --cov=./rcwa --cov-report xml --omit="*/test*"
 
     - name: Lint with flake8
       run: |
