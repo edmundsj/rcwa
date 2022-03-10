@@ -5,16 +5,16 @@ import sys
 import unittest
 import rcwa
 
-import rcwa.test.testCrystal as testCrystal
-import rcwa.test.testHarmonics as testHarmonics
-import rcwa.test.testLayer as testLayer
-import rcwa.test.testMaterial as testMaterial
-import rcwa.test.testMatrices1x1Harmonics as testMatrices1x1Harmonics
-import rcwa.test.testMatrices3x3Harmonics as testMatrices3x3Harmonics
-import rcwa.test.testNetlistParser as testNetlistParser
-import rcwa.test.testSolver1x1Harmonics as testSolver1x1Harmonics
-import rcwa.test.testSolver3x3Harmonics as testSolver3x3Harmonics
-import rcwa.test.testSource as testSource
+import rcwa.test.test_crystal as testCrystal
+import rcwa.test.test_harmonics as testHarmonics
+import rcwa.test.test_layer as testLayer
+import rcwa.test.test_material as testMaterial
+import rcwa.test.test_matrices_1x1_harmonics as testMatrices1x1Harmonics
+import rcwa.test.test_matrices_3x3_harmonics as testMatrices3x3Harmonics
+import rcwa.test.test_netlist_parser as testNetlistParser
+import rcwa.test.test_solver_1x1_harmonics as testSolver1x1Harmonics
+import rcwa.test.test_solver_3x3_harmonics as testSolver3x3Harmonics
+import rcwa.test.test_source as testSource
 
 loader = unittest.TestLoader()
 suite = unittest.TestSuite()
