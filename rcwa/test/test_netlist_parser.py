@@ -2,7 +2,7 @@ import unittest
 from rcwa.shorthand import *
 from rcwa.matrices import *
 from rcwa.testing import *
-from rcwa.source.netlist_parser import *
+from rcwa.netlist_parser import *
 from rcwa import testLocation, Layer, LayerStack
 import numpy as np
 import scipy as sp
