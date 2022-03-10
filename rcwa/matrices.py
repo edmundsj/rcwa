@@ -1,5 +1,6 @@
 from rcwa.shorthand import *
 from rcwa import Source, zeroSource
+from numpy.linalg import pinv as pinv
 
 def calculateIncidentFieldHarmonics(source, numberHarmonics):
     totalNumberHarmonics = np.prod(numberHarmonics)
@@ -40,7 +41,7 @@ def calculatePMatrix1Harmonic(kx, ky, layer):
     return P
 
 def calculatePMatrixNHarmonics(Kx, Ky, layer):
-    erInverse = inv(layer.er)
+    erInverse = pinv(layer.er)
     KMatrixDimension = Kx.shape[0]
     matrixShape = (2 *KMatrixDimension, 2 * KMatrixDimension)
     P = complexZeros(matrixShape)
@@ -71,7 +72,7 @@ def calculateQMatrix1Harmonic(kx, ky, layer):
     return Q;
 
 def calculateQMatrixNHarmonics(Kx, Ky, layer):
-    urInverse = inv(layer.ur)
+    urInverse = pinv(layer.ur)
     KMatrixDimension = Kx.shape[0]
     matrixShape = (2 *KMatrixDimension, 2 * KMatrixDimension)
     Q = complexZeros(matrixShape)
@@ -107,20 +108,20 @@ def calculateOmegaSquaredMatrix(P, Q):
     return P @ Q
 
 def calculateScatteringAMatrix(Wi, Wj, Vi, Vj):
-    return inv(Wi) @ Wj + inv(Vi) @ Vj;
+    return pinv(Wi) @ Wj + inv(Vi) @ Vj;
 
 def calculateScatteringBMatrix(Wi, Wj, Vi, Vj):
-    return inv(Wi) @ Wj - inv(Vi) @ Vj;
+    return pinv(Wi) @ Wj - inv(Vi) @ Vj;
 
 def calculateScatteringDMatrix(Ai, Bi, Xi):
-    AiInverse = inv(Ai);
+    AiInverse = pinv(Ai);
     return Ai - Xi @ Bi @ AiInverse @ Xi @ Bi;
 
 def calculateRedhefferDMatrix(SA, SB):
-    return SA[0,1] @ inv(complexIdentity(SA[0,0].shape[0]) - SB[0,0] @ SA[1,1])
+    return SA[0,1] @ pinv(complexIdentity(SA[0,0].shape[0]) - SB[0,0] @ SA[1,1])
 
 def calculateRedhefferFMatrix(SA, SB):
-    return SB[1,0] @ inv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
+    return SB[1,0] @ pinv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
 
 def calculateKzBackward(kx, ky, layer):
     if isinstance(kx, np.ndarray):
@@ -152,7 +153,7 @@ def calculateVWXMatrices(kx, ky, layer, source=zeroSource):
 def calculateVWXMatrices1Harmonic(kx, ky, kz, layer, source):
     Q = calculateQMatrix(kx, ky, layer);
     O = calculateLambdaMatrix(kz);
-    OInverse = inv(O);
+    OInverse = pinv(O);
     W = complexIdentity(2)
     X = matrixExponentiate(O * source.k0 * layer.L)
     V = Q @ W @ OInverse;
@@ -175,7 +176,7 @@ def calculateVWXMatricesNHarmonics(Kx, Ky, layer, source):
     else:
         Kz = calculateKzForward(Kx, Ky, layer)
         Lambda = calculateLambdaMatrix(Kz)
-        LambdaInverse = inv(Lambda)
+        LambdaInverse = pinv(Lambda)
         W = complexIdentity(2*Kz.shape[0])
         V = Q @ W @ LambdaInverse
         X = matrixExponentiate( -Lambda * source.k0 * layer.L)
@@ -216,7 +217,7 @@ def calculateReflectionRegionSMatrixNHarmonics(Kx, Ky, layerStack, Wg, Vg):
             complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
     lambdaRef[:KDimension, :KDimension] = 1j*Kz
     lambdaRef[KDimension:,KDimension:] = 1j*Kz
-    Vi = Q @ inv(lambdaRef)
+    Vi = Q @ pinv(lambdaRef)
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi)
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi)
 
@@ -248,7 +249,7 @@ def calculateTransmissionRegionSMatrixNHarmonics(Kx, Ky, layerStack, Wg, Vg):
             complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
     lambdaRef[:KDimension, :KDimension] = 1j*Kz
     lambdaRef[KDimension:,KDimension:] = 1j*Kz
-    Vi = Q @ inv(lambdaRef)
+    Vi = Q @ pinv(lambdaRef)
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi)
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi)
 
@@ -256,8 +257,8 @@ def calculateTransmissionRegionSMatrixNHarmonics(Kx, Ky, layerStack, Wg, Vg):
     return Strn
 
 def calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di):
-    AiInverse = inv(Ai)
-    DiInverse = inv(Di);
+    AiInverse = pinv(Ai)
+    DiInverse = pinv(Di);
 
     S = complexZeros((2, 2) + Ai.shape)
     S[0, 0] = DiInverse @ (Xi @ Bi @ AiInverse @ Xi @ Ai - Bi)
@@ -270,7 +271,7 @@ def calculateReflectionRegionSMatrixFromRaw(AReflectionRegion, BReflectionRegion
     S = complexZeros((2, 2) + AReflectionRegion.shape);
     A = AReflectionRegion;
     B = BReflectionRegion;
-    AInverse = inv(A);
+    AInverse = pinv(A);
 
     S[0,0] = - AInverse @ B;
     S[0,1] = 2 * AInverse;
@@ -281,7 +282,7 @@ def calculateReflectionRegionSMatrixFromRaw(AReflectionRegion, BReflectionRegion
 def calculateTransmissionRegionSMatrixFromRaw(ATransmissionRegion, BTransmissionRegion): # UNIT TESTS COMPLETE
     A = ATransmissionRegion;
     B = BTransmissionRegion;
-    AInverse = inv(A);
+    AInverse = pinv(A);
 
     S = complexZeros((2, 2) + A.shape);
     S[0,0] = B@ AInverse;
@@ -304,7 +305,7 @@ def calculateTEMReflectionCoefficientsFromXYZ(source, rx, ry, rz):
 def calculateReflectionCoefficient(S, Kx, Ky, KzReflectionRegion,
         WReflectionRegion, source, numberHarmonics):
     incidentFieldHarmonics = calculateIncidentFieldHarmonics(source, numberHarmonics)
-    rTransverse = WReflectionRegion @ S[0,0] @ inv(WReflectionRegion) @ incidentFieldHarmonics
+    rTransverse = WReflectionRegion @ S[0,0] @ pinv(WReflectionRegion) @ incidentFieldHarmonics
 
     rx, ry, rz = None, None, None
     if isinstance(Kx, np.ndarray):
