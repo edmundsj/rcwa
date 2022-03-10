@@ -1,0 +1,12 @@
+Examples using RCWA
+==========================================================
+
+.. literalinclude:: ../../rcwa/examples/bragg_mirror.py
+   :language: python
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

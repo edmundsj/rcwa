@@ -13,8 +13,6 @@
 __pycache__/
 __pycache__
 
-_sources/
-
 _build/
 *.buildinfo
 
