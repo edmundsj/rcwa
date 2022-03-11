@@ -1,8 +1,0 @@
-W0 350nm 550nm 3nm 75deg 1 1
-
-L0 1
-L1 4.44 80nm
-L2 1.45 235nm
-Lsub 4.44
-
-.REFRACTIVEINDEX

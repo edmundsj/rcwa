@@ -13,5 +13,4 @@ from rcwa.layer import LayerStack, Layer, freeSpaceLayer
 from rcwa.source import Source, zeroSource
 from rcwa.solver import Solver
 from rcwa.plotter import Plotter
-from rcwa.netlist_parser import *
-from rcwa.matrixParser import *
+from rcwa.shorthand import *
