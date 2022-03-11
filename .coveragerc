@@ -2,3 +2,4 @@
 omit = 
     */test*
     *plotter.py
+    */utils/fresnel.py
