@@ -35,6 +35,9 @@ class Material:
         self.dispersion_formula = None
         self.loader = None
 
+        self._er = er
+        self._ur = ur
+
         if name is not None or database_path is not None:
             self.dispersive = True
             self.loadFromDatabase(name, filename=database_path)
@@ -117,6 +120,7 @@ class Material:
         num_terms = int((len(coeffs) - 1) / 2)
         B_coeffs = [coeffs[2*i+1] for i in range(num_terms)]
         C_coeffs = [coeffs[2*i+2] for i in range(num_terms)]
+
         def dispersion_formula_er(wavelength):
             L = wavelength
             b_terms = [b * L**2 / (L**2 - c**2) for b, c in zip(B_coeffs, C_coeffs)]
@@ -127,9 +131,9 @@ class Material:
         def dispersion_formula_ur(wavelength):
             return 1
 
-        self._er = dispersion_formula_er
-        self._ur = dispersion_formula_ur
-        self._n = dispersion_formula_n
+        self._er_dispersive = dispersion_formula_er
+        self._ur_dispersive = dispersion_formula_ur
+        self._n_dispersive = dispersion_formula_n
 
     def load_nk_formula_2_data(self, data_dict):
         coeffs = data_dict['coefficients'].split()
@@ -145,23 +149,23 @@ class Material:
         def dispersion_formula_ur(wavelength):
             return 1
 
-        self._n = dispersion_formula_n
-        self._er = dispersion_formula_er
-        self._ur = dispersion_formula_ur
+        self._n_dispersive = dispersion_formula_n
+        self._er_dispersive = dispersion_formula_er
+        self._ur_dispersive = dispersion_formula_ur
 
     def set_nk_numeric(self, data):
         data_shape = data.shape
         if data_shape[1] == 3:
-            self._n = data[:,1] + 1j*data[:,2]
+            self._n_dispersive = data[:,1] + 1j*data[:,2]
             self.wavelengths = data[:,0]
         elif data_shape[1] == 2:
             self.wavelengths = data[:,0]
-            self._n = numerical_data[:,1]
+            self._n_dispersive = numerical_data[:,1]
         else:
             raise ValueError
 
-        self._er = sq(self._n)
-        self._ur = np.ones(self._n.shape)
+        self._er_dispersive = sq(self._n_dispersive)
+        self._ur_dispersive = np.ones(self._n_dispersive.shape)
 
     def load_nk_table_data(self, data_dict):
         material_data = data_dict['data']
@@ -175,40 +179,37 @@ class Material:
         if self.dispersive == False:
             return self._n
         else:
-            return self.lookupParameter(self._n)
+            return self.lookupParameter(self._n_dispersive)
 
     @n.setter
     def n(self, n):
         self._n = n
         self._er = np.square(n)
         self._ur = 1
-        self.dispersive = False
 
     @property
     def er(self):
         if self.dispersive == False:
             return self._er
         else:
-            return self.lookupParameter(self._er)
+            return self.lookupParameter(self._er_dispersive)
 
     @er.setter
     def er(self, er):
         self._er = er
         self._n = np.sqrt(self._er * self._ur)
-        self.dispersive = False
 
     @property
     def ur(self):
         if self.dispersive == False:
             return self._ur
         else:
-            return self.lookupParameter(self._ur)
+            return self.lookupParameter(self._ur_dispersive)
 
     @ur.setter
     def ur(self, ur):
         self._ur = ur
         self._n = np.sqrt(self._ur*self._er)
-        self.dispersive = False
 
     """
     Outputs the complex permittivity-permeability pair
@@ -246,7 +247,7 @@ class Material:
         """
         Looks up a numeric value of a parameter
 
-        :param parameter: Either _n, _er, or _ur
+        :param parameter: Either _n_dispersive, _er_dispersive, or _ur_dispersive
         """
         wavelength = self.source.wavelength
         indexOfWavelength = np.searchsorted(self.wavelengths, wavelength)
