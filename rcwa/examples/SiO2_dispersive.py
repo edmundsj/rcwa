@@ -2,7 +2,6 @@
 # Contact: jordan.e@berkeley.edu
 # Creation Date: 11/01/2019
 #
-import context
 from rcwa import Material, Layer, LayerStack, Source, Solver, Plotter
 
 import numpy as np

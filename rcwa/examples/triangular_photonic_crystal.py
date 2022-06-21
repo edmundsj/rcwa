@@ -1,15 +1,6 @@
-import context
-
 import unittest
-from shorthandTest import *
-from matrices import *
-from fresnel import *
-from matrixParser import *
-from source import Source
-from layer import Layer
-from solver import *
-from crystal import Crystal
-from plotter import Plotter
+from rcwa import Source, Layer, LayerStack, Crystal, Plotter, complexArray, Solver
+import numpy as np
 
 devicePermittivityCellData = np.transpose(np.loadtxt('triangleData.csv', delimiter=','))
 devicePermeabilityCellData = 1 + 0 * devicePermittivityCellData
@@ -18,10 +9,11 @@ reflectionLayer = Layer(er=2.0, ur=1.0)
 transmissionLayer = Layer(er=9.0, ur=1.0)
 
 wavelength = 2
-k0 = 2*pi/wavelength
+deg = np.pi / 180
+k0 = 2*np.pi/wavelength
 theta = 60 * deg
 phi = 30*deg
-pTEM = 1/sqrt(2)*complexArray([1,1j])
+pTEM = 1/np.sqrt(2)*complexArray([1,1j])
 source = Source(wavelength=wavelength, theta=theta, phi=phi, pTEM=pTEM, layer=reflectionLayer)
 t1, t2 = complexArray([1.75, 0, 0]), complexArray([0, 1.5, 0])
 
