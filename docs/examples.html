@@ -231,7 +231,7 @@
 <span class="n">stepWavelength</span> <span class="o">=</span> <span class="mf">0.001</span>
 
 <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">designWavelength</span><span class="p">)</span>
-<span class="n">si</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="n">material_name</span><span class="o">=</span><span class="s1">&#39;Si&#39;</span><span class="p">)</span>
+<span class="n">si</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Si&#39;</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Wavelength (um):&#39;</span><span class="p">:</span> <span class="n">si</span><span class="o">.</span><span class="n">wavelengths</span><span class="p">,</span> <span class="s1">&#39;er&#39;</span><span class="p">:</span> <span class="n">si</span><span class="o">.</span><span class="n">_er</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">si</span><span class="o">.</span><span class="n">_n</span><span class="p">})</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
