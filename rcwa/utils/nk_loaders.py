@@ -89,6 +89,8 @@ class RIDatabaseLoader:
             return self.load_nk_formula_1_data(data_dict)
         elif data_dict['type'] == 'formula 2':
             return self.load_nk_formula_2_data(data_dict)
+        else:
+            raise ValueError(f'Formula type {data_dict["type"]} not supported. Please submit a bug report with this message and the specific material you are trying to use')
 
     def load_nk_formula_1_data(self, data_dict):
         coeffs = data_dict['coefficients'].split()
@@ -128,6 +130,7 @@ class RIDatabaseLoader:
 
         return {'er': dispersion_formula_er, 'ur': dispersion_formula_ur, 'n': dispersion_formula_n,
                 'dispersion_type': 'formula'}
+
 
     def load_nk_table_data(self, data_dict):
         material_data = data_dict['data']

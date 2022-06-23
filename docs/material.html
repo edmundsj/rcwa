@@ -83,7 +83,12 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples using RCWA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">rcwa API</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Materials in rcwa</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Materials in rcwa</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#interpolation-and-extrapolation">Interpolation and Extrapolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#imaginary-sign-convention">Imaginary Sign Convention</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-tabulated-data-files">Example Tabulated Data Files</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -150,16 +155,54 @@
             
   <div class="section" id="materials-in-rcwa">
 <h1>Materials in rcwa<a class="headerlink" href="#materials-in-rcwa" title="Permalink to this headline">¶</a></h1>
-<p>The <cite>Material</cite> class handles materials whose material properties (permittivity, permeability, or refractive index) change as a function of wavelength. There are three primary ways to describe materials:</p>
-<ol class="arabic simple">
-<li><p>Constant numerical value
-This is the simplest model for a material - a constant permittivity</p></li>
-</ol>
 <dl class="py class">
 <dt id="rcwa.Material">
 <em class="property">class </em><code class="sig-prename descclassname">rcwa.</code><code class="sig-name descname">Material</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">er</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">ur</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">database_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">source</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.Material" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>The <cite>Material</cite> class handles materials whose material properties (permittivity, permeability, or refractive index) change as a function of wavelength. There are three primary ways to describe materials:</p>
+<p><strong>1. Constant numerical value</strong></p>
+<blockquote>
+<div><p>This is the simplest model for a material - a constant permittivity / permeability or refractive index, passed in with the <cite>er</cite>, <cite>ur</cite> and <cite>n</cite> arguments.</p>
+</div></blockquote>
+<p><strong>2. Custom function of wavelength</strong></p>
+<blockquote>
+<div><p>In addition to being constants, <cite>er</cite>, <cite>ur</cite>, and <cite>n</cite> may be user-specified single-argument functions, which take wavelength as an argument. Units of wavelength in this case do not matter and returns a (potentially complex) scalar.</p>
+</div></blockquote>
+<p><strong>3. Tabulated data</strong></p>
+<blockquote>
+<div><p>If a value is passed to the <cite>filename</cite> argument, then the <cite>Material</cite> will load in that file. Csv formats are supported by default, with the first axis being wavelength and the second axis being the complex-valued refractive index. You may instead choose to separate the real- and imaginary parts into two separate columns. This works as well. An example tabulated data file is shown below.</p>
+</div></blockquote>
+<p><strong>4. Using a materials database - tabulated or dispersion formula</strong></p>
+<blockquote>
+<div><p>The refractiveindex.info database is supported by default, and contains many user-specified materials (i.e. <cite>Si</cite>, <cite>SiO2</cite>, <cite>Ti</cite>, <cite>Pt</cite>. This database provides both tabulated data and dispersion formulas, depending on the material used. CAUTION: if using this database, wavelength units must be specified in micrometers.</p>
+</div></blockquote>
+<div class="section" id="interpolation-and-extrapolation">
+<h2>Interpolation and Extrapolation<a class="headerlink" href="#interpolation-and-extrapolation" title="Permalink to this headline">¶</a></h2>
+<p>If using tabulated data, you may use any wavelength between the minimum and maximum values in the table, and the permittivity will be linearly interpolated if the desired wavelength falls between two tabulated points. If the desired wavelength falls outside the minimum or maximum, <code class="code docutils literal notranslate"><span class="pre">rcwa</span></code> will attempt to extrapolate using the slope near the boundary and give a warning.</p>
+</div>
+<div class="section" id="imaginary-sign-convention">
+<h2>Imaginary Sign Convention<a class="headerlink" href="#imaginary-sign-convention" title="Permalink to this headline">¶</a></h2>
+<p>Lossy materials are represented with a positive imaginary refractive index (i.e. <cite>2 + 0.1j</cite>. Materials with gain are represented by a negative imaginary refractive index (i.e. <cite>2 - 0.1j</cite>).</p>
+</div>
+<div class="section" id="example-tabulated-data-files">
+<h2>Example Tabulated Data Files<a class="headerlink" href="#example-tabulated-data-files" title="Permalink to this headline">¶</a></h2>
+<p>Below is what an example file for tabulated n/k data should look like, let’s call it <cite>custom_material.csv</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wavelength</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span>
+<span class="mf">0.76</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span>
+<span class="mf">0.77</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mf">0.2</span>
+<span class="mf">0.78</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mf">0.4</span>
+</pre></div>
+</div>
+<p>And a valid alternative <cite>custom_material2.csv</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wavelength</span><span class="p">,</span> <span class="n">n</span>
+<span class="mf">0.76</span><span class="p">,</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.1</span><span class="n">j</span>
+<span class="mf">0.77</span><span class="p">,</span> <span class="mf">2.1</span> <span class="o">+</span> <span class="mf">0.2</span><span class="n">j</span>
+<span class="mf">0.78</span><span class="p">,</span> <span class="mf">2.1</span> <span class="o">+</span> <span class="mf">0.4</span><span class="n">j</span>
+</pre></div>
+</div>
+<p>Note: the files must have a header.</p>
+</div>
 </div>
 
 

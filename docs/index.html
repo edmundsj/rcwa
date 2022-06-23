@@ -162,7 +162,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">rcwa API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="material.html">Materials in rcwa</a></li>
+<li class="toctree-l1"><a class="reference internal" href="material.html">Materials in rcwa</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="material.html#interpolation-and-extrapolation">Interpolation and Extrapolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="material.html#imaginary-sign-convention">Imaginary Sign Convention</a></li>
+<li class="toctree-l2"><a class="reference internal" href="material.html#example-tabulated-data-files">Example Tabulated Data Files</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="getting-started">
@@ -179,9 +184,9 @@
 <div class="section" id="hello-world-program">
 <h2>Hello World Program<a class="headerlink" href="#hello-world-program" title="Permalink to this headline">¶</a></h2>
 <p>To run a simple example, run:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">python</span> <span class="pre">-m</span> <span class="pre">rcwa.examples.bragg_mirror</span>
-<span class="pre">`</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">rcwa</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">bragg_mirror</span>
+</pre></div>
+</div>
 <p>This should run an example with a 10-layer bragg mirror (also known as a [dielectric mirror](<a class="reference external" href="https://en.wikipedia.org/wiki/Dielectric_mirror">https://en.wikipedia.org/wiki/Dielectric_mirror</a>)), which can have very high reflectance near its design wavelength, and output the reflectance and transmission as a function of wavelength.</p>
 </div>
 <div class="section" id="d-photonic-crystal-example">
