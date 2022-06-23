@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import yaml
-from utils import nk_location
+from rcwa.utils import nk_location
 
 def nk_to_complex(data):
 
