@@ -50,13 +50,16 @@ def testnk(silicon):
     # Case 3: wavelength is larger than one we have in database - extrapolate linearly
     silicon.source.wavelength = 1.47
     nDesired = 3.485 + 1.09e-13j
-    nCalculated = silicon.n
+    with pytest.warns(Warning) as warning:
+        nCalculated = silicon.n
+
     assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n3", absoluteTolerance=1e-3)
 
     # Case 4: wavelength is smaller than one we have in database - extrapolate in the opposite direction
     silicon.source.wavelength = 0.23
     nDesired = 1.437 + 2.7803j
-    nCalculated = silicon.n
+    with pytest.warns(Warning) as warning:
+        nCalculated = silicon.n
     assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n4", absoluteTolerance=1e-3)
 
 def testnkInterpolate(silicon):
@@ -114,13 +117,15 @@ def testEr(silicon):
     # Case 3: wavelength is larger than one we have in database - extrapolate linearly
     silicon.source.wavelength = 1.47
     erDesired = sq(3.487 + 1.09e-13j) - 0.01395
-    erCalculated = silicon.er
+    with pytest.warns(Warning) as warning:
+        erCalculated = silicon.er
     assertAlmostEqual(erCalculated, erDesired, absoluteTolerance=1e-5, errorMessage="material: testnk: er3")
 
     # Case 4: wavelength is smaller than one we have in database
     silicon.source.wavelength = 0.23
     erDesired = -4.744348+7.505422j
-    erCalculated = silicon.er
+    with pytest.warns(Warning) as warning:
+        erCalculated = silicon.er
     assertAlmostEqual(erCalculated, erDesired, absoluteTolerance = 1e-5,errorMessage="material: testnk: er4")
 
 def testUr(silicon):

@@ -7,6 +7,7 @@ import pandas as pd
 import rcwa
 import os
 from rcwa.utils import CSVLoader, RIDatabaseLoader
+import warnings
 
 class Material:
     database = RIDatabaseLoader()
@@ -145,11 +146,13 @@ class Material:
             slope = (parameter[-1] - parameter[-2]) / (self.wavelengths[-1] - self.wavelengths[-2])
             deltaWavelength = wavelength - self.wavelengths[-1]
             return_value = parameter[-1] + slope * deltaWavelength
+            warnings.warn(f'Requested wavelength {wavelength} outside available material range {self.wavelengths[0]} - {self.wavelengths[-1]}')
 
         elif wavelength < self.wavelengths[0]: # Extrapolate the other direction if necessary
             slope = (parameter[1] - parameter[0]) / (self.wavelengths[1] - self.wavelengths[0])
             deltaWavelength = self.wavelengths[0] - wavelength
             return_value = parameter[0] - slope * deltaWavelength
+            warnings.warn(f'Requested wavelength {wavelength} outside available material range {self.wavelengths[0]} - {self.wavelengths[-1]}')
 
         else: # Our wavelength is in the range over which we have data
             if wavelength == self.wavelengths[indexOfWavelength]: # We found the EXACT wavelength
