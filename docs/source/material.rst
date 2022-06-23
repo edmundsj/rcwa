@@ -1,0 +1,15 @@
+.. Rigorous Coupled Wave Analysis documentation master file, created by
+   sphinx-quickstart on Mon Sep 28 12:56:28 2020.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Materials in rcwa
+==========================================================
+
+The `Material` class handles materials whose material properties (permittivity, permeability, or refractive index) change as a function of wavelength. There are three primary ways to describe materials:
+
+#. Constant numerical value
+
+   This is the simplest model for a material - a constant permittivity
+
+.. autoclass:: rcwa.Material

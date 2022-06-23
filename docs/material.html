@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; Rigorous Coupled Wave Analysis 1.0 documentation</title>
+  <title>Materials in rcwa &mdash; Rigorous Coupled Wave Analysis 1.0 documentation</title>
   
 
   
@@ -25,7 +25,6 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
-        <script src="_static/searchtools.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -35,7 +34,8 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="rcwa API" href="api.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -62,7 +62,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -80,10 +80,10 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples using RCWA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">rcwa API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="material.html">Materials in rcwa</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Materials in rcwa</a></li>
 </ul>
 
             
@@ -129,12 +129,14 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Search</li>
+      <li>Materials in rcwa</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
+            <a href="_sources/material.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -146,24 +148,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="materials-in-rcwa">
+<h1>Materials in rcwa<a class="headerlink" href="#materials-in-rcwa" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>Material</cite> class handles materials whose material properties (permittivity, permeability, or refractive index) change as a function of wavelength. There are three primary ways to describe materials:</p>
+<ol class="arabic simple">
+<li><p>Constant numerical value
+This is the simplest model for a material - a constant permittivity</p></li>
+</ol>
+<dl class="py class">
+<dt id="rcwa.Material">
+<em class="property">class </em><code class="sig-prename descclassname">rcwa.</code><code class="sig-name descname">Material</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">er</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">ur</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">database_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">source</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.Material" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-  
-  <div id="search-results">
-  
-  </div>
+</div>
+
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="api.html" class="btn btn-neutral float-left" title="rcwa API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -196,14 +206,7 @@
   
   
     
-  
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
    
-
 
 </body>
 </html>

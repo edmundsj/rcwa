@@ -25,12 +25,5 @@ Once the user has created a :code:`Source` and :code:`LayerStack` class, these a
 
 .. autoclass:: rcwa.Material
 
-.. autoclass:: rcwa.Plotter
+.. autoclass:: rcwa.utils.Plotter
     :members: plotRTSpectra
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

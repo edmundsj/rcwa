@@ -10,8 +10,9 @@ Documentation for Rigorous Coupled Wave Analysis
    :maxdepth: 2
    :caption: Contents:
 
-   api
    examples
+   api
+   material
 
 Getting Started
 ------------------
@@ -19,9 +20,9 @@ Installation
 ______________
 The recommended way to install this software is with `pip`:
 
-```
-pip install rcwa
-```
+.. code-block::
+
+    pip install rcwa
 
 And that's it!
 
