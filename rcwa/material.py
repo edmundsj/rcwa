@@ -10,6 +10,17 @@ import rcwa
 import os
 from rcwa.shorthand import *
 
+class CSVLoader:
+    def __init__(self, filename):
+        self.filename = filename
+
+    def load(self):
+        data = pd.read_csv(self.filename)
+        if '(nm)' in data.columns[0]:
+            data.iloc[:,0] /= 1000
+
+        return data.values
+
 class Material:
     """
     Material class for defining materials permittivity / permeability / refractive index as a function of wavelength / angle.
@@ -17,17 +28,23 @@ class Material:
     :param filename: File containing n/k data for the material in question
     """
 
-    def __init__(self, material_name=None, er=1, ur=1, n=None, filename=None, source=None):
+    def __init__(self, name=None, er=1, ur=1, n=None, database_path=None, filename=None, source=None):
         self.name = ''
         self.source=source
         self.dispersive = False
         self.dispersion_formula = None
+        self.loader = None
 
-        if material_name != None or filename !=None:
+        if name is not None or database_path is not None:
             self.dispersive = True
-            self.loadFromDatabase(material_name, filename=filename)
-
-        elif material_name == None:
+            self.loadFromDatabase(name, filename=database_path)
+        elif filename is not None:
+            self.dispersive = True
+            self.dispersion_type = 'tabulated'
+            loader = CSVLoader(filename=filename)
+            data = loader.load()
+            self.set_nk_numeric(data)
+        else:
             self.dispersive = False
             if n == None: # If the refractive index is not defined, go with the permittivity
                 self._er = er
@@ -132,17 +149,13 @@ class Material:
         self._er = dispersion_formula_er
         self._ur = dispersion_formula_ur
 
-    def load_nk_table_data(self, data_dict):
-        material_data = data_dict['data']
-        nk_data_string = list(filter(None, material_data.split('\n')))
-        split_data = [elem.split() for elem in nk_data_string]
-        numerical_data = np.array(split_data, dtype=np.float64)
-        data_shape = numerical_data.shape
+    def set_nk_numeric(self, data):
+        data_shape = data.shape
         if data_shape[1] == 3:
-            self._n = numerical_data[:,1] + 1j*numerical_data[:,2]
-            self.wavelengths = numerical_data[:,0]
+            self._n = data[:,1] + 1j*data[:,2]
+            self.wavelengths = data[:,0]
         elif data_shape[1] == 2:
-            self.wavelengths = numerical_data[:,0]
+            self.wavelengths = data[:,0]
             self._n = numerical_data[:,1]
         else:
             raise ValueError
@@ -150,6 +163,12 @@ class Material:
         self._er = sq(self._n)
         self._ur = np.ones(self._n.shape)
 
+    def load_nk_table_data(self, data_dict):
+        material_data = data_dict['data']
+        nk_data_string = list(filter(None, material_data.split('\n')))
+        split_data = [elem.split() for elem in nk_data_string]
+        numerical_data = np.array(split_data, dtype=np.float64)
+        self.set_nk_numeric(numerical_data)
 
     @property
     def n(self):
