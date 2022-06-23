@@ -7,10 +7,10 @@ file_location = os.path.dirname(__file__)
 nkLocation = os.path.join(file_location, 'nkData/')
 testLocation = os.path.join(file_location, 'test')
 
+from rcwa import utils
 from rcwa.material import Material
 from rcwa.crystal import Crystal
 from rcwa.layer import LayerStack, Layer, freeSpaceLayer
 from rcwa.source import Source, zeroSource
 from rcwa.solver import Solver
-from rcwa.plotter import Plotter
-from rcwa.shorthand import *
+#from rcwa.utils.shorthand import *

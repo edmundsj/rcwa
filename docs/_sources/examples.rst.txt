@@ -33,11 +33,3 @@ Rectangular Lattice Photonic Crystal with Triangular Shape
 
 .. literalinclude:: ../../rcwa/examples/triangular_photonic_crystal.py
    :language: python
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

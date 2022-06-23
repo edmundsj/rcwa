@@ -1,5 +1,4 @@
 import numpy as np
-from rcwa import Crystal
 import matplotlib.pyplot as plt
 
 class Plotter:

@@ -5,7 +5,7 @@ from rcwa.shorthand import *
 from rcwa.testing import *
 from rcwa.matrices import *
 from rcwa.harmonics import *
-from rcwa import testLocation, numpyArrayFromFile, numpyArrayFromSeparatedColumnsFile
+from rcwa import testLocation
 from rcwa import Layer, LayerStack, freeSpaceLayer, Solver, Crystal, Source
 
 np.set_printoptions(threshold=sys.maxsize)

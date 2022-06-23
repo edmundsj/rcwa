@@ -10,8 +10,9 @@ Documentation for Rigorous Coupled Wave Analysis
    :maxdepth: 2
    :caption: Contents:
 
-   api
    examples
+   api
+   material
 
 Getting Started
 ------------------
@@ -19,9 +20,9 @@ Installation
 ______________
 The recommended way to install this software is with `pip`:
 
-```
-pip install rcwa
-```
+.. code-block::
+
+    pip install rcwa
 
 And that's it!
 
@@ -29,9 +30,9 @@ Hello World Program
 ----------------------
 To run a simple example, run:
 
-```
-python -m rcwa.examples.bragg_mirror
-```
+.. code-block::
+
+    python -m rcwa.examples.bragg_mirror
 
 
 This should run an example with a 10-layer bragg mirror (also known as a [dielectric mirror](https://en.wikipedia.org/wiki/Dielectric_mirror)), which can have very high reflectance near its design wavelength, and output the reflectance and transmission as a function of wavelength.
