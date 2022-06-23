@@ -87,6 +87,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#interpolation-and-extrapolation">Interpolation and Extrapolation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#imaginary-sign-convention">Imaginary Sign Convention</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example-tabulated-data-files">Example Tabulated Data Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#material-examples">Material Examples</a></li>
 </ul>
 </li>
 </ul>
@@ -171,11 +172,11 @@
 </div></blockquote>
 <p><strong>3. Tabulated data</strong></p>
 <blockquote>
-<div><p>If a value is passed to the <cite>filename</cite> argument, then the <cite>Material</cite> will load in that file. Csv formats are supported by default, with the first axis being wavelength and the second axis being the complex-valued refractive index. You may instead choose to separate the real- and imaginary parts into two separate columns. This works as well. An example tabulated data file is shown below.</p>
+<div><p>If a value is passed to the <code class="code docutils literal notranslate"><span class="pre">filename</span></code> argument, then the <code class="code docutils literal notranslate"><span class="pre">Material</span></code> will load in that file. Csv formats are supported by default, with the first axis being wavelength and the second axis being the complex-valued refractive index. You may instead choose to separate the real- and imaginary parts into two separate columns. This works as well. An example tabulated data file is shown below.</p>
 </div></blockquote>
 <p><strong>4. Using a materials database - tabulated or dispersion formula</strong></p>
 <blockquote>
-<div><p>The refractiveindex.info database is supported by default, and contains many user-specified materials (i.e. <cite>Si</cite>, <cite>SiO2</cite>, <cite>Ti</cite>, <cite>Pt</cite>. This database provides both tabulated data and dispersion formulas, depending on the material used. CAUTION: if using this database, wavelength units must be specified in micrometers.</p>
+<div><p>The refractiveindex.info database is supported by default, and contains many user-specified materials (i.e. <code class="code docutils literal notranslate"><span class="pre">Si</span></code>, <code class="code docutils literal notranslate"><span class="pre">SiO2</span></code>, <code class="code docutils literal notranslate"><span class="pre">Ti</span></code>, <code class="code docutils literal notranslate"><span class="pre">Pt</span></code>. This database provides both tabulated data and dispersion formulas, depending on the material used. CAUTION: if using this database, wavelength units must be specified in micrometers.</p>
 </div></blockquote>
 <div class="section" id="interpolation-and-extrapolation">
 <h2>Interpolation and Extrapolation<a class="headerlink" href="#interpolation-and-extrapolation" title="Permalink to this headline">¶</a></h2>
@@ -183,18 +184,18 @@
 </div>
 <div class="section" id="imaginary-sign-convention">
 <h2>Imaginary Sign Convention<a class="headerlink" href="#imaginary-sign-convention" title="Permalink to this headline">¶</a></h2>
-<p>Lossy materials are represented with a positive imaginary refractive index (i.e. <cite>2 + 0.1j</cite>. Materials with gain are represented by a negative imaginary refractive index (i.e. <cite>2 - 0.1j</cite>).</p>
+<p>Lossy materials are represented with a positive imaginary refractive index (i.e. <code class="code docutils literal notranslate"><span class="pre">2</span> <span class="pre">+</span> <span class="pre">0.1j</span></code>. Materials with gain are represented by a negative imaginary refractive index (i.e. <code class="code docutils literal notranslate"><span class="pre">2</span> <span class="pre">-</span> <span class="pre">0.1j</span></code>).</p>
 </div>
 <div class="section" id="example-tabulated-data-files">
 <h2>Example Tabulated Data Files<a class="headerlink" href="#example-tabulated-data-files" title="Permalink to this headline">¶</a></h2>
-<p>Below is what an example file for tabulated n/k data should look like, let’s call it <cite>custom_material.csv</cite>:</p>
+<p>Below is what an example file for tabulated n/k data should look like, let’s call it <code class="code docutils literal notranslate"><span class="pre">custom_material.csv</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wavelength</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span>
 <span class="mf">0.76</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span>
 <span class="mf">0.77</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mf">0.2</span>
 <span class="mf">0.78</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mf">0.4</span>
 </pre></div>
 </div>
-<p>And a valid alternative <cite>custom_material2.csv</cite>:</p>
+<p>And a valid alternative <code class="code docutils literal notranslate"><span class="pre">custom_material2.csv</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wavelength</span><span class="p">,</span> <span class="n">n</span>
 <span class="mf">0.76</span><span class="p">,</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.1</span><span class="n">j</span>
 <span class="mf">0.77</span><span class="p">,</span> <span class="mf">2.1</span> <span class="o">+</span> <span class="mf">0.2</span><span class="n">j</span>
@@ -202,6 +203,29 @@
 </pre></div>
 </div>
 <p>Note: the files must have a header.</p>
+</div>
+<div class="section" id="material-examples">
+<h2>Material Examples<a class="headerlink" href="#material-examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rcwa</span> <span class="kn">import</span> <span class="n">Material</span>
+
+<span class="c1"># Use a constant index or permittivity</span>
+<span class="n">my_material</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">5</span> <span class="o">+</span> <span class="mf">0.1</span><span class="n">j</span><span class="p">)</span>
+<span class="n">my_material_2</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="n">er</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">ur</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+
+<span class="c1"># Use a custom function</span>
+<span class="k">def</span> <span class="nf">n_func</span><span class="p">(</span><span class="n">wavelength</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">wavelength</span> <span class="o">/</span> <span class="mf">1.5</span>
+
+<span class="n">my_dispersive_material</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n_func</span><span class="p">)</span>
+
+<span class="c1"># Use built-in databases</span>
+<span class="n">Si</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="s1">&#39;Si&#39;</span><span class="p">)</span>
+<span class="n">SiO2</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="s1">&#39;SiO2&#39;</span><span class="p">)</span>
+
+<span class="c1"># Use a custom file</span>
+<span class="n">custom_material</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;custom_filename.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

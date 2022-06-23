@@ -57,3 +57,27 @@ And a valid alternative :code:`custom_material2.csv`:
 
 Note: the files must have a header.
 
+Material Examples
+---------------------------------
+
+.. code-block::
+
+    from rcwa import Material
+
+    # Use a constant index or permittivity
+    my_material = Material(n=5 + 0.1j)
+    my_material_2 = Material(er=4, ur=1.1)
+
+    # Use a custom function
+    def n_func(wavelength):
+        return 1 + wavelength / 1.5
+
+    my_dispersive_material = Material(n=n_func)
+
+    # Use built-in databases
+    Si = Material('Si')
+    SiO2 = Material('SiO2')
+
+    # Use a custom file
+    custom_material = Material(filename='custom_filename.csv')
+
