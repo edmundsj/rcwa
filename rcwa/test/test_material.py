@@ -1,5 +1,6 @@
 import pytest
 import os
+import numpy as np
 from rcwa import Material, Source
 from rcwa.testing import *
 from rcwa.shorthand import *
@@ -12,9 +13,8 @@ def silicon():
 
 def testExtractMaterialDatabase():
     fake_material = Material()
-    fake_material.extractMaterialDatabase()
     materials_to_check = ['Pt', 'Si', 'Ag', 'Ti', 'Au', 'SiO2']
-    assert all(i in fake_material.materials.keys() for i in materials_to_check) == True
+    assert all(i in fake_material.database.materials.keys() for i in materials_to_check) == True
 
 def testLoadFromDatabase():
     wavelength = 0.1879 # Should load from Johnson nk table
