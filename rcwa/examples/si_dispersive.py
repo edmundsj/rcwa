@@ -15,7 +15,7 @@ stepWavelength = 0.001
 
 source = Source(wavelength=designWavelength)
 si = Material(name='Si')
-data = pd.DataFrame({'Wavelength (um):': si.wavelengths, 'er': si._er, 'n': si._n})
+data = pd.DataFrame({'Wavelength (um):': si.wavelengths, 'er': si._er_dispersive, 'n': si._n_dispersive})
 print(data)
 
 reflectionLayer = Layer(n=1) # Free space

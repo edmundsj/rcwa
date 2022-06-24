@@ -1,5 +1,5 @@
 import unittest
-from rcwa import Source, Layer, LayerStack, Crystal, Solver
+from rcwa import Source, Layer, LayerStack, Crystal, Solver, Grating
 from rcwa.utils import Plotter
 from rcwa.shorthand import complexArray
 import numpy as np
@@ -21,11 +21,10 @@ lattice_vector = [1.0, 0, 0]
 
 crystal_thickness = 0.5
 
-N_harmonics = 3
+N_harmonics = 11
 
-device_crystal = Crystal(permittivity_data, permeability_data, lattice_vector)
-crystal_layer = Layer(crystal=device_crystal, L=crystal_thickness, numberHarmonics=N_harmonics)
-layer_stack = LayerStack(reflection_layer, crystal_layer, transmission_layer)
+grating_layer = Grating(period=2, t=0.5, n=4, n_void=1,Nx=500, shape='rectangular')
+layer_stack = LayerStack(reflection_layer, grating_layer, transmission_layer)
 
 solver = Solver(layer_stack, source, N_harmonics)
 solver.Solve()

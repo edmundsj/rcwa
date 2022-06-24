@@ -7,15 +7,15 @@ class Layer:
     """
     Class for defining a single layer of a layer stack used in a simulation
 
-    :param er: Permittivity of the layer
-    :param ur: Permeability of the layer
+    :param er: Permittivity of the layer. Overridden by crystal permittivity if specified.
+    :param ur: Permeability of the layer. Overridden by crystal permeability if specified.
     :param L: Thickness of the layer
-    :param n: Refractive index of the layer
-    :param crystal: Crystal object if the layer is periodic in x/y
+    :param n: Refractive index of the layer. Overridden by cristal er/ur if specified.
+    :param crystal: Crystal object if the layer is periodic in x and/or y
     :param material: Material object containing the material's permittivity and permeability as a function of wavelength/angle.
 
     """
-    def __init__(self, er=1.0, ur=1.0, L=0.0, n=None, crystal=None, numberHarmonics=None, material=None, source=None):
+    def __init__(self, er=1.0, ur=1.0, L=0.0, n=None, crystal=None, material=None):
         if material == None:
             self.material = Material(er=er, ur=ur, n=n)
         else:
@@ -23,13 +23,12 @@ class Layer:
 
         self.L = L
         self.crystal = crystal
-        self._source = source # For wavelength-dependent materials this is required.
 
         if crystal is not None:
             self.homogenous = False
-            if numberHarmonics is not None:
+            #if numberHarmonics is not None:
 
-                self.setConvolutionMatrix(numberHarmonics)
+                #self.setConvolutionMatrix(numberHarmonics)
         else:
             self.homogenous = True
 
