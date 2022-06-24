@@ -99,7 +99,7 @@ def generateKMatrix1D(source, crystal, numberHarmonics, component):
         raise ValueError
 
     minHarmonicT1 = calculateMinHarmonic(numberHarmonics)
-    maxHarmonicT1 = calculateMinHarmonic(numberHarmonics)
+    maxHarmonicT1 = calculateMaxHarmonic(numberHarmonics)
 
     diagonalIndex = 0;
     for desiredHarmonicT1 in range(minHarmonicT1, maxHarmonicT1 + 1):
