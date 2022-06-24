@@ -36,7 +36,7 @@ stack = LayerStack(reflectionLayer,
 source = Source(wavelength=designWavelength)
 
 print("Solving system...")
-TMMSolver = Solver(stack, source, (1, 1))
+TMMSolver = Solver(stack, source, 1)
 wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
         stepWavelength)
 

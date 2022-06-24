@@ -9,9 +9,9 @@ class Solver:
 
     :param layerStack: layerStack: Stack of layers to simulate
     :param source: Source object which includes wavelength and direction information
-    :param numberHarmonics: The number of harmonics in x, y to simulate (number of Fourier components). Defaults to (1, 1). Should be a 2-dimensional tuple.
+    :param numberHarmonics: The number of harmonics in x, y to simulate (number of Fourier components). For planar films this should be 1. For 1D diffraction gratings this should be a single integer. For 2D periodic films this should be a 2-tuple. Must be an odd number.
     """
-    def __init__(self, layerStack, source, numberHarmonics=(1,1)):
+    def __init__(self, layerStack, source, numberHarmonics=1):
         self.numberHarmonics = numberHarmonics
         self.layerStack = layerStack
         self.source = source
