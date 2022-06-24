@@ -40,6 +40,8 @@ with open("README.md", "r") as fh:
 				'pandas>=0.24.0',
 				'scipy>=1.2.2',
 				'pyyaml>=5.0.0',
+                'pytest>6.2.2',
+                'progressbar2',
 		],
 	license="MIT",
 	)
