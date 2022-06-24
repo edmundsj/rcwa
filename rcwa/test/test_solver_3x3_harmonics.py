@@ -1,11 +1,10 @@
 import unittest
-from rcwa import Source, Layer, Plotter, Crystal, Solver, LayerStack
+from rcwa import Source, Layer, Crystal, Solver, LayerStack
+from rcwa import testLocation
 from rcwa.shorthand import *
 from rcwa.testing import *
 from rcwa.matrices import *
-from rcwa import numpyArrayFromFile, testLocation, numpyArrayFromSeparatedColumnsFile
 import numpy as np
-
 
 class TestSolver(unittest.TestCase):
 

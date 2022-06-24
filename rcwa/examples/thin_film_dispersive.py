@@ -2,6 +2,7 @@
 # Contact: jordan.e@berkeley.edu
 # Creation Date: 11/01/2019
 #
+import context
 from rcwa import Material, Layer, LayerStack, Source, Solver, Plotter
 
 import numpy as np
@@ -15,12 +16,13 @@ stepWavelength = 0.001
 
 source = Source(wavelength=designWavelength)
 si = Material(name='Si')
-data = pd.DataFrame({'Wavelength (um):': si.wavelengths, 'er': si._er, 'n': si._n})
+data = pd.DataFrame({'Wavelength (um):': si.wavelengths, 'er': si._er_dispersive, 'n': si._n_dispersive})
 print(data)
 
 reflectionLayer = Layer(n=1) # Free space
-transmissionLayer = Layer(material=si)
-stack = LayerStack(reflectionLayer, transmissionLayer)
+thin_film = Layer(L=0.1, material=si)
+transmissionLayer = Layer(n=4)
+stack = LayerStack(reflectionLayer, thin_film, transmissionLayer)
 
 print("Solving system...")
 TMMSolver = Solver(stack, source, (1, 1))

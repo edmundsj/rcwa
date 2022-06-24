@@ -38,7 +38,7 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="rcwa API" href="api.html" /> 
+    <link rel="next" title="Examples using RCWA" href="examples.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,10 +84,9 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">rcwa API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#indices-and-tables">Indices and tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples using RCWA</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html#indices-and-tables">Indices and tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">rcwa API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="material.html">Materials in rcwa</a></li>
 </ul>
 
             
@@ -157,8 +156,6 @@
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">rcwa API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#indices-and-tables">Indices and tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples using RCWA</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#bragg-mirror-reflection-spectra">Bragg Mirror Reflection Spectra</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#reflection-from-a-dispersive-interface-silicon">Reflection from a Dispersive Interface (Silicon)</a></li>
@@ -167,7 +164,14 @@
 <li class="toctree-l2"><a class="reference internal" href="examples.html#rectangular-lattice-photonic-crystal-with-triangular-shape">Rectangular Lattice Photonic Crystal with Triangular Shape</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html#indices-and-tables">Indices and tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">rcwa API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="material.html">Materials in rcwa</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="material.html#interpolation-and-extrapolation">Interpolation and Extrapolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="material.html#imaginary-sign-convention">Imaginary Sign Convention</a></li>
+<li class="toctree-l2"><a class="reference internal" href="material.html#example-tabulated-data-files">Example Tabulated Data Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="material.html#material-examples">Material Examples</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <section id="getting-started">
@@ -175,18 +179,18 @@
 <section id="installation">
 <h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
 <p>The recommended way to install this software is with <cite>pip</cite>:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">pip</span> <span class="pre">install</span> <span class="pre">rcwa</span>
-<span class="pre">`</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">rcwa</span>
+</pre></div>
+</div>
 <p>And that’s it!</p>
 </section>
 </section>
 <section id="hello-world-program">
 <h2>Hello World Program<a class="headerlink" href="#hello-world-program" title="Permalink to this headline">¶</a></h2>
 <p>To run a simple example, run:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">python</span> <span class="pre">-m</span> <span class="pre">rcwa.examples.bragg_mirror</span>
-<span class="pre">`</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">rcwa</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">bragg_mirror</span>
+</pre></div>
+</div>
 <p>This should run an example with a 10-layer bragg mirror (also known as a [dielectric mirror](<a class="reference external" href="https://en.wikipedia.org/wiki/Dielectric_mirror">https://en.wikipedia.org/wiki/Dielectric_mirror</a>)), which can have very high reflectance near its design wavelength, and output the reflectance and transmission as a function of wavelength.</p>
 </section>
 <section id="d-photonic-crystal-example">
@@ -234,7 +238,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="api.html" class="btn btn-neutral float-right" title="rcwa API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples using RCWA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>

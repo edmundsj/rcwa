@@ -1,6 +1,6 @@
 # DATA FOR THIS FILE TAKEN FROM THE TMM BENCHMARKING DATA PROVIDED BY RUMPF.
 import unittest
-from rcwa import Source, Layer, Plotter, Crystal, Solver, LayerStack
+from rcwa import Source, Layer, Crystal, Solver, LayerStack
 from rcwa.shorthand import *
 from rcwa.testing import *
 from rcwa.matrices import *

@@ -38,8 +38,8 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples using RCWA" href="examples.html" />
-    <link rel="prev" title="Documentation for Rigorous Coupled Wave Analysis" href="index.html" /> 
+    <link rel="next" title="Materials in rcwa" href="material.html" />
+    <link rel="prev" title="Examples using RCWA" href="examples.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -85,10 +85,9 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">rcwa API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples using RCWA</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html#indices-and-tables">Indices and tables</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">rcwa API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="material.html">Materials in rcwa</a></li>
 </ul>
 
             
@@ -155,7 +154,7 @@
             
   <section id="rcwa-api">
 <h1>rcwa API<a class="headerlink" href="#rcwa-api" title="Permalink to this headline">¶</a></h1>
-<p>There are four main user-facing classes: <code class="code docutils literal notranslate"><span class="pre">Solver</span></code>, <code class="code docutils literal notranslate"><span class="pre">Layer</span></code>, <code class="code docutils literal notranslate"><span class="pre">LayerStack</span></code>, <code class="code docutils literal notranslate"><span class="pre">Source</span></code>, <code class="code docutils literal notranslate"><span class="pre">Material</span></code>, <code class="code docutils literal notranslate"><span class="pre">Crystal</span></code>, and <code class="code docutils literal notranslate"><span class="pre">Plotter</span></code>. The <code class="code docutils literal notranslate"><span class="pre">Layer</span></code> class is used to set up the individual simulation layers and define their properties, including thickness, material properties, and crystal structures (if applicable). The <code class="code docutils literal notranslate"><span class="pre">Material</span></code> class can be passed into the <code class="code docutils literal notranslate"><span class="pre">Layer</span></code> class to define a layer whose material properties are dependent on refractive index. The <code class="code docutils literal notranslate"><span class="pre">Crystal</span></code> class is used to define layers which are periodic in x and y, and is also passed into the <code class="code docutils literal notranslate"><span class="pre">Layer</span></code> class. Once all individual layers are constructed, they are used to create a <code class="code docutils literal notranslate"><span class="pre">LayerStack</span></code>, which contains information about which region is considered the “incident” region and which is the “transmission” region (both are semi-infinite).</p>
+<p>The main user-facing classes: <code class="code docutils literal notranslate"><span class="pre">Solver</span></code>, <code class="code docutils literal notranslate"><span class="pre">Layer</span></code>, <code class="code docutils literal notranslate"><span class="pre">LayerStack</span></code>, <code class="code docutils literal notranslate"><span class="pre">Source</span></code>, <code class="code docutils literal notranslate"><span class="pre">Material</span></code>, <code class="code docutils literal notranslate"><span class="pre">Crystal</span></code>, and <code class="code docutils literal notranslate"><span class="pre">Plotter</span></code>. The <code class="code docutils literal notranslate"><span class="pre">Layer</span></code> class is used to set up the individual simulation layers and define their properties, including thickness, material properties, and crystal structures (if applicable). The <code class="code docutils literal notranslate"><span class="pre">Material</span></code> class can be passed into the <code class="code docutils literal notranslate"><span class="pre">Layer</span></code> class to define a layer whose material properties are dependent on refractive index. The <code class="code docutils literal notranslate"><span class="pre">Crystal</span></code> class is used to define layers which are periodic in x and y, and is also passed into the <code class="code docutils literal notranslate"><span class="pre">Layer</span></code> class. Once all individual layers are constructed, they are used to create a <code class="code docutils literal notranslate"><span class="pre">LayerStack</span></code>, which contains information about which region is considered the “incident” region and which is the “transmission” region (both are semi-infinite).</p>
 <p>The <code class="code docutils literal notranslate"><span class="pre">Source</span></code> class is used to define the excitation source - the wavelength, polarization, and incident angle.</p>
 <p>Once the user has created a <code class="code docutils literal notranslate"><span class="pre">Source</span></code> and <code class="code docutils literal notranslate"><span class="pre">LayerStack</span></code> class, these are passed into the <code class="code docutils literal notranslate"><span class="pre">Solver</span></code> class, which then runs the simulation, and makes the results available as a dictionary <code class="code docutils literal notranslate"><span class="pre">Solver.results</span></code>.</p>
 <dl class="py class">
@@ -205,7 +204,13 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="rcwa.LayerStack">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rcwa.</span></span><span class="sig-name descname"><span class="pre">LayerStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">layers</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.LayerStack" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Class that defines overall geometry in terms of a stack of layers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>layers</strong> – Layer objects, starting with the bottom-most layer (substrate) and ending with the top-most region (where the source is incident from)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rcwa.Source">
@@ -241,28 +246,70 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rcwa.Material">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rcwa.</span></span><span class="sig-name descname"><span class="pre">Material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">material_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">er</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ur</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.Material" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rcwa.</span></span><span class="sig-name descname"><span class="pre">Material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">er</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ur</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.Material" title="Permalink to this definition">¶</a></dt>
 <dd><p>Material class for defining materials permittivity / permeability / refractive index as a function of wavelength / angle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filename</strong> – File containing n/k data for the material in question</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Material name to be looked up in database (i.e. Si)</p></li>
+<li><p><strong>er</strong> – Complex-valued numerical permittivity value or function of wavelength</p></li>
+<li><p><strong>ur</strong> – Complex-valued numerical permeability value or function of wavelength</p></li>
+<li><p><strong>n</strong> – Complex-valued refractive index of material. Overrides er / ur</p></li>
+<li><p><strong>source</strong> – Excitation source to link to material (mandatory for dispersive materials)</p></li>
+<li><p><strong>filename</strong> – File containing n/k data for the material in question</p></li>
+<li><p><strong>database_path</strong> – Raw file path within database</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="rcwa.Plotter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rcwa.</span></span><span class="sig-name descname"><span class="pre">Plotter</span></span><a class="headerlink" href="#rcwa.Plotter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="rcwa.utils.Plotter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rcwa.utils.</span></span><span class="sig-name descname"><span class="pre">Plotter</span></span><a class="headerlink" href="#rcwa.utils.Plotter" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="rcwa.utils.Plotter.plotEllipsometrySpectra">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plotEllipsometrySpectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resultsList</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.utils.Plotter.plotEllipsometrySpectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the ellipsometry spectra from simulation results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>resultsList</strong> – List of results from simulation output</p>
+</dd>
+<dt class="field-even">Returns fig, ax</dt>
+<dd class="field-even"><p>Figure and axes objects for plot</p>
+</dd>
+</dl>
+</dd></dl>
 
-</section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="rcwa.utils.Plotter.plotRTEMSpectra">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plotRTEMSpectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resultsList</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.utils.Plotter.plotRTEMSpectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the TE/TM reflectance from simulation results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>resultsList</strong> – List of results from simulation output</p>
+</dd>
+<dt class="field-even">Returns fig, ax</dt>
+<dd class="field-even"><p>Figure and axes objects for plot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rcwa.utils.Plotter.plotRTSpectra">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plotRTSpectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resultsList</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.utils.Plotter.plotRTSpectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the reflectance, transmittance, and conservation spectra from a set of simulatiotn results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>resultsList</strong> – List of results from simulation output</p>
+</dd>
+<dt class="field-even">Returns fig, ax</dt>
+<dd class="field-even"><p>Figure and axes objects for plot</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -273,10 +320,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="examples.html" class="btn btn-neutral float-right" title="Examples using RCWA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="material.html" class="btn btn-neutral float-right" title="Materials in rcwa" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Documentation for Rigorous Coupled Wave Analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="examples.html" class="btn btn-neutral float-left" title="Examples using RCWA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
