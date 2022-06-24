@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Materials in rcwa &mdash; Rigorous Coupled Wave Analysis 1.0 documentation</title>
@@ -21,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -33,6 +34,8 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="rcwa API" href="api.html" /> 
@@ -79,7 +82,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples using RCWA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">rcwa API</a></li>
@@ -154,11 +157,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="materials-in-rcwa">
+  <section id="materials-in-rcwa">
 <h1>Materials in rcwa<a class="headerlink" href="#materials-in-rcwa" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="rcwa.Material">
-<em class="property">class </em><code class="sig-prename descclassname">rcwa.</code><code class="sig-name descname">Material</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">er</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">ur</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">database_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">source</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.Material" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rcwa.Material">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rcwa.</span></span><span class="sig-name descname"><span class="pre">Material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">er</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ur</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.Material" title="Permalink to this definition">¶</a></dt>
 <dd><p>Material class for defining materials permittivity / permeability / refractive index as a function of wavelength / angle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -192,15 +195,15 @@
 <blockquote>
 <div><p>The refractiveindex.info database is supported by default, and contains many user-specified materials (i.e. <code class="code docutils literal notranslate"><span class="pre">Si</span></code>, <code class="code docutils literal notranslate"><span class="pre">SiO2</span></code>, <code class="code docutils literal notranslate"><span class="pre">Ti</span></code>, <code class="code docutils literal notranslate"><span class="pre">Pt</span></code>. This database provides both tabulated data and dispersion formulas, depending on the material used. CAUTION: if using this database, wavelength units must be specified in micrometers.</p>
 </div></blockquote>
-<div class="section" id="interpolation-and-extrapolation">
+<section id="interpolation-and-extrapolation">
 <h2>Interpolation and Extrapolation<a class="headerlink" href="#interpolation-and-extrapolation" title="Permalink to this headline">¶</a></h2>
 <p>If using tabulated data, you may use any wavelength between the minimum and maximum values in the table, and the permittivity will be linearly interpolated if the desired wavelength falls between two tabulated points. If the desired wavelength falls outside the minimum or maximum, <code class="code docutils literal notranslate"><span class="pre">rcwa</span></code> will attempt to extrapolate using the slope near the boundary and give a warning.</p>
-</div>
-<div class="section" id="imaginary-sign-convention">
+</section>
+<section id="imaginary-sign-convention">
 <h2>Imaginary Sign Convention<a class="headerlink" href="#imaginary-sign-convention" title="Permalink to this headline">¶</a></h2>
 <p>Lossy materials are represented with a positive imaginary refractive index (i.e. <code class="code docutils literal notranslate"><span class="pre">2</span> <span class="pre">+</span> <span class="pre">0.1j</span></code>. Materials with gain are represented by a negative imaginary refractive index (i.e. <code class="code docutils literal notranslate"><span class="pre">2</span> <span class="pre">-</span> <span class="pre">0.1j</span></code>).</p>
-</div>
-<div class="section" id="example-tabulated-data-files">
+</section>
+<section id="example-tabulated-data-files">
 <h2>Example Tabulated Data Files<a class="headerlink" href="#example-tabulated-data-files" title="Permalink to this headline">¶</a></h2>
 <p>Below is what an example file for tabulated n/k data should look like, let’s call it <code class="code docutils literal notranslate"><span class="pre">custom_material.csv</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wavelength</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span>
@@ -217,8 +220,8 @@
 </pre></div>
 </div>
 <p>Note: the files must have a header.</p>
-</div>
-<div class="section" id="material-examples">
+</section>
+<section id="material-examples">
 <h2>Material Examples<a class="headerlink" href="#material-examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rcwa</span> <span class="kn">import</span> <span class="n">Material</span>
 
@@ -240,8 +243,8 @@
 <span class="n">custom_material</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;custom_filename.csv&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
