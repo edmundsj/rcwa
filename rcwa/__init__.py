@@ -13,4 +13,4 @@ from rcwa.crystal import Crystal
 from rcwa.layer import LayerStack, Layer, freeSpaceLayer
 from rcwa.source import Source, zeroSource
 from rcwa.solver import Solver
-#from rcwa.utils.shorthand import *
+from rcwa.utils import Plotter

@@ -1,5 +1,6 @@
 import unittest
-from rcwa import Source, Layer, LayerStack, Crystal, Plotter, complexArray, Solver
+from rcwa import Source, Layer, LayerStack, Crystal, Solver
+from rcwa.shorthand import complexArray
 import numpy as np
 
 devicePermittivityCellData = np.transpose(np.loadtxt('triangleData.csv', delimiter=','))
