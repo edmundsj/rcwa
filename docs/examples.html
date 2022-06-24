@@ -5,8 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Examples using RCWA &mdash; Rigorous Coupled Wave Analysis 1.0 documentation</title>
@@ -22,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -34,8 +33,6 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="rcwa API" href="api.html" />
@@ -83,7 +80,7 @@
               
             
             
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Examples using RCWA</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#bragg-mirror-reflection-spectra">Bragg Mirror Reflection Spectra</a></li>
@@ -159,10 +156,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="examples-using-rcwa">
+  <div class="section" id="examples-using-rcwa">
 <h1>Examples using RCWA<a class="headerlink" href="#examples-using-rcwa" title="Permalink to this headline">¶</a></h1>
 <p>These examples can all be found in the <cite>examples</cite> folder in the main <cite>rcwa</cite> package on github.</p>
-<section id="bragg-mirror-reflection-spectra">
+<div class="section" id="bragg-mirror-reflection-spectra">
 <h2>Bragg Mirror Reflection Spectra<a class="headerlink" href="#bragg-mirror-reflection-spectra" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Author: Jordan Edmunds, Ph.D. Student, UC Berkeley</span>
 <span class="c1"># Contact: jordan.e@berkeley.edu</span>
@@ -212,8 +209,8 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="reflection-from-a-dispersive-interface-silicon">
+</div>
+<div class="section" id="reflection-from-a-dispersive-interface-silicon">
 <h2>Reflection from a Dispersive Interface (Silicon)<a class="headerlink" href="#reflection-from-a-dispersive-interface-silicon" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Author: Jordan Edmunds, Ph.D. Student, UC Berkeley</span>
 <span class="c1"># Contact: jordan.e@berkeley.edu</span>
@@ -250,8 +247,8 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="reflection-from-a-dispersive-interface-sio2">
+</div>
+<div class="section" id="reflection-from-a-dispersive-interface-sio2">
 <h2>Reflection from a Dispersive Interface (SiO2)<a class="headerlink" href="#reflection-from-a-dispersive-interface-sio2" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Author: Jordan Edmunds, Ph.D. Student, UC Berkeley</span>
 <span class="c1"># Contact: jordan.e@berkeley.edu</span>
@@ -286,8 +283,8 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="ellipsometry-of-bare-si-wafer-broken">
+</div>
+<div class="section" id="ellipsometry-of-bare-si-wafer-broken">
 <h2>Ellipsometry of bare Si wafer [BROKEN]<a class="headerlink" href="#ellipsometry-of-bare-si-wafer-broken" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Author: Jordan Edmunds, Ph.D. Student, UC Berkeley</span>
 <span class="c1"># Contact: jordan.e@berkeley.edu</span>
@@ -306,7 +303,7 @@
 
 <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="n">incident_angle</span><span class="p">)</span>
 <span class="n">si</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="s1">&#39;Si&#39;</span><span class="p">)</span>
-<span class="nb">breakpoint</span><span class="p">()</span>
+<span class="n">breakpoint</span><span class="p">()</span>
 
 <span class="n">reflectionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Free space</span>
 <span class="n">transmissionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">material</span><span class="o">=</span><span class="n">si</span><span class="p">)</span>
@@ -329,8 +326,8 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="rectangular-lattice-photonic-crystal-with-triangular-shape">
+</div>
+<div class="section" id="rectangular-lattice-photonic-crystal-with-triangular-shape">
 <h2>Rectangular Lattice Photonic Crystal with Triangular Shape<a class="headerlink" href="#rectangular-lattice-photonic-crystal-with-triangular-shape" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">from</span> <span class="nn">rcwa</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">LayerStack</span><span class="p">,</span> <span class="n">Crystal</span><span class="p">,</span> <span class="n">Plotter</span><span class="p">,</span> <span class="n">complexArray</span><span class="p">,</span> <span class="n">Solver</span>
@@ -371,8 +368,8 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">RTot</span><span class="p">,</span> <span class="n">TTot</span><span class="p">,</span> <span class="n">RTot</span><span class="o">+</span><span class="n">TTot</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

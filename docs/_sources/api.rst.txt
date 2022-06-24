@@ -26,4 +26,4 @@ Once the user has created a :code:`Source` and :code:`LayerStack` class, these a
 .. autoclass:: rcwa.Material
 
 .. autoclass:: rcwa.utils.Plotter
-    :members: plotRTSpectra
+    :members:

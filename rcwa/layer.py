@@ -124,6 +124,11 @@ class Layer:
 freeSpaceLayer = Layer(1,1)
 
 class LayerStack:
+    """
+    Class that defines overall geometry in terms of a stack of layers
+
+    :param layers: Layer objects, starting with the bottom-most layer (substrate) and ending with the top-most region (where the source is incident from)
+    """
     def __init__(self, *layers):
         if len(layers) == 1:
             if isinstance(layers[0], list):

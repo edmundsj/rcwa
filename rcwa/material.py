@@ -10,18 +10,20 @@ from rcwa.utils import CSVLoader, RIDatabaseLoader
 import warnings
 
 class Material:
+    """
+    Material class for defining materials permittivity / permeability / refractive index as a function of wavelength / angle.
+
+    :param name: Material name to be looked up in database (i.e. Si)
+    :param er: Complex-valued numerical permittivity value or function of wavelength
+    :param ur: Complex-valued numerical permeability value or function of wavelength
+    :param n: Complex-valued refractive index of material. Overrides er / ur
+    :param source: Excitation source to link to material (mandatory for dispersive materials)
+    :param filename: File containing n/k data for the material in question
+    :param database_path: Raw file path within database
+    """
     database = RIDatabaseLoader()
 
     def __init__(self, name=None, er=1, ur=1, n=None, database_path=None, filename=None, source=None):
-        """
-        Material class for defining materials permittivity / permeability / refractive index as a function of wavelength / angle.
-
-        :param filename: File containing n/k data for the material in question
-        :param name: Material name to be looked up in database (i.e. Si)
-        :param er: Complex-valued numerical permittivity value or function of wavelength
-        :param ur: Complex-valued numerical permeability value or function of wavelength
-        :param source: Excitation source to link to material (mandatory for dispersive materials)
-        """
         self.name = ''
         self.source=source
         self.dispersive = False

@@ -6,7 +6,7 @@
 rcwa API
 ==========================================================
 
-There are four main user-facing classes: :code:`Solver`, :code:`Layer`, :code:`LayerStack`, :code:`Source`, :code:`Material`, :code:`Crystal`, and :code:`Plotter`. The :code:`Layer` class is used to set up the individual simulation layers and define their properties, including thickness, material properties, and crystal structures (if applicable). The :code:`Material` class can be passed into the :code:`Layer` class to define a layer whose material properties are dependent on refractive index. The :code:`Crystal` class is used to define layers which are periodic in x and y, and is also passed into the :code:`Layer` class. Once all individual layers are constructed, they are used to create a :code:`LayerStack`, which contains information about which region is considered the "incident" region and which is the "transmission" region (both are semi-infinite).
+The main user-facing classes: :code:`Solver`, :code:`Layer`, :code:`LayerStack`, :code:`Source`, :code:`Material`, :code:`Crystal`, and :code:`Plotter`. The :code:`Layer` class is used to set up the individual simulation layers and define their properties, including thickness, material properties, and crystal structures (if applicable). The :code:`Material` class can be passed into the :code:`Layer` class to define a layer whose material properties are dependent on refractive index. The :code:`Crystal` class is used to define layers which are periodic in x and y, and is also passed into the :code:`Layer` class. Once all individual layers are constructed, they are used to create a :code:`LayerStack`, which contains information about which region is considered the "incident" region and which is the "transmission" region (both are semi-infinite).
 
 The :code:`Source` class is used to define the excitation source - the wavelength, polarization, and incident angle. 
 
@@ -26,4 +26,4 @@ Once the user has created a :code:`Source` and :code:`LayerStack` class, these a
 .. autoclass:: rcwa.Material
 
 .. autoclass:: rcwa.utils.Plotter
-    :members: plotRTSpectra
+    :members:

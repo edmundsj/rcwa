@@ -2,8 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Plotter:
+
     @staticmethod
     def plotRTSpectra(resultsList):
+        """
+        Plots the reflectance, transmittance, and conservation spectra from a set of simulatiotn results
+
+        :param resultsList: List of results from simulation output
+        :returns fig, ax: Figure and axes objects for plot
+        """
         xData = np.array([result['source'].wavelength for result in resultsList])
         yDataReflection = np.array([result['RTot'] for result in resultsList])
         yDataTransmission = np.array([result['TTot'] for result in resultsList])
@@ -15,9 +22,16 @@ class Plotter:
         ax.set_title('R and T vs wavelength')
         ax.set_xlabel('wavelength (um)')
         ax.set_ylabel('R, T')
+        return fig, ax
 
     @staticmethod
     def plotEllipsometrySpectra(resultsList):
+        """
+        Plots the ellipsometry spectra from simulation results
+
+        :param resultsList: List of results from simulation output
+        :returns fig, ax: Figure and axes objects for plot
+        """
         xData = np.array([result['source'].wavelength for result in resultsList])
         tanPsiData = np.array([result['tanPsi'] for result in resultsList])
         cosDeltaData = np.array([result['cosDelta'] for result in resultsList])
@@ -33,6 +47,12 @@ class Plotter:
 
     @staticmethod
     def plotRTEMSpectra(resultsList):
+        """
+        Plots the TE/TM reflectance from simulation results
+
+        :param resultsList: List of results from simulation output
+        :returns fig, ax: Figure and axes objects for plot
+        """
         xData = np.array([result.source.wavelength for result in resultsList])
         RTEData = np.array([np.sq(np.abs(result.rTE)) for result in resultsList])
         RTMData = np.array([np.sq(np.abs(result.rTM)) for result in resultsList])
