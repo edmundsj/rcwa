@@ -3,6 +3,8 @@ from rcwa.matrices import *
 from rcwa.harmonics import *
 from rcwa import Layer, LayerStack
 from copy import deepcopy
+from progressbar import ProgressBar, AnimatedMarker, Percentage, Bar, Counter, ETA
+import time
 
 class Solver:
     """ Main class that invokes all methods necessary to solve an RCWA/TMM simulation
@@ -34,7 +36,10 @@ class Solver:
         """
         if wavelengths.size == 0:
             wavelengths = np.array([self.source.wavelength])
-        for wavelength in wavelengths:
+
+        bar = ProgressBar(widgets=[Counter(), f'/{len(wavelengths)} ', Bar(), ETA()], max_value=len(wavelengths)).start()
+
+        for i, wavelength in enumerate(wavelengths):
             self.source.layer = self.layerStack.reflectionLayer
             self.source.wavelength = wavelength # Update the source wavelength and all associated things.
             self.setupKMatrices()
@@ -45,6 +50,9 @@ class Solver:
             self.calculateGlobalSMatrix()
             self.calculateRTQuantities()
             self.packageResults()
+            bar.update(i)
+
+        bar.finish()
 
     def calculateRTQuantities(self):
         self.rx, self.ry, self.rz = calculateReflectionCoefficient(self.SGlobal, self.Kx, self.Ky,

@@ -1,6 +1,8 @@
 # ignore all vim-generated swap files
 *.swp
 
+.idea/
+
 # ignore whatever this is
 .DS_STORE
 
