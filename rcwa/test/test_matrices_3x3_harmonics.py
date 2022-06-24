@@ -427,13 +427,13 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
     def testCalculateDiffractionEfficiencies(self):
         RActual = self.R;
         RCalculated = calculateDiffractionReflectionEfficiency(self.rx, self.ry, self.rz,
-                self.source, self.KzReflectionRegion, self.layerStack)
+                self.source, self.KzReflectionRegion, self.layerStack, self.numberHarmonics)
         RCalculated = RCalculated
         assertAlmostEqual(RActual, RCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         TActual = self.T
         TCalculated = calculateDiffractionTransmissionEfficiency(self.tx, self.ty, self.tz,
-                self.source, self.KzTransmissionRegion, self.layerStack)
+                self.source, self.KzTransmissionRegion, self.layerStack, self.numberHarmonics)
         TCalculated = TCalculated
         assertAlmostEqual(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
 

@@ -9,6 +9,11 @@ def assertAlmostEqual(a, b, absoluteTolerance=1e-10, relativeTolerance=1e-9, err
     if isinstance(a, np.ndarray) or isinstance(b, np.ndarray):
         assert(a.shape == b.shape)
 
+    if np.isscalar(a):
+        assert np.isscalar(a) and np.isscalar(b)
+    else:
+        np.testing.assert_equal(type(a), type(b))
+
 def getUnequalIndices(a, b, absoluteTolerance=1e-10, relativeTolerance=1e-9):
     truthArray = np.greater(np.abs(a - b),
             (absoluteTolerance + relativeTolerance * np.abs(a - b)*np.ones(a.shape)))
@@ -23,3 +28,4 @@ def assertArrayEqual(a, b, errorMessage=""):
 
 def assertStringEqual(a, b):
     np.testing.assert_array_equal(a, b)
+

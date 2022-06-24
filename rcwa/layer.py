@@ -1,6 +1,8 @@
 from rcwa.shorthand import *
 from rcwa import Material
 
+# TODO: Convolution matrix generation must be refactored. It's a hot mess and hard to understand.
+
 class Layer:
     """
     Class for defining a single layer of a layer stack used in a simulation
@@ -26,6 +28,7 @@ class Layer:
         if crystal is not None:
             self.homogenous = False
             if numberHarmonics is not None:
+
                 self.setConvolutionMatrix(numberHarmonics)
         else:
             self.homogenous = True
@@ -73,9 +76,16 @@ class Layer:
             self.ur = self.ur * complexIdentity(prod(numberHarmonics))
 
     def generateConvolutionMatrix(self, cellData, numberHarmonics):
-        dataDimension = len(cellData.shape);
-        if(dataDimension == 2):
+        dataDimension = self.crystal.dimensions;
+
+        if isinstance(numberHarmonics, int):
+            numberHarmonics = (numberHarmonics,)
+
+        if dataDimension == 1:
+            numberHarmonics = (numberHarmonics + (1, 1))
+        elif dataDimension == 2:
             numberHarmonics = (numberHarmonics + (1,))
+
         (P, Q, R) = numberHarmonics
 
         convolutionMatrixSize = P*Q*R;

@@ -336,7 +336,7 @@ def calculateTransmissionCoefficient(S, Kx, Ky, KzTransmissionRegion,
         tz = - (Kx * tx + Ky * ty) / KzTransmissionRegion
     return tx, ty, tz
 
-def calculateDiffractionReflectionEfficiency(rx, ry, rz, source, KzReflectionRegion, layerStack):
+def calculateDiffractionReflectionEfficiency(rx, ry, rz, source, KzReflectionRegion, layerStack, numberHarmonics):
     urReflectionRegion = layerStack.reflectionLayer.ur
     preMatrix = real(-1 /urReflectionRegion * KzReflectionRegion) / \
             real(source.kIncident[2] / urReflectionRegion)
@@ -344,12 +344,14 @@ def calculateDiffractionReflectionEfficiency(rx, ry, rz, source, KzReflectionReg
     if isinstance(KzReflectionRegion, np.ndarray):
         R = preMatrix @ (sq(np.abs(rx)) + sq(np.abs(ry)) + sq(np.abs(rz)))
         RDimension = int(sqrt(rx.shape[0]))
-        R = R.reshape((RDimension, RDimension))
+        if not np.isscalar(numberHarmonics):
+            R = R.reshape((RDimension, RDimension))
     else:
         R = -preMatrix * (sq(np.abs(rx)) + sq(np.abs(ry)) + sq(np.abs(rz)))
     return R
 
-def calculateDiffractionTransmissionEfficiency(tx, ty, tz, source, KzTransmissionRegion, layerStack):
+def calculateDiffractionTransmissionEfficiency(tx, ty, tz, source, KzTransmissionRegion, layerStack,
+                                              numberHarmonics):
     urTransmissionRegion = layerStack.transmissionLayer.ur
     urReflectionRegion = layerStack.reflectionLayer.ur
     preMatrix = real(1 / urTransmissionRegion * KzTransmissionRegion) / \
@@ -358,7 +360,8 @@ def calculateDiffractionTransmissionEfficiency(tx, ty, tz, source, KzTransmissio
     if isinstance(KzTransmissionRegion, np.ndarray):
         T = preMatrix @ (sq(np.abs(tx)) + sq(np.abs(ty)) + sq(np.abs(tz)))
         TDimension = int(sqrt(tx.shape[0]))
-        T = T.reshape((TDimension, TDimension))
+        if not np.isscalar(numberHarmonics):
+            T = T.reshape((TDimension, TDimension))
     else:
         T = preMatrix * (sq(np.abs(tx)) + sq(np.abs(ty)) + sq(np.abs(tz)))
     return T

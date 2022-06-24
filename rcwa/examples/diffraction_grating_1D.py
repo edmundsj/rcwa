@@ -1,0 +1,39 @@
+import unittest
+from rcwa import Source, Layer, LayerStack, Crystal, Solver
+from rcwa.utils import Plotter
+from rcwa.shorthand import complexArray
+import numpy as np
+
+permittivity_data = np.array([1, 1, 1, 1, 3, 3, 3, 3])
+permeability_data = 1 + 0 * permittivity_data
+
+reflection_layer = Layer(er=1.0, ur=1.0)
+transmission_layer = Layer(er=9.0, ur=1.0)
+
+wavelength = 0.5
+deg = np.pi / 180
+k0 = 2*np.pi/wavelength
+theta = 60 * deg
+phi = 1*deg
+pTEM = 1/np.sqrt(2)*complexArray([1,1j])
+source = Source(wavelength=wavelength, theta=theta, phi=phi, pTEM=pTEM, layer=reflection_layer)
+lattice_vector = [1.0, 0, 0]
+
+crystal_thickness = 0.5
+
+N_harmonics = 3
+
+device_crystal = Crystal(permittivity_data, permeability_data, lattice_vector)
+crystal_layer = Layer(crystal=device_crystal, L=crystal_thickness, numberHarmonics=N_harmonics)
+layer_stack = LayerStack(reflection_layer, crystal_layer, transmission_layer)
+
+solver = Solver(layer_stack, source, N_harmonics)
+solver.Solve()
+
+# Get the amplitude reflection and transmission coefficients
+(rxCalculated, ryCalculated, rzCalculated) = (solver.rx, solver.ry, solver.rz)
+(txCalculated, tyCalculated, tzCalculated) = (solver.tx, solver.ty, solver.tz)
+
+# Get the diffraction efficiencies R and T and overall reflection and transmission coefficients R and T
+(R, T, RTot, TTot) = (solver.R, solver.T, solver.RTot, solver.TTot)
+print(RTot, TTot, RTot+TTot)

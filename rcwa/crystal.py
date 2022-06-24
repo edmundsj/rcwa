@@ -15,24 +15,56 @@ class Crystal:
         self.dimensions = len(latticeVectors)
         rawLatticeVectors = np.array(latticeVectors)
         self.latticeVectors = []
-        if(self.dimensions == 2 and len(latticeVectors[0]) >= 2):
+
+        if len(rawLatticeVectors[0]) < self.dimensions:
+            raise ValueError('Lattice vector does not have enough dimensions. Needs at least {self.dimensions}')
+
+        if self.dimensions == 1:
+            self.latticeVectors.append(rawLatticeVectors[0, 0:2])
+
+        if(self.dimensions == 2):
             self.latticeVectors.append(rawLatticeVectors[0, 0:2])
             self.latticeVectors.append(rawLatticeVectors[1, 0:2])
 
         if(self.dimensions > 0):
             self.reciprocalLatticeVectors = self.calculateReciprocalLatticeVectors();
             self.crystalType = self.determineCrystalType();
-            (self.keySymmetryPoints, self.keySymmetryNames) = self.generateKeySymmetryPoints()
             self.latticeConstant = norm(self.latticeVectors[0]) # TODO: Make this more general
 
+            if self.dimensions > 1:
+                (self.keySymmetryPoints, self.keySymmetryNames) = self.generateKeySymmetryPoints()
+            else:
+                self.keySymmetryPoints, self.keySymmetryNames  = None, None
+
+
     def calculateReciprocalLatticeVectors(self):
-        if self.dimensions == 2:
-            return self.calculateReciprocalLatticeVectors2D();
+        if self.dimensions == 1:
+            return self.calculateReciprocalLatticeVectors1D()
+        elif self.dimensions == 2:
+            return self.calculateReciprocalLatticeVectors2D()
         elif self.dimensions == 3:
-            return self.calculateReciprocalLatticeVectors3D();
+            return self.calculateReciprocalLatticeVectors3D()
         else:
             raise NotImplementedError(f"Cannot calculate reciprocal lattice for {self.dimensions}D." +
                     " Not currently implemented.")
+
+    def calculateReciprocalLatticeVectors1D(self):
+        t1 = self.latticeVectors[0]
+        t1_direction = t1 / np.linalg.norm(t1)
+
+        T1 = 2 * pi / np.linalg.norm(t1) * t1_direction
+        return (T1,)
+
+    def calculateReciprocalLatticeVectors2D(self):
+        rotationMatirx90Degrees = complexArray([
+            [0,-1],
+            [1,0]]);
+        t1 = self.latticeVectors[0];
+        t2 = self.latticeVectors[1];
+
+        T1 = 2 * pi * rotationMatirx90Degrees @ t2 / dot(t1, rotationMatirx90Degrees @ t2);
+        T2 = 2 * pi * rotationMatirx90Degrees @ t1 / dot(t2, rotationMatirx90Degrees @ t1);
+        return (T1, T2);
 
     def calculateReciprocalLatticeVectors2D(self):
         rotationMatirx90Degrees = complexArray([
@@ -56,11 +88,14 @@ class Crystal:
         return (T1, T2, T3);
 
     def determineCrystalType(self):
-        if self.dimensions == 2:
+        if self.dimensions == 1:
+            crystalType = 'SQUARE'
+        elif self.dimensions == 2:
             crystalType = self.determineCrystalType2D()
-            return crystalType
         else:
             raise NotImplementedError
+
+        return crystalType
 
     def determineCrystalType2D(self):
         epsilon = 0.00001

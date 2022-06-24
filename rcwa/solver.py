@@ -52,9 +52,9 @@ class Solver:
         self.tx, self.ty, self.tz = calculateTransmissionCoefficient(self.SGlobal, self.Kx, self.Ky,
                 self.KzTransmissionRegion, self.WTransmissionRegion, self.source, self.numberHarmonics)
         self.R = calculateDiffractionReflectionEfficiency(self.rx, self.ry, self.rz, self.source,
-                self.KzReflectionRegion, self.layerStack)
+                self.KzReflectionRegion, self.layerStack, self.numberHarmonics)
         self.T = calculateDiffractionTransmissionEfficiency(self.tx, self.ty, self.tz, self.source,
-                self.KzTransmissionRegion, self.layerStack)
+                self.KzTransmissionRegion, self.layerStack, self.numberHarmonics)
         self.RTot = np.sum(self.R)
         self.TTot = np.sum(self.T)
         self.conservation = self.RTot + self.TTot
@@ -101,6 +101,7 @@ class Solver:
             # Ensure that Kz for the gap layer is 1
             self.layerStack.gapLayer = Layer(er=1 + sq(self.Kx) + sq(self.Ky), ur=1, L=0)
             self.TMMSimulation = True
+
         self.KzReflectionRegion = calculateKzBackward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
         self.KzTransmissionRegion = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmissionLayer)
         self.KzGapRegion = calculateKzForward(self.Kx, self.Ky, self.layerStack.gapLayer)
