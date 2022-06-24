@@ -159,25 +159,6 @@
             
   <section id="materials-in-rcwa">
 <h1>Materials in rcwa<a class="headerlink" href="#materials-in-rcwa" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="rcwa.Material">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rcwa.</span></span><span class="sig-name descname"><span class="pre">Material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">er</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ur</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rcwa.Material" title="Permalink to this definition">¶</a></dt>
-<dd><p>Material class for defining materials permittivity / permeability / refractive index as a function of wavelength / angle.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – Material name to be looked up in database (i.e. Si)</p></li>
-<li><p><strong>er</strong> – Complex-valued numerical permittivity value or function of wavelength</p></li>
-<li><p><strong>ur</strong> – Complex-valued numerical permeability value or function of wavelength</p></li>
-<li><p><strong>n</strong> – Complex-valued refractive index of material. Overrides er / ur</p></li>
-<li><p><strong>source</strong> – Excitation source to link to material (mandatory for dispersive materials)</p></li>
-<li><p><strong>filename</strong> – File containing n/k data for the material in question</p></li>
-<li><p><strong>database_path</strong> – Raw file path within database</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <p>The <cite>Material</cite> class handles materials whose material properties (permittivity, permeability, or refractive index) change as a function of wavelength. There are three primary ways to describe materials:</p>
 <p><strong>1. Constant numerical value</strong></p>
 <blockquote>
