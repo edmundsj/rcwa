@@ -10,6 +10,7 @@ dependencies:
   - numpy
   - pandas
   - pip
+  - progressbar2
   - pyserial
   - pyvisa
   - scipy
