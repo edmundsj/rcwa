@@ -98,7 +98,6 @@ class Material:
 
     @n.setter
     def n(self, n):
-        self._n = n
         self._er = np.square(n)
         self._ur = 1
 
@@ -112,7 +111,6 @@ class Material:
     @er.setter
     def er(self, er):
         self._er = er
-        self._n = np.sqrt(self._er * self._ur)
 
     @property
     def ur(self):
@@ -124,8 +122,6 @@ class Material:
     @ur.setter
     def ur(self, ur):
         self._ur = ur
-        self._n = np.sqrt(self._ur*self._er)
-
 
     def lookupParameter(self, parameter):
         if self.dispersion_type == 'tabulated':

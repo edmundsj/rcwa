@@ -15,6 +15,11 @@ class Solver:
     :param n_harmonics: The number of harmonics in x, y to simulate (number of Fourier components). For planar films this should be 1. For 1D diffraction gratings this should be a single integer. For 2D periodic films this should be a 2-tuple. Must be an odd number.
     """
     def __init__(self, layer_stack, source, n_harmonics=1):
+        self.atol = None
+        self.rtol = None
+        self.max_iters = None
+        self.check_convergence = None
+
         self.n_harmonics = n_harmonics
         self.layer_stack = layer_stack
         self.source = source
@@ -27,13 +32,26 @@ class Solver:
         self._outer_matrices()
         self.results = []
 
-    def solve(self, *sweep_args, **sweep_kw):
+    def solve(self, *sweep_args, max_iters=50, atol=1e-3, rtol=1e-2, check_convergence=False, **sweep_kw):
         """
         Solves the simulation or performs a simulation sweep of the desired parameters
 
         :param sweep_args: Objects along with their parameters to sweep. i.e. (layer, {'thickness': [1, 2, 2.5]})
         :param sweep_kw: Source variables to sweep (theta, phi, wavelength, etc.). Can either be a single keyword argument or several. If several are used, all combinations of the two parameters will be made
+        :param max_iters: Maximum number of iterations to complete before convergence
+        :param atol: Absolute tolerance threshold for total reflectance at which simulation has converged
+        :param rtol: Relative tolerance threshold for total reflectance at which simulation has converged
+        :param check_convergence: If True, check for convergence testing
         """
+        self.atol = atol
+        self.rtol = rtol
+        self.max_iters = max_iters
+
+        self.check_convergence = check_convergence
+        self.converged = False
+        self.iters = 0
+        self.last_RTot = 1
+
         self.results = []
         self.sweep_objects, self.sweep_vars, self.sweep_vals = self._sweeps(*sweep_args, **sweep_kw)
         n_sweeps = len(self.sweep_vals)
@@ -41,17 +59,51 @@ class Solver:
         bar = ProgressBar(widgets=[Counter(), f'/{n_sweeps} ', Bar(), ETA()], max_value=n_sweeps).start()
 
         for i, sweep in enumerate(self.sweep_vals):
+
             self._assign_sweep_vars(sweep)
 
-            self._initialize()
-            self._inner_s_matrix()
-            self._global_s_matrix()
-            self._rt_quantities()
+            while not self.converged:
+
+                self._initialize()
+                self._inner_s_matrix()
+                self._global_s_matrix()
+                self._rt_quantities()
+                self.iters += 1
+                self.converged = self._check_converged()
+
+                self.last_RTot = self.RTot
+                self._increase_harmonics()
+
             self._append_results()
+            self.iters = 0
+            self.last_RTot = 1
+            self.converged = False
             bar.update(i)
 
         bar.finish()
         self.results = self._package_results()
+
+    def _increase_harmonics(self, factor=1.3):
+        pass
+
+    def _check_converged(self):
+        converged = False
+        if self.iters >= self.max_iters:
+            raise RuntimeError('Exceeded maximum number of iterations {self.max_iters} without convergence. Aborting.')
+
+        self.relative_error = np.abs((self.last_RTot - self.RTot)/self.last_RTot)
+        self.absolute_error = np.abs(self.RTot - self.last_RTot)
+
+        if self.TMMSimulation and self.iters > 0:
+            converged = True
+
+        if not self.check_convergence:
+            converged = True
+
+        if self.relative_error < self.rtol and self.absolute_error < self.atol:
+            converged = True
+
+        return converged
 
     @staticmethod
     def _sweeps(*sweep_args, **sweep_kw):
