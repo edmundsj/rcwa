@@ -19,7 +19,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         urData = 1 * complexOnes((512, 439))
         triangleCrystal = Crystal(t1, t2, er=erData, ur=urData)
         dummyLayer = Layer(crystal=triangleCrystal)
-        dummyLayer._set_convolution_matrices(self.numberHarmonics)
+        dummyLayer.set_convolution_matrices(self.numberHarmonics)
 
         convolutionMatrixActual = complexIdentity(9)
         convolutionMatrixCalculated = dummyLayer.ur
@@ -40,7 +40,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         triangleCrystal = Crystal(t1, t2, er=erData, ur=urData)
         dummyLayer = Layer(crystal=triangleCrystal)
         dummyStack = LayerStack(dummyLayer)
-        dummyStack._set_convolution_matrices(self.numberHarmonics)
+        dummyStack.set_convolution_matrices(self.numberHarmonics)
 
         convolutionMatrixActual = self.layerStack.internal_layers[0].er
         convolutionMatrixCalculated = dummyStack.internal_layers[0].er

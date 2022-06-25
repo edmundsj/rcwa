@@ -66,7 +66,7 @@ class Layer:
     def source(self, source):
         self.material.source = source
 
-    def _set_convolution_matrices(self, numberHarmonics):
+    def set_convolution_matrices(self, numberHarmonics):
         if self.crystal is not None:
             self.er = self._convolution_matrix(self.crystal.permittivityCellData, numberHarmonics)
             self.ur = self._convolution_matrix(self.crystal.permeabilityCellData, numberHarmonics)
@@ -196,9 +196,9 @@ class LayerStack:
         self.gapLayer.ur = 1
 
     # set all convolution matrices for all interior layers
-    def _set_convolution_matrices(self, numberHarmonics):
+    def set_convolution_matrices(self, numberHarmonics):
         for layer in self.internal_layers:
-            layer._set_convolution_matrices(numberHarmonics)
+            layer.set_convolution_matrices(numberHarmonics)
 
     @property
     def crystal(self):

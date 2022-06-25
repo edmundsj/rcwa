@@ -21,7 +21,7 @@ class Solver:
         self.source.layer = layer_stack.incident_layer
         self.layer_stack.source = source
 
-        self.layer_stack._set_convolution_matrices(n_harmonics)
+        self.layer_stack.set_convolution_matrices(self.n_harmonics)
         self.baseCrystal = self.layer_stack.crystal
         self._k_matrices()
         self._gap_matrices()
@@ -36,18 +36,14 @@ class Solver:
         :param sweep_kw: Source variables to sweep (theta, phi, wavelength, etc.). Can either be a single keyword argument or several. If several are used, all combinations of the two parameters will be made
         """
         self.results = []
-        self.sweep_vars, self.sweep_vals = self._sweeps(*sweep_args, **sweep_kw)
+        self.sweep_objects, self.sweep_vars, self.sweep_vals = self._sweeps(*sweep_args, **sweep_kw)
         n_sweeps = len(self.sweep_vals)
 
         bar = ProgressBar(widgets=[Counter(), f'/{n_sweeps} ', Bar(), ETA()], max_value=n_sweeps).start()
 
         for i, sweep in enumerate(self.sweep_vals):
-            self._assign_sweep_vars(self.sweep_vars, sweep)
-            self._couple_source()
+            self._assign_sweep_vars(sweep)
 
-            self._k_matrices()
-            self._gap_matrices()
-            self._outer_matrices()
             self._initialize()
             self._inner_s_matrix()
             self._global_s_matrix()
@@ -59,19 +55,39 @@ class Solver:
         self.results = self._package_results()
 
     @staticmethod
-    def _sweeps(**sweep_kw):
-        sweep_vars = sweep_kw.keys()
-        sweep_vals = list(product(*sweep_kw.values()))
-        return sweep_vars, sweep_vals
+    def _sweeps(*sweep_args, **sweep_kw):
+        sweep_objects = []
+        sweep_vars = []
+        sweep_vectors = []
+        for pair in sweep_args:
+            obj, param_dict = pair
+            for key, val in param_dict.items():
+                sweep_objects.append(obj)
+                sweep_vars.append(key)
+                sweep_vectors.append(val)
+        for key, val in sweep_kw.items():
+            sweep_objects.append(None)
+            sweep_vars.append(key)
+            sweep_vectors.append(val)
+
+        sweep_vals = list(product(*sweep_vectors))
+
+        return sweep_objects, sweep_vars, sweep_vals
+
+    def _assign_sweep_vars(self, sweep):
+        for obj, var, val in zip(self.sweep_objects, self.sweep_vars, sweep):
+            if obj is None:
+                obj = self.source
+
+            if not hasattr(obj, var):
+                raise ValueError(f"""Object {obj} does not have attribute {var}.
+                                 Invalid sweep variable. Available default variables are 
+                                 "phi", "theta", "wavelength", "pTEM"'
+                                 """)
+            setattr(obj, var, val)
 
     def _couple_source(self):
         self.source.layer = self.layer_stack.incident_layer
-
-    def _assign_sweep_vars(self, sweep_vars, sweep):
-        for var, val in zip(sweep_vars, sweep):
-            if not hasattr(self.source, var):
-                raise ValueError(f'Source does not have attribute {var}. Invalid sweep variable. Available variables are "phi", "theta", "wavelength", "pTEM"')
-            setattr(self.source, var, val)
 
     def _rt_quantities(self):
         self.rx, self.ry, self.rz = calculateReflectionCoefficient(self.SGlobal, self.Kx, self.Ky,
@@ -190,3 +206,9 @@ class Solver:
         self.tx, self.ty, self.tz = None, None, None
         self.R, self.T, self.RTot, self.TTot, self.CTot = None, None, None, None, None
         self.Si = [None for _ in range(len(self.layer_stack.internal_layers))]
+
+        self._couple_source()
+        self.layer_stack.set_convolution_matrices(self.n_harmonics)
+        self._k_matrices()
+        self._gap_matrices()
+        self._outer_matrices()
