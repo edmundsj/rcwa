@@ -3,10 +3,10 @@
 # Creation Date: 11/01/2019
 #
 from rcwa import Material, Layer, LayerStack, Source, Solver, Plotter
-
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+
 
 def solve_system():
         startWavelength = 0.25
@@ -21,7 +21,7 @@ def solve_system():
         reflectionLayer = Layer(n=1) # Free space
         thin_film = Layer(thickness=0.1, material=si)
         transmissionLayer = Layer(n=4)
-        stack = LayerStack(reflectionLayer, thin_film, transmissionLayer)
+        stack = LayerStack(thin_film, incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
         print("Solving system...")
         TMMSolver = Solver(stack, source, (1, 1))

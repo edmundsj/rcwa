@@ -1,5 +1,4 @@
 import pytest
-import os
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 from rcwa.examples.bragg_mirror import solve_system as solve_bragg

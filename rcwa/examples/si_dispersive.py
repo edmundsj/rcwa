@@ -20,7 +20,7 @@ def solve_system():
 
         reflectionLayer = Layer(n=1) # Free space
         transmissionLayer = Layer(material=si)
-        stack = LayerStack(reflectionLayer, transmissionLayer)
+        stack = LayerStack(incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
         print("Solving system...")
         TMMSolver = Solver(stack, source, (1, 1))

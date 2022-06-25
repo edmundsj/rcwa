@@ -8,12 +8,12 @@ from rcwa.matrices import *
 
 class Test1x1Harmonic(unittest.TestCase):
     def testCalculateKz(self):
-        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
+        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.incident_layer)
         KzActual = np.float64(self.KzReflectionRegion)
         assert_almost_equal(KzActual, KzCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "Kz in Reflection region not correct")
 
-        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmissionLayer)
+        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmission_layer)
         KzActual = self.KzTransmissionRegion
         assert_almost_equal(KzActual, KzCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "Kz in transmission region not correct")
@@ -52,7 +52,7 @@ class Test1x1Harmonic(unittest.TestCase):
 
     def testCalculateKVector(self):
         kVectorActual = complexArray([self.Kx, self.Ky, self.KzReflectionRegion])
-        kVectorCalculated = calculateKVector(self.source, self.layerStack.reflectionLayer)
+        kVectorCalculated = calculateKVector(self.source, self.layerStack.incident_layer)
         assert_almost_equal(kVectorActual, kVectorCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testCalcEz(self):
@@ -119,7 +119,7 @@ class Test1x1Harmonic(unittest.TestCase):
         VActual = complexArray([[0-0.1051j,0-0.4941j],[0+0.6970j,0+0.1051j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W_ref, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.reflectionLayer)
+        (VCalculated, W_ref, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.incident_layer)
         VActual = complexArray([
             [0 - 0.5017j, 0 - 0.8012j],
             [0 + 1.7702j, 0 + 0.5017j]]);
@@ -394,7 +394,7 @@ class Test1x1Harmonic(unittest.TestCase):
         transmissionLayer = Layer(erTransmissionRegion, urTransmissionRegion)
         layer1 = Layer(er=erLayer1, ur=urLayer1, thickness=thicknessLayer1)
         layer2 = Layer(er=erLayer2, ur=urLayer2, thickness=thicknessLayer2)
-        self.layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
+        self.layerStack = LayerStack(layer1, layer2, incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
         self.Kx = reflectionLayer.n* sin(self.theta) * cos(self.phi)
         self.Ky = reflectionLayer.n* sin(self.theta) * sin(self.phi)

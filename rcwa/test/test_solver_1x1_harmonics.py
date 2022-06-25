@@ -169,7 +169,7 @@ class TestSolver1x1(unittest.TestCase):
 
         layer1 = Layer(er=2.0, ur=1.0, thickness=thicknessLayer1)
         layer2 = Layer(er=1.0, ur=3.0, thickness=thicknessLayer2)
-        layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
+        layerStack = LayerStack(layer1, layer2, incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
         self.solver = Solver(layerStack, source, numberHarmonics)
 

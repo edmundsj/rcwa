@@ -138,32 +138,26 @@ class LayerStack:
     """
     Class that defines overall geometry in terms of a stack of layers
 
-    :param layers: Layer objects, starting with the top-most layer (reflection region) and ending with the top-most region (substrate)
+    :param internal_layers: Layer objects, starting with the top-most layer (reflection region) and ending with the top-most region (substrate)
+    :param incident_layer: Semi-infinite layer of incident region. Defaults to free space
+    :param transmission_layer: Semi-infinite layer of transmission region. Defaults to free space
     """
-    def __init__(self, *layers):
-        if len(layers) == 1:
-            if isinstance(layers[0], list):
-                layers = layers[0]
+    def __init__(self, *internal_layers, incident_layer=freeSpaceLayer, transmission_layer=freeSpaceLayer):
+        if len(internal_layers) == 1:
+            if isinstance(internal_layers[0], list):
+                internal_layers = internal_layers[0]
         self.gapLayer = Layer(er=1,ur=1)
-        if len(layers) == 0:
-            self.reflectionLayer = freeSpaceLayer
-            self.transmissionLayer = freeSpaceLayer
-            self.internal_layers = []
-        elif len(layers) == 1:
-            self.reflectionLayer = layers[0]
-            self.transmissionLayer = layers[0]
-            self.internal_layers = []
-        else:
-            self.reflectionLayer = layers[0]
-            self.transmissionLayer = layers[-1]
-            self.internal_layers = list(layers[1:-1])
+        self.incident_layer = incident_layer
+        self.transmission_layer = transmission_layer
+
+        self.internal_layers = list(internal_layers)
 
     def __eq__(self, other):
         if not isinstance(other, LayerStack):
             return NotImplemented
 
-        reflection_layers_same = self.reflectionLayer == other.reflectionLayer
-        transmission_layers_same = self.transmissionLayer == other.transmissionLayer
+        reflection_layers_same = self.incident_layer == other.incident_layer
+        transmission_layers_same = self.transmission_layer == other.transmission_layer
         internal_layers_same = False
         if len(self.internal_layers) == len(other.internal_layers):
             for i in range(len(self.internal_layers)):
@@ -174,8 +168,8 @@ class LayerStack:
         return internal_layers_same and reflection_layers_same and transmission_layers_same
 
     def __str__(self):
-        top_string = f'\nReflection Layer:\n\t' + str(self.reflectionLayer) + \
-                f'\nTransmissionLayer:\n\t' + str(self.transmissionLayer) + \
+        top_string = f'\nReflection Layer:\n\t' + str(self.incident_layer) + \
+                f'\nTransmissionLayer:\n\t' + str(self.transmission_layer) + \
                 f'\nInternal Layer Count: {len(self.internal_layers)}\n'
         internal_string = ''
         for layer in self.internal_layers:
@@ -194,8 +188,8 @@ class LayerStack:
         self._source = source
         for layer in self.internal_layers:
             layer.source = self.source
-        self.reflectionLayer.source = source
-        self.transmissionLayer.source = source
+        self.incident_layer.source = source
+        self.transmission_layer.source = source
 
     def _set_gap_layer(self, kx, ky):
         self.gapLayer.er = 1 + sq(kx) + sq(ky)

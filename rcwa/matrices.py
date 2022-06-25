@@ -198,8 +198,8 @@ def calculateReflectionRegionSMatrix(kx, ky, layerStack, Wg, Vg):
         return calculateReflectionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg)
 
 def calculateReflectionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg):
-    kz = calculateKzForward(kx, ky, layerStack.reflectionLayer);
-    (Vi, Wi, X) = calculateVWXMatrices(kx, ky, layerStack.reflectionLayer);
+    kz = calculateKzForward(kx, ky, layerStack.incident_layer);
+    (Vi, Wi, X) = calculateVWXMatrices(kx, ky, layerStack.incident_layer);
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi);
 
@@ -210,11 +210,11 @@ def calculateReflectionRegionSMatrixNHarmonics(Kx, Ky, layerStack, Wg, Vg):
     KDimension = Kx.shape[0]
     lambdaRef = complexZeros((KDimension*2, KDimension*2))
     Wi = complexIdentity(KDimension * 2)
-    Q = calculateQMatrix(Kx, Ky, layerStack.reflectionLayer)
+    Q = calculateQMatrix(Kx, Ky, layerStack.incident_layer)
 
     # I have no idea why we conjugate ur * er and then conjugate the whole thing.
-    Kz = conj(sqrt (conj(layerStack.reflectionLayer.er*layerStack.reflectionLayer.ur)* \
-            complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
+    Kz = conj(sqrt (conj(layerStack.incident_layer.er * layerStack.incident_layer.ur) * \
+                    complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
     lambdaRef[:KDimension, :KDimension] = 1j*Kz
     lambdaRef[KDimension:,KDimension:] = 1j*Kz
     Vi = Q @ pinv(lambdaRef)
@@ -231,7 +231,7 @@ def calculateTransmissionRegionSMatrix(kx, ky, layerStack, Wg, Vg):
         return calculateTransmissionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg)
 
 def calculateTransmissionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg):
-    (Vi, Wi, X) = calculateVWXMatrices(kx, ky, layerStack.transmissionLayer)
+    (Vi, Wi, X) = calculateVWXMatrices(kx, ky, layerStack.transmission_layer)
     Ai = calculateScatteringAMatrix(Wg, Wi, Vg, Vi);
     Bi = calculateScatteringBMatrix(Wg, Wi, Vg, Vi);
 
@@ -242,11 +242,11 @@ def calculateTransmissionRegionSMatrixNHarmonics(Kx, Ky, layerStack, Wg, Vg):
     KDimension = Kx.shape[0]
     lambdaRef = complexZeros((KDimension*2, KDimension*2))
     Wi = complexIdentity(KDimension * 2)
-    Q = calculateQMatrix(Kx, Ky, layerStack.transmissionLayer)
+    Q = calculateQMatrix(Kx, Ky, layerStack.transmission_layer)
 
     # I have no idea why we conjugate ur * er and then conjugate the whole thing.
-    Kz = conj(sqrt (conj(layerStack.transmissionLayer.er * layerStack.transmissionLayer.ur)* \
-            complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
+    Kz = conj(sqrt (conj(layerStack.transmission_layer.er * layerStack.transmission_layer.ur) * \
+                    complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
     lambdaRef[:KDimension, :KDimension] = 1j*Kz
     lambdaRef[KDimension:,KDimension:] = 1j*Kz
     Vi = Q @ pinv(lambdaRef)
@@ -337,7 +337,7 @@ def calculateTransmissionCoefficient(S, Kx, Ky, KzTransmissionRegion,
     return tx, ty, tz
 
 def calculateDiffractionReflectionEfficiency(rx, ry, rz, source, KzReflectionRegion, layerStack, numberHarmonics):
-    urReflectionRegion = layerStack.reflectionLayer.ur
+    urReflectionRegion = layerStack.incident_layer.ur
     preMatrix = real(-1 /urReflectionRegion * KzReflectionRegion) / \
             real(source.k_incident[2] / urReflectionRegion)
     R = None
@@ -352,8 +352,8 @@ def calculateDiffractionReflectionEfficiency(rx, ry, rz, source, KzReflectionReg
 
 def calculateDiffractionTransmissionEfficiency(tx, ty, tz, source, KzTransmissionRegion, layerStack,
                                               numberHarmonics):
-    urTransmissionRegion = layerStack.transmissionLayer.ur
-    urReflectionRegion = layerStack.reflectionLayer.ur
+    urTransmissionRegion = layerStack.transmission_layer.ur
+    urReflectionRegion = layerStack.incident_layer.ur
     preMatrix = real(1 / urTransmissionRegion * KzTransmissionRegion) / \
             real(source.k_incident[2] / urReflectionRegion)
 
@@ -372,8 +372,8 @@ def calculateEz(kx, ky, kz, Ex, Ey):
 
 def calculateRT(kzReflectionRegion, kzTransmissionRegion,
         layerStack, ExyzReflected, ExyzTransmitted):
-    urTransmissionRegion = layerStack.transmissionLayer.ur
-    urReflectionRegion = layerStack.reflectionLayer.ur
+    urTransmissionRegion = layerStack.transmission_layer.ur
+    urReflectionRegion = layerStack.incident_layer.ur
     R = sq(norm(ExyzReflected))
     T = sq(norm(ExyzTransmitted))*np.real(kzTransmissionRegion / urTransmissionRegion) / \
             (kzReflectionRegion / urReflectionRegion);

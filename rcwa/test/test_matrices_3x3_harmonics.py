@@ -1,13 +1,12 @@
 import numpy as np
 import sys
 import unittest
-from rcwa.shorthand import *
-from rcwa.testing import *
 from rcwa.matrices import *
 from rcwa.harmonics import *
 from rcwa import test_dir
 from rcwa import Layer, LayerStack, freeSpaceLayer, Solver, Crystal, Source
 from rcwa.testing import assert_almost_equal
+import os
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -36,11 +35,11 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
     def testSetConvolutionMatrixStack(self):
         t1 = complexArray([1.75,0,0])
         t2 = complexArray([0, 1.5, 0])
-        erData = np.transpose(np.loadtxt(test_dir + '/triangleData.csv', delimiter=','))
+        erData = np.transpose(np.loadtxt(os.path.join(test_dir, 'triangleData.csv'), delimiter=','))
         urData = 1 * complexOnes((512, 439))
         triangleCrystal = Crystal(t1, t2, er=erData, ur=urData)
         dummyLayer = Layer(crystal=triangleCrystal)
-        dummyStack = LayerStack(freeSpaceLayer, dummyLayer, freeSpaceLayer)
+        dummyStack = LayerStack(dummyLayer)
         dummyStack._set_convolution_matrices(self.numberHarmonics)
 
         convolutionMatrixActual = self.layerStack.internal_layers[0].er
@@ -72,12 +71,12 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 "Q matrix Layer 1");
 
         QActual = self.QReflectionRegion
-        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.reflectionLayer)
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.incident_layer)
         assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q Reflection Region");
 
         QActual = self.QTransmissionRegion
-        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.transmissionLayer)
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.transmission_layer)
         assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q Transmission Region");
 
@@ -370,12 +369,12 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
     def testCalculateKz(self):
         KzActual = self.KzReflectionRegion
-        KzCalculated = calculateKzBackward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
+        KzCalculated = calculateKzBackward(self.Kx, self.Ky, self.layerStack.incident_layer)
         assert_almost_equal(KzActual, KzCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Kz Reflection")
 
         KzActual = self.KzTransmissionRegion
-        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmissionLayer)
+        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmission_layer)
         assert_almost_equal(KzActual, KzCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Kz Transmission")
 
@@ -465,7 +464,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         layer1.homogenous = False
         layer2 = Layer(erDeviceRegion, urDeviceRegion, thicknessLayer2)
 
-        self.layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
+        self.layerStack = LayerStack(layer1, layer2, incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
         self.source = Source(wavelength, theta, phi, pTEM, reflectionLayer)
         self.numberHarmonics = (numberHarmonicsX, numberHarmonicsY)
 

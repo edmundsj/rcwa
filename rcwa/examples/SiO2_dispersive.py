@@ -3,9 +3,7 @@
 # Creation Date: 11/01/2019
 #
 from rcwa import Material, Layer, LayerStack, Source, Solver, Plotter
-
 import numpy as np
-import pandas as pd
 from matplotlib import pyplot as plt
 
 def solve_system():
@@ -18,7 +16,7 @@ def solve_system():
 
         reflectionLayer = Layer(n=1) # Free space
         transmissionLayer = Layer(material=siO2)
-        stack = LayerStack(reflectionLayer, transmissionLayer)
+        stack = LayerStack(incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
         print("Solving system...")
         TMMSolver = Solver(stack, source, (1, 1))

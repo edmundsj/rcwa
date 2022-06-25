@@ -27,7 +27,7 @@ def solve_system():
 
     deviceCrystal = Crystal(t1, t2, er=devicePermittivityCellData, ur=devicePermeabilityCellData)
     layer1 = Layer(crystal=deviceCrystal, thickness=crystalThickness)
-    layerStack = LayerStack(reflectionLayer, layer1, transmissionLayer)
+    layerStack = LayerStack(layer1, incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
     rcwa_solver = Solver(layerStack, source, numberHarmonics)
     rcwa_solver.solve()

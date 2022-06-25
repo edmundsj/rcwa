@@ -27,3 +27,21 @@ def testExtractCrystal():
 
     calculatedCrystal = testStack.crystal
     assert_equal(calculatedCrystal, actualCrystal)
+
+def test_empty_layer():
+    empty_layer = Layer()
+    desired_defaults = {'n': 1, 'er': 1, 'ur': 1, 'source': None}
+    for key, val in desired_defaults.items():
+        assert hasattr(empty_layer, key)
+    for key, desired_val in desired_defaults.items():
+        actual_val = getattr(empty_layer, key)
+        assert actual_val == desired_val
+
+def test_empty_stack():
+    empty_stack = LayerStack()
+    desired_defaults = {'internal_layers': [], 'incident_layer': freeSpaceLayer, 'transmission_layer': freeSpaceLayer}
+    for key, val in desired_defaults.items():
+        assert hasattr(empty_stack, key)
+    for key, desired_val in desired_defaults.items():
+        actual_val = getattr(empty_stack, key)
+        assert actual_val == desired_val

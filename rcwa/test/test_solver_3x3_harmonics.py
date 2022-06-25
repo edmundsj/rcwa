@@ -152,7 +152,7 @@ class TestSolver(unittest.TestCase):
         deviceCrystal = Crystal(t1, t2, er=devicePermittivityCellData, ur=devicePermeabilityCellData)
         layer1 = Layer(crystal=deviceCrystal, thickness=thicknessLayer1)
         layer2 = Layer(er=6.0, ur=1.0, thickness=thicknessLayer2)
-        layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
+        layerStack = LayerStack(layer1, layer2, incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
         self.solver = Solver(layerStack, source, numberHarmonics)
 

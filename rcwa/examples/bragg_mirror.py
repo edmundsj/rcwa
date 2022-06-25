@@ -3,7 +3,6 @@
 # Creation Date: 11/01/2019
 #
 from rcwa import Layer, LayerStack, Source, Solver, Plotter
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -31,9 +30,8 @@ def solve_system():
     layer8 = Layer(n=n1, thickness=t1)
     layer9 = Layer(n=n2, thickness=t2)
     layer10 = Layer(n=n1, thickness=t1)
-    stack = LayerStack(reflectionLayer,
-           layer0, layer1, layer2, layer3, layer4, layer5, layer6, layer7, layer8, layer9, layer10,
-            transmissionLayer)
+    stack = LayerStack(layer0, layer1, layer2, layer3, layer4, layer5, layer6, layer7, layer8, layer9, layer10,
+                       incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
     source = Source(wavelength=designWavelength)
 
     print("Solving system...")
