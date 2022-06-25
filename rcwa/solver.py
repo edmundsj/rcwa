@@ -5,6 +5,7 @@ from rcwa import Layer, LayerStack
 from copy import deepcopy
 from progressbar import ProgressBar, AnimatedMarker, Percentage, Bar, Counter, ETA
 import time
+from itertools import product
 
 class Solver:
     """ Main class that invokes all methods necessary to solve an RCWA/TMM simulation
@@ -28,20 +29,26 @@ class Solver:
         self.results = []
         self.ClearSolution()
 
-    def Solve(self, wavelengths=np.array([])):
+    def Solve(self, sweep_list=None, **sweep_kw):
         """
         Solves the simulation or performs a simulation sweep of the desired parameters
 
-        :param wavelengths: list of wavelengths to simulate (can be a single number)
+        :param sweep_dict: Source variables to sweep (theta, phi, wavelength) as a list of dictionaries
+        :param sweep_kw: Source variables to sweep (theta, phi, wavelength, etc.). Can either be a single keyword argument or several. If several are used, all combinations of the two parameters will be made
         """
-        if wavelengths.size == 0:
-            wavelengths = np.array([self.source.wavelength])
 
-        bar = ProgressBar(widgets=[Counter(), f'/{len(wavelengths)} ', Bar(), ETA()], max_value=len(wavelengths)).start()
+        self.source.layer = self.layerStack.reflectionLayer
+        sweep_vars = sweep_kw.keys()
+        sweeps = list(product(*sweep_kw.values()))
 
-        for i, wavelength in enumerate(wavelengths):
-            self.source.layer = self.layerStack.reflectionLayer
-            self.source.wavelength = wavelength # Update the source wavelength and all associated things.
+        bar = ProgressBar(widgets=[Counter(), f'/{len(sweeps)} ', Bar(), ETA()], max_value=len(sweeps)).start()
+
+        for i, sweep in enumerate(sweeps):
+            for var, val in zip(sweep_vars, sweep):
+                if not hasattr(self.source, var):
+                    raise ValueError(f'Source does not have attribute {var}. Invalid sweep variable')
+                setattr(self.source, var, val)
+
             self.setupKMatrices()
             self.setupGapMatrices()
             self.setupReflectionTransmissionMatrices()
