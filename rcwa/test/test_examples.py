@@ -9,7 +9,7 @@ from rcwa.examples.SiO2_dispersive import solve_system as solve_siO2_dispersive
 from rcwa.examples.si_ellipsometry import solve_system as solve_si_ellipsometry
 from rcwa.examples.thin_film_dispersive import solve_system as solve_thin_film_dispersive
 from rcwa.examples.triangular_photonic_crystal_2D import solve_system as solve_triangular_photonic_crystal
-
+from rcwa.examples.grating_sweep import solve_system as solve_grating_sweep
 
 def test_bragg_mirror():
     solver = solve_bragg()
@@ -107,4 +107,12 @@ def test_solve_triangular_pc():
     assert_allclose(results['RTot'], 0.15593548090823117)
     assert_allclose(results['TTot'], 0.844064519091769)
     assert_allclose(results['rx'], rx_desired, atol=1e-8, rtol=1e-5)
+
+def test_grating_sweep():
+    solver = solve_grating_sweep()
+    assert hasattr(solver, 'results')
+    results = solver.results
+    assert 'thickness' in results.keys()
+    assert_equal(results['thickness'],  [0.3, 0.4, 0.5])
+    assert len(np.unique(results['RTot'])) == len(results['thickness'])
 

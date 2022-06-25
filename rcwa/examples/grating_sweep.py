@@ -4,22 +4,11 @@ import numpy as np
 
 
 def solve_system():
-    permittivity_data = np.array([1, 1, 1, 1, 3, 3, 3, 3])
-    permeability_data = 1 + 0 * permittivity_data
-
     reflection_layer = Layer(er=1.0, ur=1.0)
     transmission_layer = Layer(er=9.0, ur=1.0)
 
     wavelength = 0.5
-    deg = np.pi / 180
-    k0 = 2*np.pi/wavelength
-    theta = 60 * deg
-    phi = 1*deg
-    pTEM = 1/np.sqrt(2)*complexArray([1,1j])
-    source = Source(wavelength=wavelength, theta=theta, phi=phi, pTEM=pTEM, layer=reflection_layer)
-    lattice_vector = [1.0, 0, 0]
-
-    crystal_thickness = 0.5
+    source = Source(wavelength=wavelength)
 
     N_harmonics = 11
 
@@ -27,16 +16,12 @@ def solve_system():
     layer_stack = LayerStack(grating_layer, incident_layer=reflection_layer, transmission_layer=transmission_layer)
 
     solver_1d = Solver(layer_stack, source, N_harmonics)
-    solver_1d.solve()
+    solver_1d.solve((grating_layer, {'thickness': [0.3, 0.4, 0.5]}))
 
     return solver_1d
 
 if __name__ == 'main':
     solver = solve_system()
-
-    # Get the amplitude reflection and transmission coefficients
-    (rxCalculated, ryCalculated, rzCalculated) = (solver.rx, solver.ry, solver.rz)
-    (txCalculated, tyCalculated, tzCalculated) = (solver.tx, solver.ty, solver.tz)
 
     # Get the diffraction efficiencies R and T and overall reflection and transmission coefficients R and T
     (R, T, RTot, TTot) = (solver.R, solver.T, solver.RTot, solver.TTot)

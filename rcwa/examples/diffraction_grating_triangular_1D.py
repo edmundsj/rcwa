@@ -23,7 +23,7 @@ def solve_system():
 
     N_harmonics = 11
 
-    grating = TriangularGrating(period=2, t=0.5, n=4, n_void=1,Nx=500)
+    grating = TriangularGrating(period=2, thickness=0.5, n=4, n_void=1, Nx=500)
     layer_stack = LayerStack(*grating.slice(), incident_layer=reflection_layer, transmission_layer=transmission_layer)
 
     solver_1d = Solver(layer_stack, source, N_harmonics)

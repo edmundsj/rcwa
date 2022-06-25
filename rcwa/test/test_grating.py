@@ -5,7 +5,7 @@ import numpy as np
 
 @pytest.fixture
 def triangle():
-    grating = TriangularGrating(t=0.2, er=2, er_void=0.5, ur=1, ur_void=1, Nx=3, Nz=3)
+    grating = TriangularGrating(thickness=0.2, er=2, er_void=0.5, ur=1, ur_void=1, Nx=3, Nz=3)
     return grating
 
 def test_groove_width_nonsensical():
