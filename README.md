@@ -30,11 +30,12 @@ Features
 - Implements 1D Transfer Matrix Method for homogenous layers
 - Implements full rectangular 2D RCWA for periodic layers
 - Huge material database for n/k values in optical range built-in based on [refractiveindex.info](https://refractiveindex.info/), including metals, plastics, glass, and ceramics
+- Easy to use class-based syntax 
+- Easily run source parameter sweeps of arbitrary complexity
 - Compute reflection and transmission spectra at arbitrary incidence and polarization
 - Compute spectroscopic ellipsometry curves
 - Exactly solves Maxwell's Equations for arbitrary layer stacks of any thickness
 - Compute reflected power, transmitted power, and S-parameters
-- Easy to use class-based syntax 
 - Large, fast-to-run test suite
 - Extremely fast narrowband, rigorously correct simulations well suited for resonant devices
 

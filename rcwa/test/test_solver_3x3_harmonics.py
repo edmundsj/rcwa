@@ -119,7 +119,7 @@ class TestSolver(unittest.TestCase):
 
     def testIntegrationMultiWavelength(self):
         testWavelengths = self.solver.source.wavelength*np.arange(0.2,2,0.01)
-        self.solver.Solve(testWavelengths)
+        self.solver.Solve(wavelength=testWavelengths)
         #Plotter.plotReflectionSpectra(self.solver.results)
 
     def setUp(self):

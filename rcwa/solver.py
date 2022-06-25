@@ -29,26 +29,21 @@ class Solver:
         self.results = []
         self.ClearSolution()
 
-    def Solve(self, sweep_list=None, **sweep_kw):
+    def Solve(self, **sweep_kw):
         """
         Solves the simulation or performs a simulation sweep of the desired parameters
 
-        :param sweep_dict: Source variables to sweep (theta, phi, wavelength) as a list of dictionaries
         :param sweep_kw: Source variables to sweep (theta, phi, wavelength, etc.). Can either be a single keyword argument or several. If several are used, all combinations of the two parameters will be made
         """
 
         self.source.layer = self.layerStack.reflectionLayer
-        sweep_vars = sweep_kw.keys()
-        sweeps = list(product(*sweep_kw.values()))
+        sweep_vars, sweep_vals = self.sweeps(**sweep_kw)
+        N_sweeps = len(sweep_vals)
 
-        bar = ProgressBar(widgets=[Counter(), f'/{len(sweeps)} ', Bar(), ETA()], max_value=len(sweeps)).start()
+        bar = ProgressBar(widgets=[Counter(), f'/{N_sweeps} ', Bar(), ETA()], max_value=N_sweeps).start()
 
-        for i, sweep in enumerate(sweeps):
-            for var, val in zip(sweep_vars, sweep):
-                if not hasattr(self.source, var):
-                    raise ValueError(f'Source does not have attribute {var}. Invalid sweep variable')
-                setattr(self.source, var, val)
-
+        for i, sweep in enumerate(sweep_vals):
+            self.assign_sweep_vars(sweep_vars, sweep)
             self.setupKMatrices()
             self.setupGapMatrices()
             self.setupReflectionTransmissionMatrices()
@@ -60,6 +55,17 @@ class Solver:
             bar.update(i)
 
         bar.finish()
+
+    def sweeps(self, **sweep_kw):
+        sweep_vars = sweep_kw.keys()
+        sweep_vals = list(product(*sweep_kw.values()))
+        return sweep_vars, sweep_vals
+
+    def assign_sweep_vars(self, sweep_vars, sweep):
+        for var, val in zip(sweep_vars, sweep):
+            if not hasattr(self.source, var):
+                raise ValueError(f'Source does not have attribute {var}. Invalid sweep variable. Available variables are "phi", "theta", "wavelength", "pTEM"')
+            setattr(self.source, var, val)
 
     def calculateRTQuantities(self):
         self.rx, self.ry, self.rz = calculateReflectionCoefficient(self.SGlobal, self.Kx, self.Ky,
