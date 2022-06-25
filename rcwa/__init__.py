@@ -4,8 +4,9 @@ __email__ = 'edmundsj@uci.edu'
 import os
 
 file_location = os.path.dirname(__file__)
-nkLocation = os.path.join(file_location, 'nkData/')
-testLocation = os.path.join(file_location, 'test')
+nk_dir = os.path.join(file_location, 'nkData/')
+test_dir = os.path.join(file_location, 'test')
+example_dir = os.path.join(file_location, 'examples')
 
 from rcwa import utils
 from rcwa.material import Material

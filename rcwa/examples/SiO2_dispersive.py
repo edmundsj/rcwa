@@ -8,24 +8,29 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-designWavelength = 1.3
-startWavelength = 0.25
-stopWavelength = 0.85
-stepWavelength = 0.001
+def solve_system():
+        startWavelength = 0.25
+        stopWavelength = 0.85
+        stepWavelength = 0.001
 
-source = Source(wavelength=designWavelength)
-siO2 = Material(material_name='SiO2')
+        source = Source(wavelength=startWavelength)
+        siO2 = Material('SiO2')
 
-reflectionLayer = Layer(n=1) # Free space
-transmissionLayer = Layer(material=siO2)
-stack = LayerStack(reflectionLayer, transmissionLayer)
+        reflectionLayer = Layer(n=1) # Free space
+        transmissionLayer = Layer(material=siO2)
+        stack = LayerStack(reflectionLayer, transmissionLayer)
 
-print("Solving system...")
-TMMSolver = Solver(stack, source, (1, 1))
-wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
-        stepWavelength)
+        print("Solving system...")
+        TMMSolver = Solver(stack, source, (1, 1))
+        wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
+                stepWavelength)
 
-TMMSolver.solve(wavelengths=wavelengths)
-#Plotter.plotEllipsometrySpectra(TMMSolver.results)
-Plotter.plotRTSpectra(TMMSolver.results)
-plt.show()
+        TMMSolver.solve(wavelength=wavelengths)
+        #Plotter.plotEllipsometrySpectra(TMMSolver.results)
+        fig, ax = Plotter.plotRTSpectra(TMMSolver.results)
+        return TMMSolver
+
+
+if __name__ == 'main':
+        solver = solve_system()
+        plt.show()

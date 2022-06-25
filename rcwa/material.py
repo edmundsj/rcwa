@@ -81,10 +81,10 @@ class Material:
         """
 
         if filename is not None:
-            file_to_load = os.path.join(rcwa.nkLocation, 'data', filename)
+            file_to_load = os.path.join(rcwa.nk_dir, 'data', filename)
 
         if material_name in self.database.materials.keys():
-            file_to_load = os.path.join(rcwa.nkLocation, 'data', self.database.materials[material_name])
+            file_to_load = os.path.join(rcwa.nk_dir, 'data', self.database.materials[material_name])
 
         data_dict = self.database.load(file_to_load)
         self._set_dispersive_nk(data_dict)

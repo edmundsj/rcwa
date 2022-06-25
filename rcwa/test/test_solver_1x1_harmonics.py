@@ -105,9 +105,9 @@ class TestSolver1x1(unittest.TestCase):
         cosDeltaActual = self.cosDelta
         deltaActual = self.delta
 
-        tanPsiCalculated = self.solver.results['tanPsi'][0]
-        deltaCalculated = self.solver.results['delta'][0]
-        cosDeltaCalculated = self.solver.results['cosDelta'][0]
+        tanPsiCalculated = self.solver.results['tanPsi']
+        deltaCalculated = self.solver.results['delta']
+        cosDeltaCalculated = self.solver.results['cosDelta']
 
         assert_almost_equal(tanPsiActual, tanPsiCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tanPsi")

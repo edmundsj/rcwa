@@ -89,17 +89,22 @@ class Solver:
         Turns the list of simulation results created during simulation into something more useful
         """
 
+        n_results = len(self.results)
         result_keys = self.results[0].keys()
         new_results = {}
-        for key in result_keys:
-            new_results[key] = []
-            for result in self.results:
-                new_results[key].append(result[key])
 
-        for i, key in enumerate(self.sweep_vars):
-            new_results[key] = []
-            for sweep in enumerate(self.sweep_vals):
-                new_results[key].append(sweep[i])
+        if n_results > 1:
+            for key in result_keys:
+                new_results[key] = []
+                for result in self.results:
+                    new_results[key].append(result[key])
+
+            for i, key in enumerate(self.sweep_vars):
+                new_results[key] = []
+                for sweep in self.sweep_vals:
+                    new_results[key].append(sweep[i])
+        else:
+            new_results = self.results[0]
 
         return new_results
 

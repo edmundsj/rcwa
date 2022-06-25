@@ -1,6 +1,6 @@
 import unittest
 from rcwa import Source, Layer, Crystal, Solver, LayerStack
-from rcwa import testLocation
+from rcwa import test_dir
 from rcwa.shorthand import *
 from rcwa.testing import *
 from rcwa.matrices import *
@@ -126,7 +126,7 @@ class TestSolver(unittest.TestCase):
         self.absoluteTolerance = 1e-4
         self.relativeTolerance = 1e-3
 
-        devicePermittivityCellData = np.transpose(np.loadtxt(testLocation + '/triangleData.csv', delimiter=','))
+        devicePermittivityCellData = np.transpose(np.loadtxt(test_dir + '/triangleData.csv', delimiter=','))
         devicePermeabilityCellData = 1 + 0 * devicePermittivityCellData
 
         reflectionLayer = Layer(er=2.0, ur=1.0)
@@ -166,65 +166,65 @@ class TestSolver(unittest.TestCase):
         self.Ky = np.diag(complexArray(
             [1.9457, 1.9457, 1.9457, 0.6124, 0.6124, 0.6124, -0.7210, -0.7210, -0.7210]))
         self.KzReflectionRegion = numpyArrayFromFile(
-                testLocation + "/matrixDataOblique/reflectionRegion/KzReflectionRegion.txt")
+            test_dir + "/matrixDataOblique/reflectionRegion/KzReflectionRegion.txt")
         self.KzTransmissionRegion = np.diag(complexArray(
             [0.5989, 2.0222, 2.2820, 1.9415, 2.7386, 2.9357, 1.9039, 2.7121, 2.9109]))
         self.KzGapRegion = numpyArrayFromFile(
-                testLocation + "/matrixDataOblique/freeSpace/KzFreeSpace.txt")
+            test_dir + "/matrixDataOblique/freeSpace/KzFreeSpace.txt")
 
         self.SGlobal11= numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/SGlobal11.txt")
+            test_dir + "/matrixDataOblique/SGlobal11.txt")
         self.SGlobal12= numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/SGlobal12.txt")
+            test_dir + "/matrixDataOblique/SGlobal12.txt")
         self.SGlobal21= numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/SGlobal21.txt")
+            test_dir + "/matrixDataOblique/SGlobal21.txt")
         self.SGlobal22= numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/SGlobal22.txt")
+            test_dir + "/matrixDataOblique/SGlobal22.txt")
         self.SGlobal = complexArray([
             [self.SGlobal11, self.SGlobal12],
             [self.SGlobal21, self.SGlobal22]])
 
         self.S11ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/reflectionRegion/S11ReflectionRegion.txt")
+            test_dir + "/matrixDataOblique/reflectionRegion/S11ReflectionRegion.txt")
         self.S12ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/reflectionRegion/S12ReflectionRegion.txt")
+            test_dir + "/matrixDataOblique/reflectionRegion/S12ReflectionRegion.txt")
         self.S21ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/reflectionRegion/S21ReflectionRegion.txt")
+            test_dir + "/matrixDataOblique/reflectionRegion/S21ReflectionRegion.txt")
         self.S22ReflectionRegion = numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/reflectionRegion/S22ReflectionRegion.txt")
+            test_dir + "/matrixDataOblique/reflectionRegion/S22ReflectionRegion.txt")
         self.SReflectionRegion = complexArray([
             [self.S11ReflectionRegion, self.S12ReflectionRegion],
             [self.S21ReflectionRegion, self.S22ReflectionRegion]])
 
         self.S11TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/transmissionRegion/S11TransmissionRegion.txt")
+            test_dir + "/matrixDataOblique/transmissionRegion/S11TransmissionRegion.txt")
         self.S12TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/transmissionRegion/S12TransmissionRegion.txt")
+            test_dir + "/matrixDataOblique/transmissionRegion/S12TransmissionRegion.txt")
         self.S21TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/transmissionRegion/S21TransmissionRegion.txt")
+            test_dir + "/matrixDataOblique/transmissionRegion/S21TransmissionRegion.txt")
         self.S22TransmissionRegion = numpyArrayFromSeparatedColumnsFile(
-                testLocation + "/matrixDataOblique/transmissionRegion/S22TransmissionRegion.txt")
+            test_dir + "/matrixDataOblique/transmissionRegion/S22TransmissionRegion.txt")
         self.STransmissionRegion = complexArray([
             [self.S11TransmissionRegion, self.S12TransmissionRegion],
             [self.S21TransmissionRegion, self.S22TransmissionRegion]])
 
-        self.S11Layer1 = numpyArrayFromSeparatedColumnsFile(testLocation + "/matrixDataOblique/layer1/S11Layer1.txt")
-        self.S12Layer1 = numpyArrayFromSeparatedColumnsFile(testLocation + "/matrixDataOblique/layer1/S12Layer1.txt")
-        self.S21Layer1 = numpyArrayFromSeparatedColumnsFile(testLocation + "/matrixDataOblique/layer1/S21Layer1.txt")
-        self.S22Layer1 = numpyArrayFromSeparatedColumnsFile(testLocation + "/matrixDataOblique/layer1/S22Layer1.txt")
+        self.S11Layer1 = numpyArrayFromSeparatedColumnsFile(test_dir + "/matrixDataOblique/layer1/S11Layer1.txt")
+        self.S12Layer1 = numpyArrayFromSeparatedColumnsFile(test_dir + "/matrixDataOblique/layer1/S12Layer1.txt")
+        self.S21Layer1 = numpyArrayFromSeparatedColumnsFile(test_dir + "/matrixDataOblique/layer1/S21Layer1.txt")
+        self.S22Layer1 = numpyArrayFromSeparatedColumnsFile(test_dir + "/matrixDataOblique/layer1/S22Layer1.txt")
         self.SLayer1 = complexArray([
             [self.S11Layer1, self.S12Layer1],
             [self.S21Layer1, self.S22Layer1]])
 
-        self.S11Layer2 = numpyArrayFromSeparatedColumnsFile(testLocation + "/matrixDataOblique/layer2/S11Layer2.txt")
-        self.S12Layer2 = numpyArrayFromSeparatedColumnsFile(testLocation + "/matrixDataOblique/layer2/S12Layer2.txt")
-        self.S21Layer2 = numpyArrayFromSeparatedColumnsFile(testLocation + "/matrixDataOblique/layer2/S21Layer2.txt")
-        self.S22Layer2 = numpyArrayFromSeparatedColumnsFile(testLocation + "/matrixDataOblique/layer2/S22Layer2.txt")
+        self.S11Layer2 = numpyArrayFromSeparatedColumnsFile(test_dir + "/matrixDataOblique/layer2/S11Layer2.txt")
+        self.S12Layer2 = numpyArrayFromSeparatedColumnsFile(test_dir + "/matrixDataOblique/layer2/S12Layer2.txt")
+        self.S21Layer2 = numpyArrayFromSeparatedColumnsFile(test_dir + "/matrixDataOblique/layer2/S21Layer2.txt")
+        self.S22Layer2 = numpyArrayFromSeparatedColumnsFile(test_dir + "/matrixDataOblique/layer2/S22Layer2.txt")
         self.SLayer2 = complexArray([
             [self.S11Layer2, self.S12Layer2],
             [self.S21Layer2, self.S22Layer2]])
-        self.DLayer12= np.loadtxt(testLocation + '/matrixDataOblique/layer2/D12.csv', dtype=np.cdouble)
-        self.FLayer12= np.loadtxt(testLocation + '/matrixDataOblique/layer2/F12.csv', dtype=np.cdouble)
+        self.DLayer12= np.loadtxt(test_dir + '/matrixDataOblique/layer2/D12.csv', dtype=np.cdouble)
+        self.FLayer12= np.loadtxt(test_dir + '/matrixDataOblique/layer2/F12.csv', dtype=np.cdouble)
 
         self.rx = complexArray([-0.0187- 0.0155j, 0.0486 - 0.0467j, 0.0016 + 0.0012j,
             0.0324 - 0.0229j, -0.1606 - 0.0348j, -0.0089 + 0.0156j,
