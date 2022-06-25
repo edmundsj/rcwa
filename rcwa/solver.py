@@ -21,8 +21,7 @@ class Solver:
         self.source.layer = layer_stack.incident_layer
         self.layer_stack.source = source
 
-        self.layer_stack.set_convolution_matrices(self.n_harmonics)
-        self.baseCrystal = self.layer_stack.crystal
+        self._initialize()
         self._k_matrices()
         self._gap_matrices()
         self._outer_matrices()
@@ -102,7 +101,7 @@ class Solver:
         self.TTot = np.sum(self.T)
         self.conservation = self.RTot + self.TTot
 
-        if self.TMMSimulation is True:
+        if self.TMMSimulation:
             self.rTEM = calculateTEMReflectionCoefficientsFromXYZ(self.source, self.rx, self.ry, self.rz)
 
     def _package_results(self):
@@ -139,11 +138,11 @@ class Solver:
         tempResults['R'], tempResults['T'] = deepcopy((self.R, self.T))
         tempResults['RTot'], tempResults['TTot'], tempResults['conservation'] = \
                 deepcopy((self.RTot, self.TTot, self.conservation))
-        tempResults['crystal'] = deepcopy(self.baseCrystal)
+        tempResults['crystal'] = deepcopy(self.base_crystal)
         tempResults['source'] = deepcopy(self.source)
         tempResults['S'] = deepcopy(self.SGlobal)
 
-        if self.TMMSimulation is True:
+        if self.TMMSimulation:
             tempResults['rTE'] = self.rTEM[0]
             tempResults['rTM'] = self.rTEM[1]
             rho = tempResults['rTM'] / tempResults['rTE']
@@ -153,35 +152,51 @@ class Solver:
 
         self.results.append(tempResults)
 
+    @property
+    def _k_dimension(self):
+        if self.TMMSimulation:
+            k_dim = 1
+        else:
+            k_dim = np.prod(self.n_harmonics)
+
+        return k_dim
+
+    @property
+    def _s_element_dimension(self):
+        s_dim = self._k_dimension * 2
+        return s_dim
+        
+    @property
+    def _s_element_shape(self):
+        s_dim = self._s_element_dimension
+        s_shape = (s_dim, s_dim)
+        return s_shape
+
+    @property
+    def base_crystal(self):
+        return self.layer_stack.crystal
+
     def _k_matrices(self):
         """
         Sets up the Kx, Ky, and Kz matrices for solving the simulation once the source, crystal, and
         number harmonics are known.
         """
-        self.Kx = kx_matrix(self.source, self.baseCrystal, self.n_harmonics)
-        self.Ky = ky_matrix(self.source, self.baseCrystal, self.n_harmonics)
-        if isinstance(self.Kx, np.ndarray):
-            self.KDimension = self.Kx.shape[0]
-            self.TMMSimulation = False
-        else:
-            self.KDimension = 1
-            # Ensure that Kz for the gap layer is 1
+        self.Kx = kx_matrix(self.source, self.base_crystal, self.n_harmonics)
+        self.Ky = ky_matrix(self.source, self.base_crystal, self.n_harmonics)
+
+        if self.TMMSimulation: # Ensure that Kz for the gap layer is 1
             self.layer_stack.gapLayer = Layer(er=1 + sq(self.Kx) + sq(self.Ky), ur=1, thickness=0)
-            self.TMMSimulation = True
 
         self.KzReflectionRegion = calculateKzBackward(self.Kx, self.Ky, self.layer_stack.incident_layer)
         self.KzTransmissionRegion = calculateKzForward(self.Kx, self.Ky, self.layer_stack.transmission_layer)
         self.KzGapRegion = calculateKzForward(self.Kx, self.Ky, self.layer_stack.gapLayer)
 
-        self.scatteringElementDimension = self.KDimension * 2
-        self.scatteringElementShape = (self.scatteringElementDimension, self.scatteringElementDimension)
-
     def _outer_matrices(self):
-        self.WReflectionRegion = complexIdentity(self.scatteringElementDimension)
-        self.WTransmissionRegion = complexIdentity(self.scatteringElementDimension)
+        self.WReflectionRegion = complexIdentity(self._s_element_dimension)
+        self.WTransmissionRegion = complexIdentity(self._s_element_dimension)
 
     def _gap_matrices(self):
-        self.WGap = complexIdentity(self.scatteringElementDimension)
+        self.WGap = complexIdentity(self._s_element_dimension)
         QGap = calculateQMatrix(self.Kx, self.Ky, self.layer_stack.gapLayer)
         LambdaGap = calculateLambdaMatrix(self.KzGapRegion)
         self.VGap = QGap @ inv(LambdaGap)
@@ -201,7 +216,12 @@ class Solver:
         self.SGlobal = calculateRedhefferProduct(self.SReflection, self.SGlobal)
 
     def _initialize(self):
-        self.SGlobal = generateTransparentSMatrix(self.scatteringElementShape)
+        if self.base_crystal is None:
+            self.TMMSimulation = True
+        else:
+            self.TMMSimulation = False
+
+        self.SGlobal = generateTransparentSMatrix(self._s_element_shape)
         self.rx, self.ry, self.rz = None, None, None
         self.tx, self.ty, self.tz = None, None, None
         self.R, self.T, self.RTot, self.TTot, self.CTot = None, None, None, None, None
