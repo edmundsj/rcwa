@@ -75,3 +75,12 @@ def test_triangular_er_data(triangle):
     desired_ur_slices = [[1, 1, 1],[1, 1, 1], [1, 1, 1]]
     assert_equal(er_slices, desired_er_slices)
     assert_equal(ur_slices, desired_ur_slices)
+
+def test_triangular_slice(triangle):
+    layers = triangle.slice()
+    desired_er_slices = [[0.5, 0.5, 0.5], [0.5, 0.5, 2],[0.5, 2, 2]]
+    desired_ur_slices = [[1, 1, 1],[1, 1, 1], [1, 1, 1]]
+    er_slices = [layer.crystal.permittivityCellData for layer in layers]
+    ur_slices = [layer.crystal.permeabilityCellData for layer in layers]
+    assert_equal(er_slices, desired_er_slices)
+    assert_equal(ur_slices, desired_ur_slices)

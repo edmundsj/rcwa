@@ -61,7 +61,7 @@ class TriangularGrating(Grating):
         er_slices, ur_slices = self._er_data()
         crystals = [Crystal(er, ur, self.lattice_vector) \
                     for er, ur in zip(er_slices, ur_slices)]
-        self.layers = [Layer(crystal=crystal, L=t/Nz) for crystal in crystals]
+        self.layers = [Layer(crystal=crystal, L=self.t/self.Nz) for crystal in crystals]
 
         return self.layers
 

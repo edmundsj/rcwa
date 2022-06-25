@@ -1,5 +1,5 @@
 import unittest
-from rcwa import Source, Layer, LayerStack, Crystal, Solver, RectangularGrating
+from rcwa import Source, Layer, LayerStack, Crystal, Solver, TriangularGrating
 from rcwa.utils import Plotter
 from rcwa.shorthand import complexArray
 import numpy as np
@@ -23,8 +23,8 @@ crystal_thickness = 0.5
 
 N_harmonics = 11
 
-grating_layer = RectangularGrating(period=2, t=0.5, n=4, n_void=1,Nx=500, shape='rectangular')
-layer_stack = LayerStack(reflection_layer, grating_layer, transmission_layer)
+grating = TriangularGrating(period=2, t=0.5, n=4, n_void=1,Nx=500)
+layer_stack = LayerStack(reflection_layer, *grating.slice(), transmission_layer)
 
 solver = Solver(layer_stack, source, N_harmonics)
 solver.Solve()
