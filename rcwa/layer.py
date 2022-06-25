@@ -135,7 +135,7 @@ class LayerStack:
     """
     Class that defines overall geometry in terms of a stack of layers
 
-    :param layers: Layer objects, starting with the bottom-most layer (substrate) and ending with the top-most region (where the source is incident from)
+    :param layers: Layer objects, starting with the top-most layer (reflection region) and ending with the top-most region (substrate)
     """
     def __init__(self, *layers):
         if len(layers) == 1:
