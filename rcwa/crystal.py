@@ -1,40 +1,41 @@
 from rcwa.shorthand import *
 
+
 class Crystal:
     """
     Class used for defining periodic structures in x and y
 
-    :param permittivityCellData: 2D numpy array of permittivity values
-    :param permeabilityCellData: 2D numpy array of permeability values
-    :param latticeVectors: Real-space lattice vectors
+    :param er: 2D numpy array of permittivity values
+    :param ur: 2D numpy array of permeability values
+    :param lattice_vectors: Real-space lattice vectors
     """
-    def __init__(self, permittivityCellData=1, permeabilityCellData=1, *latticeVectors):
-        self.permeabilityCellData = permeabilityCellData
-        self.permittivityCellData = permittivityCellData
+    def __init__(self, *lattice_vectors, er=1, ur=1):
+        self.permeabilityCellData = ur
+        self.permittivityCellData = er
 
-        self.dimensions = len(latticeVectors)
-        rawLatticeVectors = np.array(latticeVectors)
-        self.latticeVectors = []
+        self.dimensions = len(lattice_vectors)
+        raw_lattice_vectors = np.array(lattice_vectors)
+        self.lattice_vectors = []
 
-        if len(rawLatticeVectors[0]) < self.dimensions:
+        if len(raw_lattice_vectors[0]) < self.dimensions:
             raise ValueError('Lattice vector does not have enough dimensions. Needs at least {self.dimensions}')
 
         if self.dimensions == 1:
-            self.latticeVectors.append(rawLatticeVectors[0, 0:2])
+            self.lattice_vectors.append(raw_lattice_vectors[0, 0:2])
 
-        if(self.dimensions == 2):
-            self.latticeVectors.append(rawLatticeVectors[0, 0:2])
-            self.latticeVectors.append(rawLatticeVectors[1, 0:2])
+        if self.dimensions == 2:
+            self.lattice_vectors.append(raw_lattice_vectors[0, 0:2])
+            self.lattice_vectors.append(raw_lattice_vectors[1, 0:2])
 
-        if(self.dimensions > 0):
+        if self.dimensions > 0:
             self.reciprocalLatticeVectors = self.calculateReciprocalLatticeVectors();
             self.crystalType = self.determineCrystalType();
-            self.latticeConstant = norm(self.latticeVectors[0]) # TODO: Make this more general
+            self.latticeConstant = norm(self.lattice_vectors[0]) # TODO: Make this more general
 
             if self.dimensions > 1:
-                (self.keySymmetryPoints, self.keySymmetryNames) = self.generateKeySymmetryPoints()
+                (self.symmetry_points, self.keySymmetryNames) = self.generateKeySymmetryPoints()
             else:
-                self.keySymmetryPoints, self.keySymmetryNames  = None, None
+                self.symmetry_points, self.keySymmetryNames  = None, None
 
 
     def calculateReciprocalLatticeVectors(self):
@@ -49,7 +50,7 @@ class Crystal:
                     " Not currently implemented.")
 
     def calculateReciprocalLatticeVectors1D(self):
-        t1 = self.latticeVectors[0]
+        t1 = self.lattice_vectors[0]
         t1_direction = t1 / np.linalg.norm(t1)
 
         T1 = 2 * pi / np.linalg.norm(t1) * t1_direction
@@ -59,8 +60,8 @@ class Crystal:
         rotationMatirx90Degrees = complexArray([
             [0,-1],
             [1,0]]);
-        t1 = self.latticeVectors[0];
-        t2 = self.latticeVectors[1];
+        t1 = self.lattice_vectors[0];
+        t2 = self.lattice_vectors[1];
 
         T1 = 2 * pi * rotationMatirx90Degrees @ t2 / dot(t1, rotationMatirx90Degrees @ t2);
         T2 = 2 * pi * rotationMatirx90Degrees @ t1 / dot(t2, rotationMatirx90Degrees @ t1);
@@ -70,17 +71,17 @@ class Crystal:
         rotationMatirx90Degrees = complexArray([
             [0,-1],
             [1,0]]);
-        t1 = self.latticeVectors[0];
-        t2 = self.latticeVectors[1];
+        t1 = self.lattice_vectors[0];
+        t2 = self.lattice_vectors[1];
 
         T1 = 2 * pi * rotationMatirx90Degrees @ t2 / dot(t1, rotationMatirx90Degrees @ t2);
         T2 = 2 * pi * rotationMatirx90Degrees @ t1 / dot(t2, rotationMatirx90Degrees @ t1);
         return (T1, T2);
 
     def calculateReciprocalLatticeVectors3D(self):
-        t1 = self.latticeVectors[0];
-        t2 = self.latticeVectors[1];
-        t3 = self.latticeVectors[2];
+        t1 = self.lattice_vectors[0];
+        t2 = self.lattice_vectors[1];
+        t3 = self.lattice_vectors[2];
         T1 = 2 * pi * cross(t2, t3) / dot(t1, cross(t2, t3));
         T2 = 2 * pi * cross(t3, t1) / dot(t2, cross(t3, t1));
         T3 = 2 * pi * cross(t1, t2) / dot(t3, cross(t1, t2));

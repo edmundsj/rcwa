@@ -14,15 +14,15 @@ def crystal_1D():
 def testExtractCrystal():
     t1 = np.array([1,0,0])
     t2 = np.array([0,1,0])
-    testCrystal = Crystal(1, 1, t1, t2)
+    testCrystal = Crystal(t1, t2)
     testLayer = Layer(crystal=testCrystal)
     testStack = LayerStack(freeSpaceLayer, testLayer, freeSpaceLayer)
 
     actualCrystal = testCrystal
-    calculatedCrystal = testStack.extractCrystal()
+    calculatedCrystal = testStack.crystal
     assertEqual(testCrystal, actualCrystal)
 
     testStack = LayerStack(freeSpaceLayer, freeSpaceLayer, testLayer, freeSpaceLayer)
 
-    calculatedCrystal = testStack.extractCrystal()
+    calculatedCrystal = testStack.crystal
     assertEqual(calculatedCrystal, actualCrystal)

@@ -1,12 +1,13 @@
 from rcwa import Layer, Slicer, Crystal
 import numpy as np
 
+
 class Grating(Layer):
     """
     Base class that doesn't do much at all.
     """
 
-    def set_eun(self, n, n_void, er, er_void, ur, ur_void):
+    def _set_eun(self, n, n_void, er, er_void, ur, ur_void):
         if n is not None:
             self._er = np.square(n)
             self._er_void = np.square(n_void)
@@ -30,6 +31,7 @@ class Grating(Layer):
             self.lattice_vector = np.array([period, 0])
             self.period = period
 
+
 class TriangularGrating(Grating):
     """
     Class for one-dimensional triangular (ramp or blaze) gratings
@@ -48,33 +50,33 @@ class TriangularGrating(Grating):
     """
     def __init__(self, period=1, er=2, ur=1, n=None, t=0.1,
                  er_void=1, ur_void=1, n_void=1, Nx=500, Nz=10,
-                lattice_vector=None):
+                 lattice_vector=None):
         self.Nx = Nx
         self.Nz = Nz
         self.t = t
 
-        self.set_eun(n=n, n_void=n_void, er=er, er_void=er_void, ur=ur, ur_void=ur_void)
+        self._set_eun(n=n, n_void=n_void, er=er, er_void=er_void, ur=ur, ur_void=ur_void)
         self.set_lv_period(period=period, lattice_vector=lattice_vector)
-        super().__init__(L=t)
+        super().__init__(thickness=t)
 
     def slice(self):
         er_slices, ur_slices = self._er_data()
-        crystals = [Crystal(er, ur, self.lattice_vector) \
+        crystals = [Crystal(self.lattice_vector, er=er, ur=ur) \
                     for er, ur in zip(er_slices, ur_slices)]
-        self.layers = [Layer(crystal=crystal, L=self.t/self.Nz) for crystal in crystals]
+        self.layers = [Layer(crystal=crystal, thickness=self.t / self.Nz) for crystal in crystals]
 
         return self.layers
 
     def _er_data(self):
         def triangle_func_er(x, y, z):
             in_void = z >= self.t * x / self.period
-            er_data = in_void * (self._er_void - self._er) + self._er
-            return er_data
+            er = in_void * (self._er_void - self._er) + self._er
+            return er
 
         def triangle_func_ur(x, y, z):
             in_void = z >= self.t * x / self.period
-            ur_data = in_void * (self._ur_void - self._ur) + self._ur
-            return ur_data
+            ur = in_void * (self._ur_void - self._ur) + self._ur
+            return ur
 
         slicer_er = Slicer(
             func=triangle_func_er, xmin=0, xmax=self.period, ymin=0, ymax=1, zmin=0, zmax=self.t,
@@ -92,6 +94,7 @@ class TriangularGrating(Grating):
         ur_slices.reverse()
         return er_slices, ur_slices
 
+
 class RectangularGrating(Grating):
     """
     Class used for simple generation of 1D gratings. By default oriented with periodicity along the x-direction.
@@ -105,30 +108,30 @@ class RectangularGrating(Grating):
     :param ur_void: Permeability of the voids in the grating
     :param n_void: Refractive index of the voids in the grating. Overrides permittivity / permeability iif used.
     :param groove_width: Width of the empty spaces (voids) in the grating. Must be smaller than period
-    :param Nx: Number of points along x to divide the grating into
+    :param nx: Number of points along x to divide the grating into
     :param lattice_vector: Explicit lattice vector for grating. Overrides period.
     """
     def __init__(self, period=1, er=2, ur=1, n=None, t=0.1,
                  er_void=1, ur_void=1, n_void=1,
-                 groove_width=0.5, Nx=500, lattice_vector=None):
+                 groove_width=0.5, nx=500, lattice_vector=None):
 
         if groove_width > period:
             raise ValueError(f'Groove width {groove_width} must be larger than period {period}')
 
         self.t = t
-        self.Nx = Nx
+        self.nx = nx
 
-        self.set_eun(n=n, n_void=n_void, er=er, er_void=er_void, ur=ur, ur_void=ur_void)
+        self._set_eun(n=n, n_void=n_void, er=er, er_void=er_void, ur=ur, ur_void=ur_void)
         self.set_lv_period(period=period, lattice_vector=lattice_vector)
 
         groove_fraction = groove_width / period
 
         er_data, ur_data = self._er_data(
             er=er, ur=ur, n=n, er_void=er_void, ur_void=ur_void, n_void=n_void,
-            Nx=Nx, groove_fraction=groove_fraction)
+            Nx=nx, groove_fraction=groove_fraction)
 
-        crystal = Crystal(er_data, ur_data, self.lattice_vector)
-        super().__init__(L=t, crystal=crystal)
+        crystal = Crystal(self.lattice_vector, er=er_data, ur=ur_data)
+        super().__init__(thickness=t, crystal=crystal)
 
     def _er_data(self, er=2, er_void=1, ur=1, ur_void=1, n=None, n_void=1, Nx=500,
                               groove_fraction=0.5):

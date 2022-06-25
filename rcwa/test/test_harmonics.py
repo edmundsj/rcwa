@@ -163,7 +163,7 @@ class testHarmonicFunctions(unittest.TestCase):
         self.ER = (self.er-1) * np.heaviside(sq(X) + sq(Y) - sq(self.r),1)
         self.ER = self.ER + 1;
         source = Source()
-        self.crystal = Crystal(self.ER, self.UR, self.t1, self.t2)
+        self.crystal = Crystal(self.t1, self.t2, er=self.ER, ur=self.UR)
 
         # The data for Kx, Ky, and Kz will be re-used at each point of key symmetry
         self.KxMatrixGPoint = complexZeros(self.matrixShape);

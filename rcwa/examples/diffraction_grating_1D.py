@@ -23,11 +23,11 @@ crystal_thickness = 0.5
 
 N_harmonics = 11
 
-grating_layer = RectangularGrating(period=2, t=0.5, n=4, n_void=1,Nx=500, shape='rectangular')
+grating_layer = RectangularGrating(period=2, t=0.5, n=4, n_void=1, nx=500, shape='rectangular')
 layer_stack = LayerStack(reflection_layer, grating_layer, transmission_layer)
 
 solver = Solver(layer_stack, source, N_harmonics)
-solver.Solve()
+solver.solve()
 
 # Get the amplitude reflection and transmission coefficients
 (rxCalculated, ryCalculated, rzCalculated) = (solver.rx, solver.ry, solver.rz)

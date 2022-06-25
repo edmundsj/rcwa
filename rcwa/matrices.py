@@ -155,7 +155,7 @@ def calculateVWXMatrices1Harmonic(kx, ky, kz, layer, source):
     O = calculateLambdaMatrix(kz);
     OInverse = pinv(O);
     W = complexIdentity(2)
-    X = matrixExponentiate(O * source.k0 * layer.L)
+    X = matrixExponentiate(O * source.k0 * layer.thickness)
     V = Q @ W @ OInverse;
 
     return (V, W, X);
@@ -171,7 +171,7 @@ def calculateVWXMatricesNHarmonics(Kx, Ky, layer, source):
         Lambda = np.diag(sqrt(eigenValues))
         LambdaInverse = np.diag(np.reciprocal(sqrt(eigenValues)))
         V = Q @ W @ LambdaInverse
-        X = matrixExponentiate( -Lambda * source.k0 * layer.L)
+        X = matrixExponentiate(-Lambda * source.k0 * layer.thickness)
         return (V, W, X)
     else:
         Kz = calculateKzForward(Kx, Ky, layer)
@@ -179,7 +179,7 @@ def calculateVWXMatricesNHarmonics(Kx, Ky, layer, source):
         LambdaInverse = pinv(Lambda)
         W = complexIdentity(2*Kz.shape[0])
         V = Q @ W @ LambdaInverse
-        X = matrixExponentiate( -Lambda * source.k0 * layer.L)
+        X = matrixExponentiate(-Lambda * source.k0 * layer.thickness)
         return (V, W, X)
 
 def calculateInternalSMatrix(kx, ky, layer, source, Wg, Vg):

@@ -3,79 +3,80 @@ from rcwa.matrices import *
 from rcwa.harmonics import *
 from rcwa import Layer, LayerStack
 from copy import deepcopy
-from progressbar import ProgressBar, AnimatedMarker, Percentage, Bar, Counter, ETA
-import time
+from progressbar import ProgressBar, Bar, Counter, ETA
 from itertools import product
+
 
 class Solver:
     """ Main class that invokes all methods necessary to solve an RCWA/TMM simulation
 
-    :param layerStack: layerStack: Stack of layers to simulate
+    :param layer_stack: layerStack: Stack of layers to simulate
     :param source: Source object which includes wavelength and direction information
-    :param numberHarmonics: The number of harmonics in x, y to simulate (number of Fourier components). For planar films this should be 1. For 1D diffraction gratings this should be a single integer. For 2D periodic films this should be a 2-tuple. Must be an odd number.
+    :param n_harmonics: The number of harmonics in x, y to simulate (number of Fourier components). For planar films this should be 1. For 1D diffraction gratings this should be a single integer. For 2D periodic films this should be a 2-tuple. Must be an odd number.
     """
-    def __init__(self, layerStack, source, numberHarmonics=1):
-        self.numberHarmonics = numberHarmonics
-        self.layerStack = layerStack
+    def __init__(self, layer_stack, source, n_harmonics=1):
+        self.n_harmonics = n_harmonics
+        self.layerStack = layer_stack
         self.source = source
-        self.source.layer = layerStack.reflectionLayer
+        self.source.layer = layer_stack.reflectionLayer
         self.layerStack.source = source
 
-        self.layerStack.setConvolutionMatrix(numberHarmonics)
-        self.baseCrystal = self.layerStack.extractCrystal()
-        self.setupKMatrices()
-        self.setupGapMatrices()
-        self.setupReflectionTransmissionMatrices()
+        self.layerStack._set_convolution_matrices(n_harmonics)
+        self.baseCrystal = self.layerStack.crystal
+        self._k_matrices()
+        self._gap_matrices()
+        self._outer_matrices()
         self.results = []
-        self.ClearSolution()
 
-    def Solve(self, **sweep_kw):
+    def solve(self, **sweep_kw):
         """
         Solves the simulation or performs a simulation sweep of the desired parameters
 
         :param sweep_kw: Source variables to sweep (theta, phi, wavelength, etc.). Can either be a single keyword argument or several. If several are used, all combinations of the two parameters will be made
         """
-
+        self._flush_solution()
         self.source.layer = self.layerStack.reflectionLayer
-        sweep_vars, sweep_vals = self.sweeps(**sweep_kw)
-        N_sweeps = len(sweep_vals)
+        sweep_vars, sweep_vals = self._sweeps(**sweep_kw)
+        n_sweeps = len(sweep_vals)
 
-        bar = ProgressBar(widgets=[Counter(), f'/{N_sweeps} ', Bar(), ETA()], max_value=N_sweeps).start()
+        bar = ProgressBar(widgets=[Counter(), f'/{n_sweeps} ', Bar(), ETA()], max_value=n_sweeps).start()
 
         for i, sweep in enumerate(sweep_vals):
-            self.assign_sweep_vars(sweep_vars, sweep)
-            self.setupKMatrices()
-            self.setupGapMatrices()
-            self.setupReflectionTransmissionMatrices()
-            self.ClearSolution()
-            self.calculateDeviceSMatrix()
-            self.calculateGlobalSMatrix()
-            self.calculateRTQuantities()
-            self.packageResults()
+            self._assign_sweep_vars(sweep_vars, sweep)
+            self._k_matrices()
+            self._gap_matrices()
+            self._outer_matrices()
+            self._flush_solution()
+            self._inner_s_matrix()
+            self._global_s_matrix()
+            self._rt_quantities()
+            self._append_results()
             bar.update(i)
 
         bar.finish()
+        self.results = self._package_results()
 
-    def sweeps(self, **sweep_kw):
+    @staticmethod
+    def _sweeps(**sweep_kw):
         sweep_vars = sweep_kw.keys()
         sweep_vals = list(product(*sweep_kw.values()))
         return sweep_vars, sweep_vals
 
-    def assign_sweep_vars(self, sweep_vars, sweep):
+    def _assign_sweep_vars(self, sweep_vars, sweep):
         for var, val in zip(sweep_vars, sweep):
             if not hasattr(self.source, var):
                 raise ValueError(f'Source does not have attribute {var}. Invalid sweep variable. Available variables are "phi", "theta", "wavelength", "pTEM"')
             setattr(self.source, var, val)
 
-    def calculateRTQuantities(self):
+    def _rt_quantities(self):
         self.rx, self.ry, self.rz = calculateReflectionCoefficient(self.SGlobal, self.Kx, self.Ky,
-                self.KzReflectionRegion, self.WReflectionRegion, self.source, self.numberHarmonics)
+                                                                   self.KzReflectionRegion, self.WReflectionRegion, self.source, self.n_harmonics)
         self.tx, self.ty, self.tz = calculateTransmissionCoefficient(self.SGlobal, self.Kx, self.Ky,
-                self.KzTransmissionRegion, self.WTransmissionRegion, self.source, self.numberHarmonics)
+                                                                     self.KzTransmissionRegion, self.WTransmissionRegion, self.source, self.n_harmonics)
         self.R = calculateDiffractionReflectionEfficiency(self.rx, self.ry, self.rz, self.source,
-                self.KzReflectionRegion, self.layerStack, self.numberHarmonics)
+                                                          self.KzReflectionRegion, self.layerStack, self.n_harmonics)
         self.T = calculateDiffractionTransmissionEfficiency(self.tx, self.ty, self.tz, self.source,
-                self.KzTransmissionRegion, self.layerStack, self.numberHarmonics)
+                                                            self.KzTransmissionRegion, self.layerStack, self.n_harmonics)
         self.RTot = np.sum(self.R)
         self.TTot = np.sum(self.T)
         self.conservation = self.RTot + self.TTot
@@ -83,7 +84,20 @@ class Solver:
         if self.TMMSimulation is True:
             self.rTEM = calculateTEMReflectionCoefficientsFromXYZ(self.source, self.rx, self.ry, self.rz)
 
-    def packageResults(self):
+    def _package_results(self):
+        """
+        Turns the list of simulation results created during simulation into something more useful
+        """
+
+        result_keys = self.results[0].keys()
+        new_results = {k: [] for k in result_keys}
+        for result in self.results:
+            for key in result_keys:
+                new_results[key].append(result[key])
+
+        return new_results
+
+    def _append_results(self):
         """
         Packages the results from the simulation into a dictionary
         """
@@ -107,20 +121,20 @@ class Solver:
 
         self.results.append(tempResults)
 
-    def setupKMatrices(self):
+    def _k_matrices(self):
         """
         Sets up the Kx, Ky, and Kz matrices for solving the simulation once the source, crystal, and
         number harmonics are known.
         """
-        self.Kx = generateKxMatrix(self.source, self.baseCrystal, self.numberHarmonics)
-        self.Ky = generateKyMatrix(self.source, self.baseCrystal, self.numberHarmonics)
+        self.Kx = generateKxMatrix(self.source, self.baseCrystal, self.n_harmonics)
+        self.Ky = generateKyMatrix(self.source, self.baseCrystal, self.n_harmonics)
         if isinstance(self.Kx, np.ndarray):
             self.KDimension = self.Kx.shape[0]
             self.TMMSimulation = False
         else:
             self.KDimension = 1
             # Ensure that Kz for the gap layer is 1
-            self.layerStack.gapLayer = Layer(er=1 + sq(self.Kx) + sq(self.Ky), ur=1, L=0)
+            self.layerStack.gapLayer = Layer(er=1 + sq(self.Kx) + sq(self.Ky), ur=1, thickness=0)
             self.TMMSimulation = True
 
         self.KzReflectionRegion = calculateKzBackward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
@@ -130,24 +144,23 @@ class Solver:
         self.scatteringElementDimension = self.KDimension * 2
         self.scatteringElementShape = (self.scatteringElementDimension, self.scatteringElementDimension)
 
-
-    def setupReflectionTransmissionMatrices(self):
+    def _outer_matrices(self):
         self.WReflectionRegion = complexIdentity(self.scatteringElementDimension)
         self.WTransmissionRegion = complexIdentity(self.scatteringElementDimension)
 
-    def setupGapMatrices(self):
+    def _gap_matrices(self):
         self.WGap = complexIdentity(self.scatteringElementDimension)
         QGap = calculateQMatrix(self.Kx, self.Ky, self.layerStack.gapLayer)
         LambdaGap = calculateLambdaMatrix(self.KzGapRegion)
         self.VGap = QGap @ inv(LambdaGap)
 
-    def calculateDeviceSMatrix(self):
-        for i in range(len(self.layerStack.internalLayer)):
-            self.Si[i] = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[i],
-                    self.source, self.WGap, self.VGap)
+    def _inner_s_matrix(self):
+        for i in range(len(self.layerStack.internal_layers)):
+            self.Si[i] = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[i],
+                                                  self.source, self.WGap, self.VGap)
             self.SGlobal = calculateRedhefferProduct(self.SGlobal, self.Si[i])
 
-    def calculateGlobalSMatrix(self):
+    def _global_s_matrix(self):
         self.STransmission = calculateTransmissionRegionSMatrix(self.Kx, self.Ky, self.layerStack,
                 self.WGap, self.VGap)
         self.SReflection = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.layerStack,
@@ -155,9 +168,10 @@ class Solver:
         self.SGlobal = calculateRedhefferProduct(self.SGlobal, self.STransmission)
         self.SGlobal = calculateRedhefferProduct(self.SReflection, self.SGlobal)
 
-    def ClearSolution(self):
+    def _flush_solution(self):
         self.SGlobal = generateTransparentSMatrix(self.scatteringElementShape)
         self.rx, self.ry, self.rz = None, None, None
         self.tx, self.ty, self.tz = None, None, None
         self.R, self.T, self.RTot, self.TTot, self.CTot = None, None, None, None, None
-        self.Si = [None for _ in range(len(self.layerStack.internalLayer))]
+        self.Si = [None for _ in range(len(self.layerStack.internal_layers))]
+        self.results = []

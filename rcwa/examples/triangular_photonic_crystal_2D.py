@@ -23,11 +23,11 @@ crystalThickness = 0.5
 numberHarmonics = (3, 3)
 
 deviceCrystal = Crystal(devicePermittivityCellData, devicePermeabilityCellData, t1, t2)
-layer1 = Layer(crystal=deviceCrystal, L=crystalThickness, numberHarmonics=numberHarmonics)
+layer1 = Layer(crystal=deviceCrystal, thickness=crystalThickness, numberHarmonics=numberHarmonics)
 layerStack = LayerStack(reflectionLayer, layer1, transmissionLayer)
 
 solver = Solver(layerStack, source, numberHarmonics)
-solver.Solve()
+solver.solve()
 
 # Get the amplitude reflection and transmission coefficients
 (rxCalculated, ryCalculated, rzCalculated) = (solver.rx, solver.ry, solver.rz)

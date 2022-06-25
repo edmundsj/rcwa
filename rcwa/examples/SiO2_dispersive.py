@@ -25,7 +25,7 @@ TMMSolver = Solver(stack, source, (1, 1))
 wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
         stepWavelength)
 
-TMMSolver.Solve(wavelengths=wavelengths)
+TMMSolver.solve(wavelengths=wavelengths)
 #Plotter.plotEllipsometrySpectra(TMMSolver.results)
 Plotter.plotRTSpectra(TMMSolver.results)
 plt.show()

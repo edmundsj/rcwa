@@ -41,33 +41,33 @@ class TestSolver(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance, "testSolver: KzGapRegion")
 
     def testEdgeSMatrices(self):
-        self.solver.Solve()
+        self.solver.solve()
         SActual = self.SReflectionRegion
         SCalculated = self.solver.SReflection
         assertAlmostEqual(SActual, SCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver: SReflection")
 
-        self.solver.Solve()
+        self.solver.solve()
         SActual = self.STransmissionRegion
         SCalculated = self.solver.STransmission
         assertAlmostEqual(SActual, SCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver: STransmission")
 
     def testInternalSMatrices(self):
-        self.solver.Solve()
+        self.solver.solve()
         SActual = self.SLayer1
         SCalculated = self.solver.Si[0]
         assertAlmostEqual(SActual, SCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver: Si[0]")
 
-        self.solver.Solve()
+        self.solver.solve()
         SActual = self.SLayer2
         SCalculated = self.solver.Si[1]
         assertAlmostEqual(SActual, SCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver: Si[1]")
 
     def testrtAmplitudeCoefficients(self):
-        self.solver.Solve()
+        self.solver.solve()
         # HACK - FOR SOME REASON MY PHASE IS OFF BY PI.
         rxActual = -self.rx
         ryActual = -self.ry
@@ -96,7 +96,7 @@ class TestSolver(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance, "testSolver: tz")
 
     def testDiffractionEfficiencies(self):
-        self.solver.Solve()
+        self.solver.solve()
         RActual = self.R
         TActual = self.T
         (RCalculated, TCalculated) = (self.solver.R, self.solver.T)
@@ -119,7 +119,7 @@ class TestSolver(unittest.TestCase):
 
     def testIntegrationMultiWavelength(self):
         testWavelengths = self.solver.source.wavelength*np.arange(0.2,2,0.01)
-        self.solver.Solve(wavelength=testWavelengths)
+        self.solver.solve(wavelength=testWavelengths)
         #Plotter.plotReflectionSpectra(self.solver.results)
 
     def setUp(self):
@@ -149,9 +149,9 @@ class TestSolver(unittest.TestCase):
 
         numberHarmonics = (3, 3)
 
-        deviceCrystal = Crystal(devicePermittivityCellData, devicePermeabilityCellData, t1, t2)
-        layer1 = Layer(crystal=deviceCrystal, L=thicknessLayer1)
-        layer2 = Layer(er=6.0, ur=1.0, L=thicknessLayer2)
+        deviceCrystal = Crystal(t1, t2, er=devicePermittivityCellData, ur=devicePermeabilityCellData)
+        layer1 = Layer(crystal=deviceCrystal, thickness=thicknessLayer1)
+        layer2 = Layer(er=6.0, ur=1.0, thickness=thicknessLayer2)
         layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
 
         self.solver = Solver(layerStack, source, numberHarmonics)

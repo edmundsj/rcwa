@@ -1,6 +1,7 @@
 from rcwa.shorthand import *
 from rcwa import freeSpaceLayer
 
+
 class Source:
     """
     Class for defining monochromatic excitation source
@@ -31,16 +32,16 @@ class Source:
         if not isinstance(other, Source):
             return NotImplemented
         return self.freeSpaceWavelength == other.freeSpaceWavelength and \
-                self.k0 == other.k0 and \
-                self.theta == other.theta and \
-                self.phi == other.phi and \
-                self.pTE == other.pTE and \
-                self.pTM == other.pTM and \
-                self.pX == other.pX and \
-                self.pY == other.pY and \
-                self.kIncident == other.kIncident and \
-                self.aTE == other.aTE and \
-                self.aTM == other.aTM
+            self.k0 == other.k0 and \
+            self.theta == other.theta and \
+            self.phi == other.phi and \
+            self.pTE == other.pTE and \
+            self.pTM == other.pTM and \
+            self.pX == other.pX and \
+            self.pY == other.pY and \
+            self.kIncident == other.kIncident and \
+            self.aTE == other.aTE and \
+            self.aTM == other.aTM
 
     def __str__(self):
         return f'wavelength: {self.freeSpaceWavelength:.3f}, (theta, phi) = ({self.theta:.4f}, {self.phi:.4f})\n' + \
@@ -56,7 +57,6 @@ class Source:
         return complexArray([self.wavelength, self.k0, self.theta, self.phi, self.pTE, self.pTM,
             self.pX, self.pY, self.kIncident[0], self.kIncident[1], self.kIncident[2],
             self.aTE[0], self.aTE[1], self.aTM[0], self.aTM[1]])
-
 
     @property
     def wavelength(self):

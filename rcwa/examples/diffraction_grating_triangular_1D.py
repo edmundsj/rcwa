@@ -27,7 +27,7 @@ grating = TriangularGrating(period=2, t=0.5, n=4, n_void=1,Nx=500)
 layer_stack = LayerStack(reflection_layer, *grating.slice(), transmission_layer)
 
 solver = Solver(layer_stack, source, N_harmonics)
-solver.Solve()
+solver.solve()
 
 # Get the amplitude reflection and transmission coefficients
 (rxCalculated, ryCalculated, rzCalculated) = (solver.rx, solver.ry, solver.rz)

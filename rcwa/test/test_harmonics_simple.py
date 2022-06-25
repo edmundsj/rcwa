@@ -14,7 +14,7 @@ def crystal_1D():
     er = np.array([1, 1, 1, 3, 3, 3])
     ur = 1 + 0 * er
     lattice_vector = [2, 0]
-    crystal = Crystal(er, ur, lattice_vector)
+    crystal = Crystal(lattice_vector, er=er, ur=ur)
 
     yield crystal
 

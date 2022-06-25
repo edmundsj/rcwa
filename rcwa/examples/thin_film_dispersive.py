@@ -20,7 +20,7 @@ data = pd.DataFrame({'Wavelength (um):': si.wavelengths, 'er': si._er_dispersive
 print(data)
 
 reflectionLayer = Layer(n=1) # Free space
-thin_film = Layer(L=0.1, material=si)
+thin_film = Layer(thickness=0.1, material=si)
 transmissionLayer = Layer(n=4)
 stack = LayerStack(reflectionLayer, thin_film, transmissionLayer)
 
@@ -29,7 +29,7 @@ TMMSolver = Solver(stack, source, (1, 1))
 wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
         stepWavelength)
 
-TMMSolver.Solve(wavelengths=wavelengths)
+TMMSolver.solve(wavelengths=wavelengths)
 #Plotter.plotEllipsometrySpectra(TMMSolver.results)
 Plotter.plotRTSpectra(TMMSolver.results)
 plt.show()

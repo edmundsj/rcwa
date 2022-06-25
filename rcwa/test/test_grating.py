@@ -48,7 +48,7 @@ def test_triangle():
 def test_set_eun():
     grating = Grating()
     n, n_void, er, er_void, ur, ur_void = None, 0, 1, 2, 3, 4
-    grating.set_eun(n=None, n_void=n_void, er=er, er_void=er_void, ur=ur, ur_void=ur_void)
+    grating._set_eun(n=None, n_void=n_void, er=er, er_void=er_void, ur=ur, ur_void=ur_void)
     desired_vals = [np.sqrt(er*ur), np.sqrt(er_void*ur_void), er, er_void, ur, ur_void]
     actual_vals = [grating._n, grating._n_void, grating._er, grating._er_void, grating._ur, grating._ur_void]
     assert_allclose(actual_vals, desired_vals)
@@ -56,7 +56,7 @@ def test_set_eun():
 def test_set_eun_override():
     grating = Grating()
     n, n_void, er, er_void, ur, ur_void = 100, 9, 1, 2, 3, 4
-    grating.set_eun(n=n, n_void=n_void, er=er, er_void=er_void, ur=ur, ur_void=ur_void)
+    grating._set_eun(n=n, n_void=n_void, er=er, er_void=er_void, ur=ur, ur_void=ur_void)
     desired_vals = [n, n_void, np.square(n), np.square(n_void), 1, 1]
     actual_vals = [grating._n, grating._n_void, grating._er, grating._er_void, grating._ur, grating._ur_void]
     assert_allclose(actual_vals, desired_vals)

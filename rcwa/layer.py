@@ -3,24 +3,25 @@ from rcwa import Material
 
 # TODO: Convolution matrix generation must be refactored. It's a hot mess and hard to understand.
 
+
 class Layer:
     """
     Class for defining a single layer of a layer stack used in a simulation
 
     :param er: Permittivity of the layer. Overridden by crystal permittivity if specified.
     :param ur: Permeability of the layer. Overridden by crystal permeability if specified.
-    :param L: Thickness of the layer
+    :param thickness: Thickness of the layer
     :param n: Refractive index of the layer. Overridden by cristal er/ur if specified.
     :param material: Material object containing the material's permittivity and permeability as a function of wavelength/angle.
     :param crystal: Crystal object if the layer is periodic in x and/or y. Overrides er, ur, n, and material
     """
-    def __init__(self, er=1.0, ur=1.0, L=0.0, n=None, material=None, crystal=None):
-        if material == None:
+    def __init__(self, er=1.0, ur=1.0, thickness=0.0, n=None, material=None, crystal=None):
+        if material is None:
             self.material = Material(er=er, ur=ur, n=n)
         else:
             self.material = material
 
-        self.L = L
+        self.thickness = thickness
         self.crystal = crystal
 
         if crystal is not None:
@@ -65,26 +66,26 @@ class Layer:
     def source(self, source):
         self.material.source = source
 
-    def setConvolutionMatrix(self, numberHarmonics):
+    def _set_convolution_matrices(self, numberHarmonics):
         if self.crystal is not None:
-            self.er = self.generateConvolutionMatrix(self.crystal.permittivityCellData, numberHarmonics)
-            self.ur = self.generateConvolutionMatrix(self.crystal.permeabilityCellData, numberHarmonics)
+            self.er = self._convolution_matrix(self.crystal.permittivityCellData, numberHarmonics)
+            self.ur = self._convolution_matrix(self.crystal.permeabilityCellData, numberHarmonics)
         else:
             self.er = self.er * complexIdentity(prod(numberHarmonics))
             self.ur = self.ur * complexIdentity(prod(numberHarmonics))
 
-    def generateConvolutionMatrix(self, cellData, numberHarmonics):
-        dataDimension = self.crystal.dimensions;
+    def _convolution_matrix(self, cellData, n_harmonics):
+        dimension = self.crystal.dimensions;
 
-        if isinstance(numberHarmonics, int):
-            numberHarmonics = (numberHarmonics,)
+        if isinstance(n_harmonics, int):
+            n_harmonics = (n_harmonics,)
 
-        if dataDimension == 1:
-            numberHarmonics = (numberHarmonics + (1, 1))
-        elif dataDimension == 2:
-            numberHarmonics = (numberHarmonics + (1,))
+        if dimension == 1:
+            n_harmonics = (n_harmonics + (1, 1))
+        elif dimension == 2:
+            n_harmonics = (n_harmonics + (1,))
 
-        (P, Q, R) = numberHarmonics
+        (P, Q, R) = n_harmonics
 
         convolutionMatrixSize = P*Q*R;
         convolutionMatrixShape = (convolutionMatrixSize, convolutionMatrixSize);
@@ -120,16 +121,18 @@ class Layer:
         if not isinstance(other, Layer):
             return NotImplemented
 
-        return self.er == other.er and self.ur == other.ur and self.L == other.L \
-                    and self.n == other.n and self.crystal == other.crystal
+        return self.er == other.er and self.ur == other.ur and self.thickness == other.thickness \
+               and self.n == other.n and self.crystal == other.crystal
 
     def __str__(self):
-        return f'Layer with\n\ter: {self.er}\n\tur: {self.ur}\n\tL: {self.L}\n\tn: {self.n}\n\tcrystal: {self.crystal}'
+        return f'Layer with\n\ter: {self.er}\n\tur: {self.ur}\n\tL: {self.thickness}\n\tn: {self.n}\n\tcrystal: {self.crystal}'
 
     def __repr__(self):
-        return f'Layer with\n\ter: {self.er}\n\tur: {self.ur}\n\tL: {self.L}\n\tn: {self.n}\n\tcrystal: {self.crystal}'
+        return f'Layer with\n\ter: {self.er}\n\tur: {self.ur}\n\tL: {self.thickness}\n\tn: {self.n}\n\tcrystal: {self.crystal}'
+
 
 freeSpaceLayer = Layer(1,1)
+
 
 class LayerStack:
     """
@@ -141,52 +144,46 @@ class LayerStack:
         if len(layers) == 1:
             if isinstance(layers[0], list):
                 layers = layers[0]
-        self.gapLayer = Layer(1,1)
+        self.gapLayer = Layer(er=1,ur=1)
         if len(layers) == 0:
             self.reflectionLayer = freeSpaceLayer
             self.transmissionLayer = freeSpaceLayer
-            self.internalLayer = []
+            self.internal_layers = []
         elif len(layers) == 1:
             self.reflectionLayer = layers[0]
             self.transmissionLayer = layers[0]
-            self.internalLayer = []
+            self.internal_layers = []
         else:
             self.reflectionLayer = layers[0]
             self.transmissionLayer = layers[-1]
-            self.internalLayer = list(layers[1:-1])
+            self.internal_layers = list(layers[1:-1])
 
     def __eq__(self, other):
         if not isinstance(other, LayerStack):
             return NotImplemented
 
-        reflectionLayersSame = self.reflectionLayer == other.reflectionLayer
-        transmissionLayersSame = self.transmissionLayer == other.transmissionLayer
-        internalLayersSame = False
-        if(len(self.internalLayer) == len(other.internalLayer)):
-            for i in range(len(self.internalLayer)):
-                if self.internalLayer[i] != other.internalLayer[i]:
-                    break;
-            internalLayersSame = True
+        reflection_layers_same = self.reflectionLayer == other.reflectionLayer
+        transmission_layers_same = self.transmissionLayer == other.transmissionLayer
+        internal_layers_same = False
+        if len(self.internal_layers) == len(other.internal_layers):
+            for i in range(len(self.internal_layers)):
+                if self.internal_layers[i] != other.internal_layers[i]:
+                    break
+            internal_layers_same = True
 
-        return internalLayersSame and reflectionLayersSame and transmissionLayersSame
+        return internal_layers_same and reflection_layers_same and transmission_layers_same
 
     def __str__(self):
-        topString= f'\nReflection Layer:\n\t' + str(self.reflectionLayer) + \
+        top_string = f'\nReflection Layer:\n\t' + str(self.reflectionLayer) + \
                 f'\nTransmissionLayer:\n\t' + str(self.transmissionLayer) + \
-                f'\nInternal Layer Count: {len(self.internalLayer)}\n'
-        internalString = ''
-        for layer in self.internalLayer:
-            internalString += str(layer) + '\n'
-        return topString + internalString
+                f'\nInternal Layer Count: {len(self.internal_layers)}\n'
+        internal_string = ''
+        for layer in self.internal_layers:
+            internal_string += str(layer) + '\n'
+        return top_string + internal_string
 
     def __repr__(self):
-        return f'\nReflection Layer:\n\t' + str(self.reflectionLayer) + \
-                f'\nTransmissionLayer:\n\t' + str(self.transmissionLayer) + \
-                f'\nInternal Layer Count: {len(self.internalLayer)}\n'
-        internalString = ''
-        for layer in self.internalLayer:
-            internalString += str(layer) + '\n'
-        return topString + internalString
+        return self.__str__()
 
     @property
     def source(self):
@@ -195,7 +192,7 @@ class LayerStack:
     @source.setter
     def source(self, source):
         self._source = source
-        for layer in self.internalLayer:
+        for layer in self.internal_layers:
             layer.source = self.source
         self.reflectionLayer.source = source
         self.transmissionLayer.source = source
@@ -205,14 +202,15 @@ class LayerStack:
         self.gapLayer.ur = 1
 
     # set all convolution matrices for all interior layers
-    def setConvolutionMatrix(self, numberHarmonics):
-        for layer in self.internalLayer:
-            layer.setConvolutionMatrix(numberHarmonics)
+    def _set_convolution_matrices(self, numberHarmonics):
+        for layer in self.internal_layers:
+            layer._set_convolution_matrices(numberHarmonics)
 
-    def extractCrystal(self):
-        for i in range(len(self.internalLayer)):
-            if self.internalLayer[i].crystal is not None:
-                return self.internalLayer[i].crystal
+    @property
+    def crystal(self):
+        for i in range(len(self.internal_layers)):
+            if self.internal_layers[i].crystal is not None:
+                return self.internal_layers[i].crystal
         return None
 
 emptyStack = LayerStack()

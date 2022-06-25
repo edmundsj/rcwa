@@ -17,9 +17,9 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         t2 = complexArray([0, 1.5, 0])
         erData = np.transpose(np.loadtxt(testLocation + '/triangleData.csv', delimiter=','))
         urData = 1 * complexOnes((512, 439))
-        triangleCrystal = Crystal(erData, urData, t1, t2)
+        triangleCrystal = Crystal(t1, t2, er=erData, ur=urData)
         dummyLayer = Layer(crystal=triangleCrystal)
-        dummyLayer.setConvolutionMatrix(self.numberHarmonics)
+        dummyLayer._set_convolution_matrices(self.numberHarmonics)
 
         convolutionMatrixActual = complexIdentity(9)
         convolutionMatrixCalculated = dummyLayer.ur
@@ -28,7 +28,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
 
         convolutionMatrixCalculated = dummyLayer.er
-        convolutionMatrixActual = self.layerStack.internalLayer[0].er
+        convolutionMatrixActual = self.layerStack.internal_layers[0].er
         assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
                 self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
 
@@ -37,13 +37,13 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         t2 = complexArray([0, 1.5, 0])
         erData = np.transpose(np.loadtxt(testLocation + '/triangleData.csv', delimiter=','))
         urData = 1 * complexOnes((512, 439))
-        triangleCrystal = Crystal(erData, urData, t1, t2)
+        triangleCrystal = Crystal(t1, t2, er=erData, ur=urData)
         dummyLayer = Layer(crystal=triangleCrystal)
         dummyStack = LayerStack(freeSpaceLayer, dummyLayer, freeSpaceLayer)
-        dummyStack.setConvolutionMatrix(self.numberHarmonics)
+        dummyStack._set_convolution_matrices(self.numberHarmonics)
 
-        convolutionMatrixActual = self.layerStack.internalLayer[0].er
-        convolutionMatrixCalculated = dummyStack.internalLayer[0].er
+        convolutionMatrixActual = self.layerStack.internal_layers[0].er
+        convolutionMatrixCalculated = dummyStack.internal_layers[0].er
         assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
                 self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
 
@@ -60,13 +60,13 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
     def testPMatrix(self):
         PActual = self.PLayer1
-        PCalculated = calculatePMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[0])
+        PCalculated = calculatePMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
         assertAlmostEqual(PActual, PCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "P matrix layer 1");
 
     def testQMatrix(self):
         QActual = self.QLayer1
-        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[0])
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
         assertAlmostEqual(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q matrix Layer 1");
 
@@ -87,14 +87,14 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance);
 
     def testWMatrix(self):
-        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0],
-                self.source)
+        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[0],
+                                                   self.source)
         WActual = self.WLayer1
         assertAlmostEqual(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer 1");
 
-        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[1],
-                self.source)
+        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[1],
+                                                   self.source)
         WActual = self.WLayer2
         assertAlmostEqual(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer 2");
@@ -107,8 +107,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         the phase of the columns (just taking absolute value) because the phase is not physically
         significant.
         """
-        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0],
-                self.source)
+        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[0],
+                                                   self.source)
         VActual = self.VLayer1
 
         # Because the physical quantity is lambda squared, the phase of many of the elements 
@@ -122,8 +122,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "V matrix Layer 1");
 
-        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[1],
-                self.source)
+        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[1],
+                                                   self.source)
         VActual = self.VLayer2
 
         # Again do the same here.
@@ -135,7 +135,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
 
     def testXMatrix(self):
-        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internalLayer[0], self.source)
+        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[0], self.source)
         XActual = self.XLayer1
 
         # Numerical error is causing accidental conjugation. To match the test data we need
@@ -190,8 +190,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 "S22 for Layer 1");
 
     def testSMatrixFromFundamentals(self):
-        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internalLayer[0],
-                self.source, self.WFreeSpace, self.VFreeSpace)
+        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0],
+                                                self.source, self.WFreeSpace, self.VFreeSpace)
 
         S11Actual = self.S11Layer1
         S11Calculated = SiCalculated[0,0]
@@ -474,10 +474,10 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         erConvolutionMatrixLayer2 = erDeviceRegion*complexIdentity(9)
         urConvolutionMatrixLayer2 = complexIdentity(9)
         # This is a bit of a hack, but that's good for test purposes.
-        self.layerStack.internalLayer[0].er = erConvolutionMatrixLayer1
-        self.layerStack.internalLayer[0].ur = urConvolutionMatrixLayer1
-        self.layerStack.internalLayer[1].er = erConvolutionMatrixLayer2
-        self.layerStack.internalLayer[1].ur = urConvolutionMatrixLayer2
+        self.layerStack.internal_layers[0].er = erConvolutionMatrixLayer1
+        self.layerStack.internal_layers[0].ur = urConvolutionMatrixLayer1
+        self.layerStack.internal_layers[1].er = erConvolutionMatrixLayer2
+        self.layerStack.internal_layers[1].ur = urConvolutionMatrixLayer2
 
         self.Kx = np.diag(complexArray(
             [2.2035, 1.0607, -0.0822, 2.2035, 1.0607, -0.0822, 2.2035, 1.0607, -0.0822]))

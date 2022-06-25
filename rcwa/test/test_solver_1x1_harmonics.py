@@ -41,20 +41,20 @@ class TestSolver1x1(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: KzGapRegion")
 
     def testEdgeSMatrices(self):
-        self.solver.Solve()
+        self.solver.solve()
         SActual = self.SReflectionRegion
         SCalculated = self.solver.SReflection
         assertAlmostEqual(SActual, SCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: SReflection")
 
-        self.solver.Solve()
+        self.solver.solve()
         SActual = self.STransmissionRegion
         SCalculated = self.solver.STransmission
         assertAlmostEqual(SActual, SCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: STransmission")
 
     def testInternalSMatrices(self):
-        self.solver.Solve()
+        self.solver.solve()
         SActual = self.SLayer1
         SCalculated = self.solver.Si[0]
         assertAlmostEqual(SActual, SCalculated,
@@ -66,7 +66,7 @@ class TestSolver1x1(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: Si[1]")
 
     def testrtAmplitudeCoefficients(self):
-        self.solver.Solve()
+        self.solver.solve()
         rxActual = self.rx
         ryActual = self.ry
         rzActual = self.rz
@@ -100,14 +100,14 @@ class TestSolver1x1(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rTM")
 
     def testEllipsometryData(self):
-        self.solver.Solve()
+        self.solver.solve()
         tanPsiActual = self.tanPsi
         cosDeltaActual = self.cosDelta
         deltaActual = self.delta
 
-        tanPsiCalculated = self.solver.results[0]['tanPsi']
-        deltaCalculated = self.solver.results[0]['delta']
-        cosDeltaCalculated = self.solver.results[0]['cosDelta']
+        tanPsiCalculated = self.solver.results['tanPsi'][0]
+        deltaCalculated = self.solver.results['delta'][0]
+        cosDeltaCalculated = self.solver.results['cosDelta'][0]
 
         assertAlmostEqual(tanPsiActual, tanPsiCalculated,
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tanPsi")
@@ -117,7 +117,7 @@ class TestSolver1x1(unittest.TestCase):
                 self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: cosDelta")
 
     def testRT(self):
-        self.solver.Solve()
+        self.solver.solve()
         RActual = self.R
         TActual = self.T
         (RCalculated, TCalculated) = (self.solver.R, self.solver.T)
@@ -136,13 +136,13 @@ class TestSolver1x1(unittest.TestCase):
 
     def testPackageResults(self):
         """ UNFINISHED """
-        self.solver.Solve()
+        self.solver.solve()
         RActual = self.R
         TActual = self.T
 
     def testIntegrationMultiWavelength(self):
         testWavelengths = self.solver.source.wavelength*np.arange(0.2,2,0.01)
-        self.solver.Solve(wavelength=testWavelengths)
+        self.solver.solve(wavelength=testWavelengths)
 
     def setUp(self):
         self.absoluteTolerance = 1e-4
@@ -167,8 +167,8 @@ class TestSolver1x1(unittest.TestCase):
 
         numberHarmonics = (1,1)
 
-        layer1 = Layer(er=2.0, ur=1.0, L=thicknessLayer1)
-        layer2 = Layer(er=1.0, ur=3.0, L=thicknessLayer2)
+        layer1 = Layer(er=2.0, ur=1.0, thickness=thicknessLayer1)
+        layer2 = Layer(er=1.0, ur=3.0, thickness=thicknessLayer2)
         layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
 
         self.solver = Solver(layerStack, source, numberHarmonics)
