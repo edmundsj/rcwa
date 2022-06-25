@@ -29,76 +29,64 @@ class Crystal:
 
         if self.dimensions > 0:
             self.reciprocalLatticeVectors = self.calculateReciprocalLatticeVectors();
-            self.crystalType = self.determineCrystalType();
+            self.crystalType = self._crystal_type();
             self.latticeConstant = norm(self.lattice_vectors[0]) # TODO: Make this more general
 
             if self.dimensions > 1:
-                (self.symmetry_points, self.keySymmetryNames) = self.generateKeySymmetryPoints()
+                self.symmetry_points, self.key_symmetry_names = self._key_symmetry_points()
             else:
-                self.symmetry_points, self.keySymmetryNames  = None, None
-
+                self.symmetry_points, self.key_symmetry_names = None, None
 
     def calculateReciprocalLatticeVectors(self):
         if self.dimensions == 1:
-            return self.calculateReciprocalLatticeVectors1D()
+            return self._reciprocal_lattice_vectors_1d()
         elif self.dimensions == 2:
-            return self.calculateReciprocalLatticeVectors2D()
+            return self._reciprocal_lattice_vectors_2d()
         elif self.dimensions == 3:
-            return self.calculateReciprocalLatticeVectors3D()
+            return self._reciprocal_lattice_vectors_3d()
         else:
             raise NotImplementedError(f"Cannot calculate reciprocal lattice for {self.dimensions}D." +
                     " Not currently implemented.")
 
-    def calculateReciprocalLatticeVectors1D(self):
+    def _reciprocal_lattice_vectors_1d(self):
         t1 = self.lattice_vectors[0]
         t1_direction = t1 / np.linalg.norm(t1)
 
         T1 = 2 * pi / np.linalg.norm(t1) * t1_direction
         return (T1,)
 
-    def calculateReciprocalLatticeVectors2D(self):
+    def _reciprocal_lattice_vectors_2d(self):
         rotationMatirx90Degrees = complexArray([
-            [0,-1],
-            [1,0]]);
-        t1 = self.lattice_vectors[0];
-        t2 = self.lattice_vectors[1];
+            [0, -1],
+            [1, 0]])
+        t1 = self.lattice_vectors[0]
+        t2 = self.lattice_vectors[1]
 
         T1 = 2 * pi * rotationMatirx90Degrees @ t2 / dot(t1, rotationMatirx90Degrees @ t2);
         T2 = 2 * pi * rotationMatirx90Degrees @ t1 / dot(t2, rotationMatirx90Degrees @ t1);
-        return (T1, T2);
+        return (T1, T2)
 
-    def calculateReciprocalLatticeVectors2D(self):
-        rotationMatirx90Degrees = complexArray([
-            [0,-1],
-            [1,0]]);
-        t1 = self.lattice_vectors[0];
-        t2 = self.lattice_vectors[1];
+    def _reciprocal_lattice_vectors_3d(self):
+        t1 = self.lattice_vectors[0]
+        t2 = self.lattice_vectors[1]
+        t3 = self.lattice_vectors[2]
+        T1 = 2 * pi * cross(t2, t3) / dot(t1, cross(t2, t3))
+        T2 = 2 * pi * cross(t3, t1) / dot(t2, cross(t3, t1))
+        T3 = 2 * pi * cross(t1, t2) / dot(t3, cross(t1, t2))
 
-        T1 = 2 * pi * rotationMatirx90Degrees @ t2 / dot(t1, rotationMatirx90Degrees @ t2);
-        T2 = 2 * pi * rotationMatirx90Degrees @ t1 / dot(t2, rotationMatirx90Degrees @ t1);
-        return (T1, T2);
+        return (T1, T2, T3)
 
-    def calculateReciprocalLatticeVectors3D(self):
-        t1 = self.lattice_vectors[0];
-        t2 = self.lattice_vectors[1];
-        t3 = self.lattice_vectors[2];
-        T1 = 2 * pi * cross(t2, t3) / dot(t1, cross(t2, t3));
-        T2 = 2 * pi * cross(t3, t1) / dot(t2, cross(t3, t1));
-        T3 = 2 * pi * cross(t1, t2) / dot(t3, cross(t1, t2));
-
-        return (T1, T2, T3);
-
-    def determineCrystalType(self):
+    def _crystal_type(self):
         if self.dimensions == 1:
             crystalType = 'SQUARE'
         elif self.dimensions == 2:
-            crystalType = self.determineCrystalType2D()
+            crystalType = self._crystal_type_2d()
         else:
             raise NotImplementedError
 
         return crystalType
 
-    def determineCrystalType2D(self):
+    def _crystal_type_2d(self):
         epsilon = 0.00001
         sideLengthDifference = abs(norm(self.reciprocalLatticeVectors[0]) -
                 norm(self.reciprocalLatticeVectors[1]))
@@ -113,7 +101,7 @@ class Crystal:
         else:
             raise NotImplementedError;
 
-    def generateKeySymmetryPoints(self):
+    def _key_symmetry_points(self):
         keySymmetryPoints = []
         keySymmetryNames = []
         T1 = self.reciprocalLatticeVectors[0]

@@ -2,6 +2,7 @@ from rcwa import Crystal, Layer, LayerStack, Source, freeSpaceLayer
 from rcwa.testing import *
 import numpy as np
 import pytest
+from numpy.testing import assert_equal
 
 @pytest.fixture
 def crystal_1D():
@@ -12,17 +13,17 @@ def crystal_1D():
     return crystal
 
 def testExtractCrystal():
-    t1 = np.array([1,0,0])
-    t2 = np.array([0,1,0])
+    t1 = np.array([1, 0, 0])
+    t2 = np.array([0, 1, 0])
     testCrystal = Crystal(t1, t2)
     testLayer = Layer(crystal=testCrystal)
     testStack = LayerStack(freeSpaceLayer, testLayer, freeSpaceLayer)
 
     actualCrystal = testCrystal
     calculatedCrystal = testStack.crystal
-    assertEqual(testCrystal, actualCrystal)
+    assert_equal(testCrystal, actualCrystal)
 
     testStack = LayerStack(freeSpaceLayer, freeSpaceLayer, testLayer, freeSpaceLayer)
 
     calculatedCrystal = testStack.crystal
-    assertEqual(calculatedCrystal, actualCrystal)
+    assert_equal(calculatedCrystal, actualCrystal)

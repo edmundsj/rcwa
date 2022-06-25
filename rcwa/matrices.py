@@ -339,7 +339,7 @@ def calculateTransmissionCoefficient(S, Kx, Ky, KzTransmissionRegion,
 def calculateDiffractionReflectionEfficiency(rx, ry, rz, source, KzReflectionRegion, layerStack, numberHarmonics):
     urReflectionRegion = layerStack.reflectionLayer.ur
     preMatrix = real(-1 /urReflectionRegion * KzReflectionRegion) / \
-            real(source.kIncident[2] / urReflectionRegion)
+            real(source.k_incident[2] / urReflectionRegion)
     R = None
     if isinstance(KzReflectionRegion, np.ndarray):
         R = preMatrix @ (sq(np.abs(rx)) + sq(np.abs(ry)) + sq(np.abs(rz)))
@@ -355,7 +355,7 @@ def calculateDiffractionTransmissionEfficiency(tx, ty, tz, source, KzTransmissio
     urTransmissionRegion = layerStack.transmissionLayer.ur
     urReflectionRegion = layerStack.reflectionLayer.ur
     preMatrix = real(1 / urTransmissionRegion * KzTransmissionRegion) / \
-            real(source.kIncident[2] / urReflectionRegion)
+            real(source.k_incident[2] / urReflectionRegion)
 
     if isinstance(KzTransmissionRegion, np.ndarray):
         T = preMatrix @ (sq(np.abs(tx)) + sq(np.abs(ty)) + sq(np.abs(tz)))

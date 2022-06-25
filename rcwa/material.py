@@ -39,13 +39,13 @@ class Material:
 
         if name is not None or database_path is not None:
             self.dispersive = True
-            self.load_from_database(name, filename=database_path)
+            self._load_from_database(name, filename=database_path)
         elif filename is not None:
             self.dispersive = True
-            self.load_from_nk_table(filename=filename)
+            self._load_from_nk_table(filename=filename)
         else:
             self.dispersive = False
-            if n == None: # If the refractive index is not defined, go with the permittivity
+            if n is None: # If the refractive index is not defined, go with the permittivity
                 self._er = er
                 self._ur = ur
                 self._n = np.sqrt(er*ur)
@@ -54,7 +54,7 @@ class Material:
                 self._er = np.square(n)
                 self._ur = 1
 
-    def set_dispersive_nk(self, data_dict):
+    def _set_dispersive_nk(self, data_dict):
         """
         Set our internal dispersive refractive index, permittivity, and permeability based on
         received data dictionary
@@ -67,13 +67,13 @@ class Material:
         if 'wavelength' in data_dict.keys():
             self.wavelengths = data_dict['wavelength']
 
-    def load_from_nk_table(self, filename):
+    def _load_from_nk_table(self, filename):
         self.dispersion_type = 'tabulated'
         loader = CSVLoader(filename=filename)
         data_dict = loader.load()
-        self.set_dispersive_nk(data_dict)
+        self._set_dispersive_nk(data_dict)
 
-    def load_from_database(self, material_name, filename=None):
+    def _load_from_database(self, material_name, filename=None):
         """
         Parses data from a CSV or database YAML file into a set of numpy arrays.
 
@@ -87,11 +87,11 @@ class Material:
             file_to_load = os.path.join(rcwa.nkLocation, 'data', self.database.materials[material_name])
 
         data_dict = self.database.load(file_to_load)
-        self.set_dispersive_nk(data_dict)
+        self._set_dispersive_nk(data_dict)
 
     @property
     def n(self):
-        if self.dispersive == False:
+        if not self.dispersive:
             return self._n
         else:
             return self.lookupParameter(self._n_dispersive)
@@ -104,7 +104,7 @@ class Material:
 
     @property
     def er(self):
-        if self.dispersive == False:
+        if not self.dispersive:
             return self._er
         else:
             return self.lookupParameter(self._er_dispersive)

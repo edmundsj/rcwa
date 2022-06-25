@@ -197,7 +197,7 @@ class LayerStack:
         self.reflectionLayer.source = source
         self.transmissionLayer.source = source
 
-    def setGapLayer(self, kx, ky):
+    def _set_gap_layer(self, kx, ky):
         self.gapLayer.er = 1 + sq(kx) + sq(ky)
         self.gapLayer.ur = 1
 
@@ -212,5 +212,6 @@ class LayerStack:
             if self.internal_layers[i].crystal is not None:
                 return self.internal_layers[i].crystal
         return None
+
 
 emptyStack = LayerStack()

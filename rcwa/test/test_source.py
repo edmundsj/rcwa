@@ -10,8 +10,8 @@ import unittest
 class testSource(unittest.TestCase):
     def testKIncident(self):
         kIncidentActual = complexArray([1.0607, 0.61237, 0.70711])
-        kIncidentCalculated = self.source.kIncident
-        assertAlmostEqual(kIncidentActual, kIncidentCalculated, self.absoluteTolerance, self.relativeTolerance,
+        kIncidentCalculated = self.source.k_incident
+        assert_almost_equal(kIncidentActual, kIncidentCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "kIncident in testSource")
 
     def setUp(self):

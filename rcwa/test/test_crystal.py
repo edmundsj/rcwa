@@ -1,6 +1,7 @@
 from rcwa import Source, Crystal
 from rcwa.shorthand import *
 from rcwa.testing import *
+from numpy.testing import assert_equal
 import pytest
 
 @pytest.fixture
@@ -19,7 +20,7 @@ def test_1D_lattice_vectors(crystal_1D):
     T1_desired = 2 * pi * complexArray([1, 0])
     T1_calculated = crystal_1D.reciprocalLatticeVectors[0]
 
-    assertAlmostEqual(T1_desired, T1_calculated);
+    assert_almost_equal(T1_desired, T1_calculated);
 
 def test_crystal_2D_more_dimensions():
     t1 = complexArray([1, 0, 0])
@@ -29,12 +30,12 @@ def test_crystal_2D_more_dimensions():
     T2_desired = 2 * pi * complexArray([0, 1])
 
     T1_calculated, T2_calculated = crystal.reciprocalLatticeVectors
-    assertAlmostEqual(T1_desired, T1_calculated);
-    assertAlmostEqual(T2_desired, T2_calculated);
+    assert_almost_equal(T1_desired, T1_calculated);
+    assert_almost_equal(T2_desired, T2_calculated);
 
 def test_1D_symmetry_points(crystal_1D):
     assert crystal_1D.symmetry_points is None
-    assert crystal_1D.keySymmetryNames is None
+    assert crystal_1D.key_symmetry_names is None
 
 def testCalculateReciprocalLatticeVectors():
     # A simple cubic 2D lattice
@@ -46,7 +47,7 @@ def testCalculateReciprocalLatticeVectors():
     reciprocalLatticeVectorsActual = (T1Actual, T2Actual)
     reciprocalLatticeVectorsCalculated = squareCrystal.reciprocalLatticeVectors
 
-    assertAlmostEqual(reciprocalLatticeVectorsActual, reciprocalLatticeVectorsCalculated)
+    assert_almost_equal(reciprocalLatticeVectorsActual, reciprocalLatticeVectorsCalculated)
 
     # A rectangular 2D lattice
     t1 = complexArray([2,0])
@@ -57,7 +58,7 @@ def testCalculateReciprocalLatticeVectors():
     reciprocalLatticeVectorsActual = (T1Actual, T2Actual)
     reciprocalLatticeVectorsCalculated = rectangularCrystal.reciprocalLatticeVectors
 
-    assertAlmostEqual(reciprocalLatticeVectorsActual, reciprocalLatticeVectorsCalculated);
+    assert_almost_equal(reciprocalLatticeVectorsActual, reciprocalLatticeVectorsCalculated);
 
 def testDetermineCrystalType():
     # A square lattice
@@ -66,7 +67,7 @@ def testDetermineCrystalType():
     squareCrystal = Crystal(t1, t2)
     crystalTypeActual = "SQUARE"
     crystalTypeCalculated = squareCrystal.crystalType
-    assertStringEqual(crystalTypeActual, crystalTypeCalculated)
+    assert_equal(crystalTypeActual, crystalTypeCalculated)
 
 
     # A rectangular lattice
@@ -75,7 +76,7 @@ def testDetermineCrystalType():
     rectangularCrystal = Crystal(t1, t2)
     crystalTypeActual = "RECTANGULAR"
     crystalTypeCalculated = rectangularCrystal.crystalType
-    assertStringEqual(crystalTypeActual, crystalTypeCalculated)
+    assert_equal(crystalTypeActual, crystalTypeCalculated)
 
 def testGenerateKeySymmetryPoints():
 
@@ -89,10 +90,10 @@ def testGenerateKeySymmetryPoints():
     keySymmetryPointsActual = [0.5 * T1, 0*T1, 0.5 * (T1 + T2)]
     keySymmetryNamesActual = ["X", "G", "M"]
     keySymmetryPointsCalculated = squareCrystal.symmetry_points
-    keySymmetryNamesCalculated = squareCrystal.keySymmetryNames
+    keySymmetryNamesCalculated = squareCrystal.key_symmetry_names
 
-    assertArrayEqual(keySymmetryPointsActual, keySymmetryPointsCalculated);
-    assertArrayEqual(keySymmetryNamesActual, keySymmetryNamesCalculated);
+    assert_equal(keySymmetryPointsActual, keySymmetryPointsCalculated);
+    assert_equal(keySymmetryNamesActual, keySymmetryNamesCalculated);
 
     # A rectangular Lattice
     t1 = complexArray([1,0])
@@ -104,7 +105,7 @@ def testGenerateKeySymmetryPoints():
     keySymmetryPointsActual = [0.5 * T1, 0 * T1, 0.5 * T2, 0.5 * (T1 + T2)];
     keySymmetryNamesActual = ["X", "G", "Y", "S"];
     keySymmetryPointsCalculated = rectangularCrystal.symmetry_points;
-    keySymmetryNamesCalculated = rectangularCrystal.keySymmetryNames;
+    keySymmetryNamesCalculated = rectangularCrystal.key_symmetry_names;
 
-    assertArrayEqual(keySymmetryPointsActual, keySymmetryPointsCalculated);
-    assertArrayEqual(keySymmetryNamesActual, keySymmetryNamesCalculated);
+    assert_equal(keySymmetryPointsActual, keySymmetryPointsCalculated);
+    assert_equal(keySymmetryNamesActual, keySymmetryNamesCalculated);

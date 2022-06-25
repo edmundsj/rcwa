@@ -126,8 +126,8 @@ class Solver:
         Sets up the Kx, Ky, and Kz matrices for solving the simulation once the source, crystal, and
         number harmonics are known.
         """
-        self.Kx = generateKxMatrix(self.source, self.baseCrystal, self.n_harmonics)
-        self.Ky = generateKyMatrix(self.source, self.baseCrystal, self.n_harmonics)
+        self.Kx = kx_matrix(self.source, self.baseCrystal, self.n_harmonics)
+        self.Ky = ky_matrix(self.source, self.baseCrystal, self.n_harmonics)
         if isinstance(self.Kx, np.ndarray):
             self.KDimension = self.Kx.shape[0]
             self.TMMSimulation = False

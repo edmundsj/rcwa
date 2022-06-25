@@ -7,6 +7,7 @@ from rcwa.matrices import *
 from rcwa.harmonics import *
 from rcwa import testLocation
 from rcwa import Layer, LayerStack, freeSpaceLayer, Solver, Crystal, Source
+from rcwa.testing import assert_almost_equal
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -23,14 +24,14 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
         convolutionMatrixActual = complexIdentity(9)
         convolutionMatrixCalculated = dummyLayer.ur
-        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
-                self.relativeTolerance, "UR convolution matrices for layer 1 not equal")
+        assert_almost_equal(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
+                            self.relativeTolerance, "UR convolution matrices for layer 1 not equal")
 
 
         convolutionMatrixCalculated = dummyLayer.er
         convolutionMatrixActual = self.layerStack.internal_layers[0].er
-        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
-                self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
+        assert_almost_equal(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
+                            self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
 
     def testSetConvolutionMatrixStack(self):
         t1 = complexArray([1.75,0,0])
@@ -44,59 +45,59 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
         convolutionMatrixActual = self.layerStack.internal_layers[0].er
         convolutionMatrixCalculated = dummyStack.internal_layers[0].er
-        assertAlmostEqual(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
-                self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
+        assert_almost_equal(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
+                            self.relativeTolerance, "ER convolution matrices for layer 1 not equal")
 
     def testKroneckerDelta(self):
         size = 9
         actualVector = complexArray([0,0,0,0,1,0,0,0,0])
         calculatedVector = kroneckerDeltaVector(size)
-        assertArrayEqual(actualVector, calculatedVector)
+        assert_almost_equal(actualVector, calculatedVector)
 
     def testTransparentSMatrix(self):
         SActual = self.transparentSMatrix
         SCalculated = generateTransparentSMatrix((18, 18));
-        assertAlmostEqual(SActual, SCalculated,self.absoluteTolerance,self.relativeTolerance);
+        assert_almost_equal(SActual, SCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testPMatrix(self):
         PActual = self.PLayer1
         PCalculated = calculatePMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
-        assertAlmostEqual(PActual, PCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(PActual, PCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "P matrix layer 1");
 
     def testQMatrix(self):
         QActual = self.QLayer1
         QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
-        assertAlmostEqual(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q matrix Layer 1");
 
         QActual = self.QReflectionRegion
         QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.reflectionLayer)
-        assertAlmostEqual(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q Reflection Region");
 
         QActual = self.QTransmissionRegion
         QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.transmissionLayer)
-        assertAlmostEqual(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q Transmission Region");
 
     def testOmegaSquaredMatrix(self):
         OmegaSquaredActual = self.OmegaSquaredLayer1
         OmegaSquaredCalculated = calculateOmegaSquaredMatrix(self.PLayer1, self.QLayer1)
-        assertAlmostEqual(OmegaSquaredActual, OmegaSquaredCalculated,
-                self.absoluteTolerance, self.relativeTolerance);
+        assert_almost_equal(OmegaSquaredActual, OmegaSquaredCalculated,
+                            self.absoluteTolerance, self.relativeTolerance);
 
     def testWMatrix(self):
         (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[0],
                                                    self.source)
         WActual = self.WLayer1
-        assertAlmostEqual(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer 1");
 
         (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[1],
                                                    self.source)
         WActual = self.WLayer2
-        assertAlmostEqual(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer 2");
 
 
@@ -119,7 +120,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         #indicesToNegate = [6, 10, 11, 15]
         #VActual[:, indicesToNegate] = - VActual[:, indicesToNegate]
 
-        assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "V matrix Layer 1");
 
         (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[1],
@@ -130,7 +131,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         VActual = np.abs(VActual)
         VCalculated = np.abs(VCalculated)
 
-        assertAlmostEqual(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "V matrix Layer 2");
 
 
@@ -144,7 +145,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         #XActual[indices, indices] = (XActual[indices, indices])
         XActual = np.abs(XActual)
         XCalculated = np.abs(XCalculated)
-        assertAlmostEqual(XActual, XCalculated, self.absoluteTolerance, 0.01,
+        assert_almost_equal(XActual, XCalculated, self.absoluteTolerance, 0.01,
                 "X matrix Layer 1");
 
     def testAMatrix(self):
@@ -152,41 +153,41 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         W = self.WLayer1
         ACalculated = calculateScatteringAMatrix(W, self.WFreeSpace, V, self.VFreeSpace);
         AActual = self.ALayer1
-        assertAlmostEqual(AActual, ACalculated, self.absoluteTolerance, self.relativeTolerance);
+        assert_almost_equal(AActual, ACalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testBMatrix(self):
         W = self.WLayer1
         V = self.VLayer1
         BCalculated = calculateScatteringBMatrix(W, self.WFreeSpace, V, self.VFreeSpace);
         BActual = self.BLayer1
-        assertAlmostEqual(BActual, BCalculated, self.absoluteTolerance, self.relativeTolerance);
+        assert_almost_equal(BActual, BCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testScatteringMatrixFromRaw(self):
         SMatrixLayer1Calculated = calculateInternalSMatrixFromRaw(self.ALayer1, self.BLayer1,
                 self.XLayer1, calculateScatteringDMatrix(self.ALayer1, self.BLayer1, self.XLayer1))
         S11Actual = self.S11Layer1
         S11Calculated = SMatrixLayer1Calculated[0,0];
-        assertAlmostEqual(S11Actual, S11Calculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(S11Actual, S11Calculated, self.absoluteTolerance, self.relativeTolerance,
                 "S11 for Layer 1");
 
         S12Actual = self.S12Layer1
         S12Calculated = SMatrixLayer1Calculated[0,1];
-        assertAlmostEqual(S12Actual, S12Calculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(S12Actual, S12Calculated, self.absoluteTolerance, self.relativeTolerance,
                 "S12 for Layer 1");
 
         S12Actual = self.S12Layer1
         S12Calculated = SMatrixLayer1Calculated[0,1];
-        assertAlmostEqual(S12Actual, S12Calculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(S12Actual, S12Calculated, self.absoluteTolerance, self.relativeTolerance,
                 "S12 for Layer 1");
 
         S21Actual = self.S21Layer1
         S21Calculated = SMatrixLayer1Calculated[1,0];
-        assertAlmostEqual(S21Actual, S21Calculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(S21Actual, S21Calculated, self.absoluteTolerance, self.relativeTolerance,
                 "S21 for Layer 1");
 
         S22Actual = self.S22Layer1
         S22Calculated = SMatrixLayer1Calculated[1,1];
-        assertAlmostEqual(S22Actual, S22Calculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(S22Actual, S22Calculated, self.absoluteTolerance, self.relativeTolerance,
                 "S22 for Layer 1");
 
     def testSMatrixFromFundamentals(self):
@@ -195,23 +196,23 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
         S11Actual = self.S11Layer1
         S11Calculated = SiCalculated[0,0]
-        assertAlmostEqual(S11Actual, S11Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S11 Matrix layer 1")
+        assert_almost_equal(S11Actual, S11Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S11 Matrix layer 1")
 
         S12Actual = self.S12Layer1
         S12Calculated = SiCalculated[0,1]
-        assertAlmostEqual(S12Actual, S12Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S12 layer 1")
+        assert_almost_equal(S12Actual, S12Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S12 layer 1")
 
         S21Actual = self.S21Layer1
         S21Calculated = SiCalculated[1,0]
-        assertAlmostEqual(S21Actual, S21Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S21 Matrix layer 1")
+        assert_almost_equal(S21Actual, S21Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S21 Matrix layer 1")
 
         S22Actual = self.S22Layer1
         S22Calculated = SiCalculated[1,1]
-        assertAlmostEqual(S22Actual, S22Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S21 Matrix layer 1")
+        assert_almost_equal(S22Actual, S22Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S21 Matrix layer 1")
 
     def testDRedhefferMatrix(self):
         # Unfortunately we don't have more test data than getting the identity back.
@@ -219,23 +220,23 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         SB = self.SLayer1
         DRedhefferMatrixActual = complexIdentity(18)
         DRedhefferMatrixCalculated = calculateRedhefferDMatrix(SA, SB)
-        assertAlmostEqual(DRedhefferMatrixActual, DRedhefferMatrixCalculated, self.absoluteTolerance,
-                self.relativeTolerance, "Layer 1 D matrix")
+        assert_almost_equal(DRedhefferMatrixActual, DRedhefferMatrixCalculated, self.absoluteTolerance,
+                            self.relativeTolerance, "Layer 1 D matrix")
 
         SA = self.SLayer1
         SB = self.SLayer2
         DRedhefferMatrixActual = self.DLayer12
         DRedhefferMatrixCalculated = calculateRedhefferDMatrix(SA, SB)
-        assertAlmostEqual(DRedhefferMatrixActual, DRedhefferMatrixCalculated, self.absoluteTolerance,
-                self.relativeTolerance, "D12 for layer 1 - 2")
+        assert_almost_equal(DRedhefferMatrixActual, DRedhefferMatrixCalculated, self.absoluteTolerance,
+                            self.relativeTolerance, "D12 for layer 1 - 2")
 
     def testFRedhefferMatrix(self):
         SA = self.SLayer1
         SB = self.SLayer2
         FRedhefferMatrixActual = self.FLayer12
         FRedhefferMatrixCalculated = calculateRedhefferFMatrix(SA, SB)
-        assertAlmostEqual(FRedhefferMatrixActual, FRedhefferMatrixCalculated, self.absoluteTolerance,
-                self.relativeTolerance, "F12 for layer 1 - 2")
+        assert_almost_equal(FRedhefferMatrixActual, FRedhefferMatrixCalculated, self.absoluteTolerance,
+                            self.relativeTolerance, "F12 for layer 1 - 2")
 
 
     def testSReflectionRegionMatrixFromRaw(self):
@@ -244,23 +245,23 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
         S11ReflectionRegionActual = self.S11ReflectionRegion
         S11ReflectionRegionCalculated = SReflectionRegionCalculated[0,0]
-        assertAlmostEqual(S11ReflectionRegionActual, S11ReflectionRegionCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "S11 Matrix layer 1")
+        assert_almost_equal(S11ReflectionRegionActual, S11ReflectionRegionCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S11 Matrix layer 1")
 
         S12ReflectionRegionActual = self.S12ReflectionRegion
         S12ReflectionRegionCalculated = SReflectionRegionCalculated[0,1]
-        assertAlmostEqual(S12ReflectionRegionActual, S12ReflectionRegionCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "S12 layer 1")
+        assert_almost_equal(S12ReflectionRegionActual, S12ReflectionRegionCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S12 layer 1")
 
         S21ReflectionRegionActual = self.S21ReflectionRegion
         S21ReflectionRegionCalculated = SReflectionRegionCalculated[1,0]
-        assertAlmostEqual(S21ReflectionRegionActual, S21ReflectionRegionCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "S21 layer 1")
+        assert_almost_equal(S21ReflectionRegionActual, S21ReflectionRegionCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S21 layer 1")
 
         S22ReflectionRegionActual = self.S22ReflectionRegion
         S22ReflectionRegionCalculated = SReflectionRegionCalculated[1,1]
-        assertAlmostEqual(S22ReflectionRegionActual, S22ReflectionRegionCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "S22 layer 1")
+        assert_almost_equal(S22ReflectionRegionActual, S22ReflectionRegionCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S22 layer 1")
 
     def testSTransmissionRegionMatrixFromRaw(self):
         STransmissionRegionCalculated = calculateTransmissionRegionSMatrixFromRaw(
@@ -268,23 +269,23 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
         S11TransmissionRegionActual = self.S11TransmissionRegion
         S11TransmissionRegionCalculated = STransmissionRegionCalculated[0,0]
-        assertAlmostEqual(S11TransmissionRegionActual, S11TransmissionRegionCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "S11")
+        assert_almost_equal(S11TransmissionRegionActual, S11TransmissionRegionCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S11")
 
         S12TransmissionRegionActual = self.S12TransmissionRegion
         S12TransmissionRegionCalculated = STransmissionRegionCalculated[0,1]
-        assertAlmostEqual(S12TransmissionRegionActual, S12TransmissionRegionCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "S12")
+        assert_almost_equal(S12TransmissionRegionActual, S12TransmissionRegionCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S12")
 
         S21TransmissionRegionActual = self.S21TransmissionRegion
         S21TransmissionRegionCalculated = STransmissionRegionCalculated[1,0]
-        assertAlmostEqual(S21TransmissionRegionActual, S21TransmissionRegionCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "S21 layer 1")
+        assert_almost_equal(S21TransmissionRegionActual, S21TransmissionRegionCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S21 layer 1")
 
         S22TransmissionRegionActual = self.S22TransmissionRegion
         S22TransmissionRegionCalculated = STransmissionRegionCalculated[1,1]
-        assertAlmostEqual(S22TransmissionRegionActual, S22TransmissionRegionCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "S22 layer 1")
+        assert_almost_equal(S22TransmissionRegionActual, S22TransmissionRegionCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S22 layer 1")
 
     def testReflectionRegionSMatrixFromFundamentals(self):
         SCalculated = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.layerStack,
@@ -292,23 +293,23 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
         S11Actual = self.S11ReflectionRegion
         S11Calculated = SCalculated[0,0]
-        assertAlmostEqual(S11Actual, S11Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S11 Reflection Region")
+        assert_almost_equal(S11Actual, S11Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S11 Reflection Region")
 
         S12Actual = self.S12ReflectionRegion
         S12Calculated = SCalculated[0,1]
-        assertAlmostEqual(S12Actual, S12Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S12 Reflection Region")
+        assert_almost_equal(S12Actual, S12Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S12 Reflection Region")
 
         S21Actual = self.S21ReflectionRegion
         S21Calculated = SCalculated[1,0]
-        assertAlmostEqual(S21Actual, S21Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S21 Reflection Region")
+        assert_almost_equal(S21Actual, S21Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S21 Reflection Region")
 
         S22Actual = self.S22ReflectionRegion
         S22Calculated = SCalculated[1,1]
-        assertAlmostEqual(S22Actual, S22Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S22 Reflection Region ")
+        assert_almost_equal(S22Actual, S22Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S22 Reflection Region ")
 
     def testTransmissionRegionSMatrixFromFundamentals(self):
         SCalculated = calculateTransmissionRegionSMatrix(self.Kx, self.Ky, self.layerStack,
@@ -316,44 +317,44 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
         S11Calculated = SCalculated[0,0]
         S11Actual = self.S11TransmissionRegion
-        assertAlmostEqual(S11Actual, S11Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S11 Transmission Region")
+        assert_almost_equal(S11Actual, S11Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S11 Transmission Region")
 
         S12Calculated = SCalculated[0,1]
         S12Actual = self.S12TransmissionRegion
-        assertAlmostEqual(S12Actual, S12Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S12 Transmission Region")
+        assert_almost_equal(S12Actual, S12Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S12 Transmission Region")
 
         S21Calculated = SCalculated[1,0]
         S21Actual = self.S21TransmissionRegion
-        assertAlmostEqual(S21Actual, S21Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S21 Transmission Region")
+        assert_almost_equal(S21Actual, S21Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S21 Transmission Region")
 
         S22Calculated = SCalculated[1,1]
         S22Actual = self.S22TransmissionRegion
-        assertAlmostEqual(S22Actual, S22Calculated,
-                self.absoluteTolerance, self.relativeTolerance, "S22 Transmission Region")
+        assert_almost_equal(S22Actual, S22Calculated,
+                            self.absoluteTolerance, self.relativeTolerance, "S22 Transmission Region")
 
     def testRedhefferProduct(self):
         SA = self.transparentSMatrix
         SB = self.SLayer1
         SABActual = self.SGlobalLayer1
         SABCalculated = calculateRedhefferProduct(SA, SB)
-        assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer product with Layer 1 and transparent matrix")
 
         SA = self.SLayer1
         SB = self.transparentSMatrix
         SABActual = self.SGlobalLayer1
         SABCalculated = calculateRedhefferProduct(SA, SB)
-        assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer product with Layer 1 and transparent matrix (reversed order)")
 
         SA = self.SLayer1
         SB = self.SLayer2
         SABActual = self.SGlobalLayer2
         SABCalculated = calculateRedhefferProduct(SA, SB)
-        assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer Product Layers 1 and 2")
 
         SA = self.SReflectionRegion
@@ -364,18 +365,18 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         SABCalculated = calculateRedhefferProduct(SABCalculated, SB2)
         SABCalculated = calculateRedhefferProduct(SABCalculated, SB3)
         SABActual = self.SGlobal
-        assertAlmostEqual(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer Product Layers 1 and 2")
 
     def testCalculateKz(self):
         KzActual = self.KzReflectionRegion
         KzCalculated = calculateKzBackward(self.Kx, self.Ky, self.layerStack.reflectionLayer)
-        assertAlmostEqual(KzActual, KzCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(KzActual, KzCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Kz Reflection")
 
         KzActual = self.KzTransmissionRegion
         KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmissionLayer)
-        assertAlmostEqual(KzActual, KzCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(KzActual, KzCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Kz Transmission")
 
 
@@ -383,8 +384,8 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         numberHarmonics = (3, 3, 1)
         fieldHarmonicsActual = complexArray([0,0,0,0,-0.35355+0.306186j,0,0,0,0,0,0,0,0,0.61237+0.1767j,0,0,0,0])
         fieldHarmonicsCalculated = calculateIncidentFieldHarmonics(self.source, numberHarmonics)
-        assertAlmostEqual(fieldHarmonicsActual, fieldHarmonicsCalculated,
-                self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(fieldHarmonicsActual, fieldHarmonicsCalculated,
+                            self.absoluteTolerance, self.relativeTolerance,
                 "Incident field harmonics")
 
     def testCalculateReflectionCoefficient(self):
@@ -397,11 +398,11 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         (rxCalculated, ryCalculated, rzCalculated) = \
                 calculateReflectionCoefficient(self.SGlobal, self.Kx, self.Ky, self.KzReflectionRegion,
                 self.WReflectionRegion, self.source, self.numberHarmonics)
-        assertAlmostEqual(rxActual, rxCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(rxActual, rxCalculated, self.absoluteTolerance, self.relativeTolerance,
                "rx")
-        assertAlmostEqual(ryActual, ryCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(ryActual, ryCalculated, self.absoluteTolerance, self.relativeTolerance,
                "ry")
-        assertAlmostEqual(rzActual, rzCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(rzActual, rzCalculated, self.absoluteTolerance, self.relativeTolerance,
                "rz")
 
     def testCalculateTransmissionCoefficient(self):
@@ -415,11 +416,11 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
             calculateTransmissionCoefficient(self.SGlobal, self.Kx, self.Ky, self.KzTransmissionRegion,
                     self.WTransmissionRegion, self.source,
                 self.numberHarmonics)
-        assertAlmostEqual(txActual, txCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(txActual, txCalculated, self.absoluteTolerance, self.relativeTolerance,
                "tx")
-        assertAlmostEqual(tyActual, tyCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(tyActual, tyCalculated, self.absoluteTolerance, self.relativeTolerance,
                "ty")
-        assertAlmostEqual(tzActual, tzCalculated, self.absoluteTolerance, self.relativeTolerance,
+        assert_almost_equal(tzActual, tzCalculated, self.absoluteTolerance, self.relativeTolerance,
                "tz")
 
     # NEED TO MAKE SURE WE RESHAPE THE DIFFRACTION EFFICIENCIES APPROPRIATELY AND FIGURE OUT
@@ -429,13 +430,13 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         RCalculated = calculateDiffractionReflectionEfficiency(self.rx, self.ry, self.rz,
                 self.source, self.KzReflectionRegion, self.layerStack, self.numberHarmonics)
         RCalculated = RCalculated
-        assertAlmostEqual(RActual, RCalculated, self.absoluteTolerance, self.relativeTolerance);
+        assert_almost_equal(RActual, RCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         TActual = self.T
         TCalculated = calculateDiffractionTransmissionEfficiency(self.tx, self.ty, self.tz,
                 self.source, self.KzTransmissionRegion, self.layerStack, self.numberHarmonics)
         TCalculated = TCalculated
-        assertAlmostEqual(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
+        assert_almost_equal(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     @classmethod
     def setUpClass(self): # NOTE - self here refers to class
