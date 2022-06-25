@@ -11,11 +11,10 @@ class Layer:
     :param ur: Permeability of the layer. Overridden by crystal permeability if specified.
     :param L: Thickness of the layer
     :param n: Refractive index of the layer. Overridden by cristal er/ur if specified.
-    :param crystal: Crystal object if the layer is periodic in x and/or y
     :param material: Material object containing the material's permittivity and permeability as a function of wavelength/angle.
-
+    :param crystal: Crystal object if the layer is periodic in x and/or y. Overrides er, ur, n, and material
     """
-    def __init__(self, er=1.0, ur=1.0, L=0.0, n=None, crystal=None, material=None):
+    def __init__(self, er=1.0, ur=1.0, L=0.0, n=None, material=None, crystal=None):
         if material == None:
             self.material = Material(er=er, ur=ur, n=n)
         else:
