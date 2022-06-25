@@ -34,19 +34,19 @@ class Solver:
 
         :param sweep_kw: Source variables to sweep (theta, phi, wavelength, etc.). Can either be a single keyword argument or several. If several are used, all combinations of the two parameters will be made
         """
-        self._flush_solution()
+        self.results = []
         self.source.layer = self.layerStack.reflectionLayer
-        sweep_vars, sweep_vals = self._sweeps(**sweep_kw)
-        n_sweeps = len(sweep_vals)
+        self.sweep_vars, self.sweep_vals = self._sweeps(**sweep_kw)
+        n_sweeps = len(self.sweep_vals)
 
         bar = ProgressBar(widgets=[Counter(), f'/{n_sweeps} ', Bar(), ETA()], max_value=n_sweeps).start()
 
-        for i, sweep in enumerate(sweep_vals):
-            self._assign_sweep_vars(sweep_vars, sweep)
+        for i, sweep in enumerate(self.sweep_vals):
+            self._assign_sweep_vars(self.sweep_vars, sweep)
             self._k_matrices()
             self._gap_matrices()
             self._outer_matrices()
-            self._flush_solution()
+            self._initialize()
             self._inner_s_matrix()
             self._global_s_matrix()
             self._rt_quantities()
@@ -90,10 +90,16 @@ class Solver:
         """
 
         result_keys = self.results[0].keys()
-        new_results = {k: [] for k in result_keys}
-        for result in self.results:
-            for key in result_keys:
+        new_results = {}
+        for key in result_keys:
+            new_results[key] = []
+            for result in self.results:
                 new_results[key].append(result[key])
+
+        for i, key in enumerate(self.sweep_vars):
+            new_results[key] = []
+            for sweep in enumerate(self.sweep_vals):
+                new_results[key].append(sweep[i])
 
         return new_results
 
@@ -168,10 +174,9 @@ class Solver:
         self.SGlobal = calculateRedhefferProduct(self.SGlobal, self.STransmission)
         self.SGlobal = calculateRedhefferProduct(self.SReflection, self.SGlobal)
 
-    def _flush_solution(self):
+    def _initialize(self):
         self.SGlobal = generateTransparentSMatrix(self.scatteringElementShape)
         self.rx, self.ry, self.rz = None, None, None
         self.tx, self.ty, self.tz = None, None, None
         self.R, self.T, self.RTot, self.TTot, self.CTot = None, None, None, None, None
         self.Si = [None for _ in range(len(self.layerStack.internal_layers))]
-        self.results = []

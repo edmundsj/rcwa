@@ -22,8 +22,8 @@ crystalThickness = 0.5
 
 numberHarmonics = (3, 3)
 
-deviceCrystal = Crystal(devicePermittivityCellData, devicePermeabilityCellData, t1, t2)
-layer1 = Layer(crystal=deviceCrystal, thickness=crystalThickness, numberHarmonics=numberHarmonics)
+deviceCrystal = Crystal(t1, t2, er=devicePermittivityCellData, ur=devicePermeabilityCellData)
+layer1 = Layer(crystal=deviceCrystal, thickness=crystalThickness)
 layerStack = LayerStack(reflectionLayer, layer1, transmissionLayer)
 
 solver = Solver(layerStack, source, numberHarmonics)

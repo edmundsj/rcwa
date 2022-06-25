@@ -4,16 +4,16 @@ import matplotlib.pyplot as plt
 class Plotter:
 
     @staticmethod
-    def plotRTSpectra(resultsList):
+    def plotRTSpectra(result):
         """
         Plots the reflectance, transmittance, and conservation spectra from a set of simulatiotn results
 
         :param resultsList: List of results from simulation output
         :returns fig, ax: Figure and axes objects for plot
         """
-        xData = np.array([result['source'].wavelength for result in resultsList])
-        yDataReflection = np.array([result['RTot'] for result in resultsList])
-        yDataTransmission = np.array([result['TTot'] for result in resultsList])
+        xData = np.array(result['wavelength'])
+        yDataReflection = np.array(result['RTot'])
+        yDataTransmission = np.array(result['TTot'])
         fig, ax = plt.subplots(1, 1)
         ax.plot(xData, yDataReflection)
         ax.plot(xData, yDataTransmission)
