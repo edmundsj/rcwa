@@ -2,9 +2,10 @@
 
 What this package can do
 ===========================
-- Calculate reflectance, transmittance, and scattering parameters from stacks of planar thin films
-- Simulate diffraction efficiencies, scattering matrices from 1D diffraction gratings
-- Simulate diffraction efficiencies, scattering matrices from 2D photonic crystals
+- Calculate reflectance, transmittance, amplitude reflection coefficients, and scattering parameters from stacks of planar thin films
+- Simulate reflectance, transmittance, diffraction efficiencies, scattering matrices from 1D diffraction gratings
+- Simulate reflectance, transmittance, diffraction efficiencies, scattering matrices from 2D photonic crystals
+- All these can be calculated fon incident plane waves with any polarization (linear, circular, elliptical), angle of incidence (phi and theta) and wavelength
 
 
 Getting Started
@@ -162,10 +163,28 @@ Author: Jordan Edmunds, UC Irvine Alumnus, UC Berkeley Ph.D. Student
 
 Date Started: 2020/01/05
 
+What this package can't do
+=========================================
+- Simulate structures which are finite in x and y
+- Simulate structures which are non-periodic or random
+
+What this package could do with minor changes
+==================================================
+- Simulate responses to non-plane-wave incident electromagnetic fields
+- Simulate modes inside gratings and photonic crystals and near-field patterns outside them
+- Calculate diffraction orders from a 1D grating or 2D photonic crystal
+- Use anisotropic materials
+- Calculate band structures of photonic crystals or gratings
+
 Frequently Asked Questions
 =============================
 Q: How do I tell the solver to use the Transfer Matrix Method or Rigorous Coupled Wave Analysis?
-A: Don't worry, it will figure it out for you.
+
+A: Don't worry, it will figure it out for you. If you define only unpatterned films, the solver will internally use the transfer matrix method. Otherwise, it will use RCWA.
+
+Q: Will this work for tilted plane waves? What about elliptically polarized light?
+
+A: Yes! RCWA and the TMM have no trouble with incident waves at arbitrary angles of incidence or polarization.
 
 License
 =========
