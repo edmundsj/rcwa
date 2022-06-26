@@ -91,6 +91,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#reflection-from-a-dispersive-interface-sio2">Reflection from a Dispersive Interface (SiO2)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ellipsometry-of-bare-si-wafer-broken">Ellipsometry of bare Si wafer [BROKEN]</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rectangular-lattice-photonic-crystal-with-triangular-shape">Rectangular Lattice Photonic Crystal with Triangular Shape</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rectangular-diffraction-grating">Rectangular Diffraction Grating</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">rcwa API</a></li>
@@ -169,47 +170,50 @@
 <span class="c1"># Creation Date: 11/01/2019</span>
 <span class="c1">#</span>
 <span class="kn">from</span> <span class="nn">rcwa</span> <span class="kn">import</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">LayerStack</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Solver</span><span class="p">,</span> <span class="n">Plotter</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
-<span class="n">designWavelength</span> <span class="o">=</span> <span class="mf">1.3</span>
-<span class="n">startWavelength</span> <span class="o">=</span> <span class="mf">0.6</span>
-<span class="n">stopWavelength</span> <span class="o">=</span> <span class="mf">2.2</span>
-<span class="n">stepWavelength</span> <span class="o">=</span> <span class="mf">0.005</span>
+<span class="k">def</span> <span class="nf">solve_system</span><span class="p">():</span>
+    <span class="n">designWavelength</span> <span class="o">=</span> <span class="mf">1.3</span>
+    <span class="n">startWavelength</span> <span class="o">=</span> <span class="mf">0.6</span>
+    <span class="n">stopWavelength</span> <span class="o">=</span> <span class="mf">2.2</span>
+    <span class="n">stepWavelength</span> <span class="o">=</span> <span class="mf">0.005</span>
 
-<span class="n">n1</span> <span class="o">=</span> <span class="mf">3.5</span> <span class="c1"># refractive index of layer 1 (Si)</span>
-<span class="n">n2</span> <span class="o">=</span> <span class="mf">1.45</span> <span class="c1"># refractive index of layer 2 (SiO2)</span>
-<span class="n">t1</span> <span class="o">=</span> <span class="n">designWavelength</span><span class="o">/</span><span class="mi">4</span><span class="o">/</span><span class="n">n1</span>
-<span class="n">t2</span> <span class="o">=</span> <span class="n">designWavelength</span><span class="o">/</span><span class="mi">4</span><span class="o">/</span><span class="n">n2</span>
+    <span class="n">n1</span> <span class="o">=</span> <span class="mf">3.5</span> <span class="c1"># refractive index of layer 1 (Si)</span>
+    <span class="n">n2</span> <span class="o">=</span> <span class="mf">1.45</span> <span class="c1"># refractive index of layer 2 (SiO2)</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">designWavelength</span><span class="o">/</span><span class="mi">4</span><span class="o">/</span><span class="n">n1</span>
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">designWavelength</span><span class="o">/</span><span class="mi">4</span><span class="o">/</span><span class="n">n2</span>
 
-<span class="n">reflectionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">transmissionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">)</span>
-<span class="n">layer0</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
-<span class="n">layer1</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
-<span class="n">layer2</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
-<span class="n">layer3</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
-<span class="n">layer4</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
-<span class="n">layer5</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
-<span class="n">layer6</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
-<span class="n">layer7</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
-<span class="n">layer8</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
-<span class="n">layer9</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
-<span class="n">layer10</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
-<span class="n">stack</span> <span class="o">=</span> <span class="n">LayerStack</span><span class="p">(</span><span class="n">reflectionLayer</span><span class="p">,</span>
-       <span class="n">layer0</span><span class="p">,</span> <span class="n">layer1</span><span class="p">,</span> <span class="n">layer2</span><span class="p">,</span> <span class="n">layer3</span><span class="p">,</span> <span class="n">layer4</span><span class="p">,</span> <span class="n">layer5</span><span class="p">,</span> <span class="n">layer6</span><span class="p">,</span> <span class="n">layer7</span><span class="p">,</span> <span class="n">layer8</span><span class="p">,</span> <span class="n">layer9</span><span class="p">,</span> <span class="n">layer10</span><span class="p">,</span>
-        <span class="n">transmissionLayer</span><span class="p">)</span>
-<span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">designWavelength</span><span class="p">)</span>
+    <span class="n">reflectionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">transmissionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">)</span>
+    <span class="n">layer0</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
+    <span class="n">layer1</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
+    <span class="n">layer2</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
+    <span class="n">layer3</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
+    <span class="n">layer4</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
+    <span class="n">layer5</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
+    <span class="n">layer6</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
+    <span class="n">layer7</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
+    <span class="n">layer8</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
+    <span class="n">layer9</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
+    <span class="n">layer10</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="n">LayerStack</span><span class="p">(</span><span class="n">layer0</span><span class="p">,</span> <span class="n">layer1</span><span class="p">,</span> <span class="n">layer2</span><span class="p">,</span> <span class="n">layer3</span><span class="p">,</span> <span class="n">layer4</span><span class="p">,</span> <span class="n">layer5</span><span class="p">,</span> <span class="n">layer6</span><span class="p">,</span> <span class="n">layer7</span><span class="p">,</span> <span class="n">layer8</span><span class="p">,</span> <span class="n">layer9</span><span class="p">,</span> <span class="n">layer10</span><span class="p">,</span>
+                       <span class="n">incident_layer</span><span class="o">=</span><span class="n">reflectionLayer</span><span class="p">,</span> <span class="n">transmission_layer</span><span class="o">=</span><span class="n">transmissionLayer</span><span class="p">)</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">designWavelength</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Solving system...&quot;</span><span class="p">)</span>
-<span class="n">TMMSolver</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">stopWavelength</span> <span class="o">+</span> <span class="n">stepWavelength</span><span class="p">,</span>
-        <span class="n">stepWavelength</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Solving system...&quot;</span><span class="p">)</span>
+    <span class="n">TMMSolver</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">stopWavelength</span> <span class="o">+</span> <span class="n">stepWavelength</span><span class="p">,</span>
+            <span class="n">stepWavelength</span><span class="p">)</span>
 
-<span class="n">TMMSolver</span><span class="o">.</span><span class="n">Solve</span><span class="p">(</span><span class="n">wavelengths</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">)</span>
-<span class="c1">#Plotter.plotEllipsometrySpectra(TMMSolver1.results)</span>
-<span class="n">Plotter</span><span class="o">.</span><span class="n">plotRTSpectra</span><span class="p">(</span><span class="n">TMMSolver</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">TMMSolver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">solve_system</span><span class="p">()</span>
+    <span class="c1">#Plotter.plotEllipsometrySpectra(TMMSolver1.results)</span>
+    <span class="n">Plotter</span><span class="o">.</span><span class="n">plotRTSpectra</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
@@ -225,29 +229,36 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
-<span class="n">designWavelength</span> <span class="o">=</span> <span class="mf">1.3</span>
-<span class="n">startWavelength</span> <span class="o">=</span> <span class="mf">0.25</span>
-<span class="n">stopWavelength</span> <span class="o">=</span> <span class="mf">0.85</span>
-<span class="n">stepWavelength</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="k">def</span> <span class="nf">solve_system</span><span class="p">():</span>
+        <span class="n">startWavelength</span> <span class="o">=</span> <span class="mf">0.25</span>
+        <span class="n">stopWavelength</span> <span class="o">=</span> <span class="mf">0.8</span>
+        <span class="n">stepWavelength</span> <span class="o">=</span> <span class="mf">0.001</span>
 
-<span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">designWavelength</span><span class="p">)</span>
-<span class="n">si</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Si&#39;</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Wavelength (um):&#39;</span><span class="p">:</span> <span class="n">si</span><span class="o">.</span><span class="n">wavelengths</span><span class="p">,</span> <span class="s1">&#39;er&#39;</span><span class="p">:</span> <span class="n">si</span><span class="o">.</span><span class="n">_er</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">si</span><span class="o">.</span><span class="n">_n</span><span class="p">})</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="c1"># Setup the source</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">startWavelength</span><span class="p">)</span>
 
-<span class="n">reflectionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Free space</span>
-<span class="n">transmissionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">material</span><span class="o">=</span><span class="n">si</span><span class="p">)</span>
-<span class="n">stack</span> <span class="o">=</span> <span class="n">LayerStack</span><span class="p">(</span><span class="n">reflectionLayer</span><span class="p">,</span> <span class="n">transmissionLayer</span><span class="p">)</span>
+        <span class="c1"># Setup the materials and geometry</span>
+        <span class="n">si</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Si&#39;</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Solving system...&quot;</span><span class="p">)</span>
-<span class="n">TMMSolver</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">stopWavelength</span> <span class="o">+</span> <span class="n">stepWavelength</span><span class="p">,</span>
-        <span class="n">stepWavelength</span><span class="p">)</span>
+        <span class="c1"># Setup the interface</span>
+        <span class="n">reflectionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Free space</span>
+        <span class="n">transmissionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">material</span><span class="o">=</span><span class="n">si</span><span class="p">)</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">LayerStack</span><span class="p">(</span><span class="n">incident_layer</span><span class="o">=</span><span class="n">reflectionLayer</span><span class="p">,</span> <span class="n">transmission_layer</span><span class="o">=</span><span class="n">transmissionLayer</span><span class="p">)</span>
 
-<span class="n">TMMSolver</span><span class="o">.</span><span class="n">Solve</span><span class="p">(</span><span class="n">wavelengths</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">)</span>
-<span class="c1">#Plotter.plotEllipsometrySpectra(TMMSolver.results)</span>
-<span class="n">Plotter</span><span class="o">.</span><span class="n">plotRTSpectra</span><span class="p">(</span><span class="n">TMMSolver</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="c1"># Setup the solver</span>
+        <span class="n">TMMSolver</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># Setup and run the sweep</span>
+        <span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">stopWavelength</span> <span class="o">+</span> <span class="n">stepWavelength</span><span class="p">,</span>
+                <span class="n">stepWavelength</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">TMMSolver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">)</span>
+        <span class="n">Plotter</span><span class="o">.</span><span class="n">plotRTSpectra</span><span class="p">(</span><span class="n">TMMSolver</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">solve_system</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
@@ -258,32 +269,34 @@
 <span class="c1"># Creation Date: 11/01/2019</span>
 <span class="c1">#</span>
 <span class="kn">from</span> <span class="nn">rcwa</span> <span class="kn">import</span> <span class="n">Material</span><span class="p">,</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">LayerStack</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Solver</span><span class="p">,</span> <span class="n">Plotter</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
-<span class="n">designWavelength</span> <span class="o">=</span> <span class="mf">1.3</span>
-<span class="n">startWavelength</span> <span class="o">=</span> <span class="mf">0.25</span>
-<span class="n">stopWavelength</span> <span class="o">=</span> <span class="mf">0.85</span>
-<span class="n">stepWavelength</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="k">def</span> <span class="nf">solve_system</span><span class="p">():</span>
+        <span class="n">startWavelength</span> <span class="o">=</span> <span class="mf">0.25</span>
+        <span class="n">stopWavelength</span> <span class="o">=</span> <span class="mf">0.85</span>
+        <span class="n">stepWavelength</span> <span class="o">=</span> <span class="mf">0.001</span>
 
-<span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">designWavelength</span><span class="p">)</span>
-<span class="n">siO2</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="n">material_name</span><span class="o">=</span><span class="s1">&#39;SiO2&#39;</span><span class="p">)</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">startWavelength</span><span class="p">)</span>
+        <span class="n">siO2</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="s1">&#39;SiO2&#39;</span><span class="p">)</span>
 
-<span class="n">reflectionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Free space</span>
-<span class="n">transmissionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">material</span><span class="o">=</span><span class="n">siO2</span><span class="p">)</span>
-<span class="n">stack</span> <span class="o">=</span> <span class="n">LayerStack</span><span class="p">(</span><span class="n">reflectionLayer</span><span class="p">,</span> <span class="n">transmissionLayer</span><span class="p">)</span>
+        <span class="n">reflectionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Free space</span>
+        <span class="n">transmissionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">material</span><span class="o">=</span><span class="n">siO2</span><span class="p">)</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">LayerStack</span><span class="p">(</span><span class="n">incident_layer</span><span class="o">=</span><span class="n">reflectionLayer</span><span class="p">,</span> <span class="n">transmission_layer</span><span class="o">=</span><span class="n">transmissionLayer</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Solving system...&quot;</span><span class="p">)</span>
-<span class="n">TMMSolver</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">stopWavelength</span> <span class="o">+</span> <span class="n">stepWavelength</span><span class="p">,</span>
-        <span class="n">stepWavelength</span><span class="p">)</span>
+        <span class="n">TMMSolver</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">stopWavelength</span> <span class="o">+</span> <span class="n">stepWavelength</span><span class="p">,</span>
+                <span class="n">stepWavelength</span><span class="p">)</span>
 
-<span class="n">TMMSolver</span><span class="o">.</span><span class="n">Solve</span><span class="p">(</span><span class="n">wavelengths</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">)</span>
-<span class="c1">#Plotter.plotEllipsometrySpectra(TMMSolver.results)</span>
-<span class="n">Plotter</span><span class="o">.</span><span class="n">plotRTSpectra</span><span class="p">(</span><span class="n">TMMSolver</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">TMMSolver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">)</span>
+        <span class="c1">#Plotter.plotEllipsometrySpectra(TMMSolver.results)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Plotter</span><span class="o">.</span><span class="n">plotRTSpectra</span><span class="p">(</span><span class="n">TMMSolver</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">solve_system</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
@@ -294,82 +307,93 @@
 <span class="c1"># Creation Date: 11/01/2019</span>
 <span class="c1">#</span>
 <span class="kn">from</span> <span class="nn">rcwa</span> <span class="kn">import</span> <span class="n">Material</span><span class="p">,</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">LayerStack</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Solver</span><span class="p">,</span> <span class="n">Plotter</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
-<span class="n">startWavelength</span> <span class="o">=</span> <span class="mf">0.25</span>
-<span class="n">stopWavelength</span> <span class="o">=</span> <span class="mf">0.850</span>
-<span class="n">stepWavelength</span> <span class="o">=</span> <span class="mf">0.001</span>
-<span class="n">incident_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">75</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">solve_system</span><span class="p">():</span>
+        <span class="n">startWavelength</span> <span class="o">=</span> <span class="mf">0.25</span>
+        <span class="n">stopWavelength</span> <span class="o">=</span> <span class="mf">0.850</span>
+        <span class="n">stepWavelength</span> <span class="o">=</span> <span class="mf">0.001</span>
+        <span class="n">incident_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">75</span><span class="p">)</span>
 
-<span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="n">incident_angle</span><span class="p">)</span>
-<span class="n">si</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="s1">&#39;Si&#39;</span><span class="p">)</span>
-<span class="nb">breakpoint</span><span class="p">()</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="n">incident_angle</span><span class="p">)</span>
+        <span class="n">si</span> <span class="o">=</span> <span class="n">Material</span><span class="p">(</span><span class="s1">&#39;Si&#39;</span><span class="p">)</span>
 
-<span class="n">reflectionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Free space</span>
-<span class="n">transmissionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">material</span><span class="o">=</span><span class="n">si</span><span class="p">)</span>
-<span class="n">stack</span> <span class="o">=</span> <span class="n">LayerStack</span><span class="p">(</span><span class="n">reflectionLayer</span><span class="p">,</span> <span class="n">transmissionLayer</span><span class="p">)</span>
+        <span class="n">reflectionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Free space</span>
+        <span class="n">transmissionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">material</span><span class="o">=</span><span class="n">si</span><span class="p">)</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">LayerStack</span><span class="p">(</span><span class="n">incident_layer</span><span class="o">=</span><span class="n">reflectionLayer</span><span class="p">,</span> <span class="n">transmission_layer</span><span class="o">=</span><span class="n">transmissionLayer</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Solving system...&quot;</span><span class="p">)</span>
-<span class="n">TMMSolver</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">stopWavelength</span> <span class="o">+</span> <span class="n">stepWavelength</span><span class="p">,</span>
-        <span class="n">stepWavelength</span><span class="p">)</span>
+        <span class="n">TMMSolver</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+        <span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">startWavelength</span><span class="p">,</span> <span class="n">stopWavelength</span> <span class="o">+</span> <span class="n">stepWavelength</span><span class="p">,</span>
+                <span class="n">stepWavelength</span><span class="p">)</span>
 
-<span class="n">TMMSolver</span><span class="o">.</span><span class="n">Solve</span><span class="p">(</span><span class="n">wavelengths</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">)</span>
+        <span class="n">TMMSolver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">)</span>
 
-<span class="n">tan_psi_predicted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;tanPsi&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">TMMSolver</span><span class="o">.</span><span class="n">results</span><span class="p">])</span>
-<span class="n">cos_delta_predicted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;cosDelta&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">TMMSolver</span><span class="o">.</span><span class="n">results</span><span class="p">])</span>
+        <span class="n">tan_psi_predicted</span> <span class="o">=</span> <span class="n">TMMSolver</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;tanPsi&#39;</span><span class="p">]</span>
+        <span class="n">cos_delta_predicted</span> <span class="o">=</span> <span class="n">TMMSolver</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;cosDelta&#39;</span><span class="p">]</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">tan_psi_predicted</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">cos_delta_predicted</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="sa">r</span><span class="s1">&#39;$Tan(\Psi)$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$Cos(\Delta)$&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">tan_psi_predicted</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">cos_delta_predicted</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="sa">r</span><span class="s1">&#39;$Tan(\Psi)$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$Cos(\Delta)$&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">solve_system</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
 <section id="rectangular-lattice-photonic-crystal-with-triangular-shape">
 <h2>Rectangular Lattice Photonic Crystal with Triangular Shape<a class="headerlink" href="#rectangular-lattice-photonic-crystal-with-triangular-shape" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">rcwa</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">LayerStack</span><span class="p">,</span> <span class="n">Crystal</span><span class="p">,</span> <span class="n">Solver</span>
+</section>
+<section id="rectangular-diffraction-grating">
+<h2>Rectangular Diffraction Grating<a class="headerlink" href="#rectangular-diffraction-grating" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rcwa</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">LayerStack</span><span class="p">,</span> <span class="n">Crystal</span><span class="p">,</span> <span class="n">Solver</span><span class="p">,</span> <span class="n">RectangularGrating</span>
 <span class="kn">from</span> <span class="nn">rcwa.shorthand</span> <span class="kn">import</span> <span class="n">complexArray</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="n">devicePermittivityCellData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;triangleData.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
-<span class="n">devicePermeabilityCellData</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">*</span> <span class="n">devicePermittivityCellData</span>
 
-<span class="n">reflectionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">er</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">ur</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-<span class="n">transmissionLayer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">er</span><span class="o">=</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">ur</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">solve_system</span><span class="p">():</span>
+    <span class="n">permittivity_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+    <span class="n">permeability_data</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">*</span> <span class="n">permittivity_data</span>
 
-<span class="n">wavelength</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
-<span class="n">k0</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">wavelength</span>
-<span class="n">theta</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">deg</span>
-<span class="n">phi</span> <span class="o">=</span> <span class="mi">30</span><span class="o">*</span><span class="n">deg</span>
-<span class="n">pTEM</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">complexArray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="n">j</span><span class="p">])</span>
-<span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">,</span> <span class="n">pTEM</span><span class="o">=</span><span class="n">pTEM</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">reflectionLayer</span><span class="p">)</span>
-<span class="n">t1</span><span class="p">,</span> <span class="n">t2</span> <span class="o">=</span> <span class="n">complexArray</span><span class="p">([</span><span class="mf">1.75</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">complexArray</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">reflection_layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">er</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ur</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">transmission_layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">er</span><span class="o">=</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">ur</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 
-<span class="n">crystalThickness</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">wavelength</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
+    <span class="n">k0</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">wavelength</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">deg</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">deg</span>
+    <span class="n">pTEM</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">complexArray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="n">j</span><span class="p">])</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">,</span> <span class="n">pTEM</span><span class="o">=</span><span class="n">pTEM</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">reflection_layer</span><span class="p">)</span>
+    <span class="n">lattice_vector</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
-<span class="n">numberHarmonics</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">crystal_thickness</span> <span class="o">=</span> <span class="mf">0.5</span>
 
-<span class="n">deviceCrystal</span> <span class="o">=</span> <span class="n">Crystal</span><span class="p">(</span><span class="n">devicePermittivityCellData</span><span class="p">,</span> <span class="n">devicePermeabilityCellData</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
-<span class="n">layer1</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="n">crystal</span><span class="o">=</span><span class="n">deviceCrystal</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">crystalThickness</span><span class="p">,</span> <span class="n">numberHarmonics</span><span class="o">=</span><span class="n">numberHarmonics</span><span class="p">)</span>
-<span class="n">layerStack</span> <span class="o">=</span> <span class="n">LayerStack</span><span class="p">(</span><span class="n">reflectionLayer</span><span class="p">,</span> <span class="n">layer1</span><span class="p">,</span> <span class="n">transmissionLayer</span><span class="p">)</span>
+    <span class="n">N_harmonics</span> <span class="o">=</span> <span class="mi">11</span>
 
-<span class="n">solver</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">layerStack</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">numberHarmonics</span><span class="p">)</span>
-<span class="n">solver</span><span class="o">.</span><span class="n">Solve</span><span class="p">()</span>
+    <span class="n">grating_layer</span> <span class="o">=</span> <span class="n">RectangularGrating</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_void</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+    <span class="n">layer_stack</span> <span class="o">=</span> <span class="n">LayerStack</span><span class="p">(</span><span class="n">grating_layer</span><span class="p">,</span> <span class="n">incident_layer</span><span class="o">=</span><span class="n">reflection_layer</span><span class="p">,</span> <span class="n">transmission_layer</span><span class="o">=</span><span class="n">transmission_layer</span><span class="p">)</span>
 
-<span class="c1"># Get the amplitude reflection and transmission coefficients</span>
-<span class="p">(</span><span class="n">rxCalculated</span><span class="p">,</span> <span class="n">ryCalculated</span><span class="p">,</span> <span class="n">rzCalculated</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">rx</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">ry</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">rz</span><span class="p">)</span>
-<span class="p">(</span><span class="n">txCalculated</span><span class="p">,</span> <span class="n">tyCalculated</span><span class="p">,</span> <span class="n">tzCalculated</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">tx</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">ty</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">tz</span><span class="p">)</span>
+    <span class="n">solver_1d</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">layer_stack</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">N_harmonics</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">solver_1d</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
 
-<span class="c1"># Get the diffraction efficiencies R and T and overall reflection and transmission coefficients R and T</span>
-<span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">RTot</span><span class="p">,</span> <span class="n">TTot</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">RTot</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">TTot</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">RTot</span><span class="p">,</span> <span class="n">TTot</span><span class="p">,</span> <span class="n">RTot</span><span class="o">+</span><span class="n">TTot</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">solve_system</span><span class="p">()</span>
+
+    <span class="c1"># Get the amplitude reflection and transmission coefficients</span>
+    <span class="p">(</span><span class="n">rxCalculated</span><span class="p">,</span> <span class="n">ryCalculated</span><span class="p">,</span> <span class="n">rzCalculated</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;rx&#39;</span><span class="p">],</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;ry&#39;</span><span class="p">],</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;rz&#39;</span><span class="p">])</span>
+    <span class="p">(</span><span class="n">txCalculated</span><span class="p">,</span> <span class="n">tyCalculated</span><span class="p">,</span> <span class="n">tzCalculated</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;tx&#39;</span><span class="p">],</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;ty&#39;</span><span class="p">],</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;tz&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Get the diffraction efficiencies R and T and overall reflection and transmission coefficients R and T</span>
+    <span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">RTot</span><span class="p">,</span> <span class="n">TTot</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">],</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">],</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;RTot&#39;</span><span class="p">],</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;TTot&#39;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">RTot</span><span class="p">,</span> <span class="n">TTot</span><span class="p">,</span> <span class="n">RTot</span><span class="o">+</span><span class="n">TTot</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
