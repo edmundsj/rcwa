@@ -1,5 +1,11 @@
 [![Build](https://github.com/edmundsj/rcwa/actions/workflows/python-package-conda.yml/badge.svg)](https://github.com/edmundsj/rcwa/actions/workflows/python-package-conda.yml) [![codecov](https://codecov.io/gh/edmundsj/rcwa/branch/master/graph/badge.svg?token=UDJ1TUESG3)](https://codecov.io/gh/edmundsj/rcwa) [![docs](https://github.com/edmundsj/rcwa/actions/workflows/build-docs.yml/badge.svg)](https://github.com/edmundsj/rcwa/actions/workflows/build-docs.yml) [![PyPI version](https://badge.fury.io/py/rcwa.svg)](https://badge.fury.io/py/rcwa) [![DOI](https://zenodo.org/badge/236611452.svg)](https://zenodo.org/badge/latestdoi/236611452)
 
+What this package can do
+===========================
+- Calculate reflectance, transmittance, and scattering parameters from stacks of planar thin films
+- Simulate diffraction efficiencies, scattering matrices from 1D diffraction gratings
+- Simulate diffraction efficiencies, scattering matrices from 2D photonic crystals
+
 
 Getting Started
 ================
@@ -24,6 +30,7 @@ python -m rcwa.examples.bragg_mirror
 This should run an example with a 10-layer bragg mirror (also known as a [dielectric mirror](https://en.wikipedia.org/wiki/Dielectric_mirror)), which can have very high reflectance near its design wavelength, and output the reflectance as a function of wavelength, as seen below:
 
 ![Bragg Mirror Plot](/images/rcwa_example_plot.png)
+
 
 Features
 ==========
