@@ -197,6 +197,10 @@ recent set of dependencies can be found there. Currently, this requires numpy,
 scipy, pandas, matplotlib, and pyyaml. The documentation is built using Sphinx
 and hosted on readthedocs.io.
 
+Contributors
+================
+Contributors are welcome!  There's lots of interesting ways to expand this package, and lots of ideas on the "Issues" page. If you want to work on those, or something else, fork the repo and get started! :)
+
 Acknowledgements / References
 ===============================
 This work is based primarily on a set of lectures and associated course
