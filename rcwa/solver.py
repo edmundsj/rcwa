@@ -41,7 +41,7 @@ class Solver:
         :param max_iters: Maximum number of iterations to complete before convergence
         :param atol: Absolute tolerance threshold for total reflectance at which simulation has converged
         :param rtol: Relative tolerance threshold for total reflectance at which simulation has converged
-        :param check_convergence: If True, check for convergence testing
+        :param check_convergence: If True, perform convergence testing for non-TMM simulations
         """
         self.atol = atol
         self.rtol = rtol
@@ -71,8 +71,9 @@ class Solver:
                 self.iters += 1
                 self.converged = self._check_converged()
 
-                self.last_RTot = self.RTot
-                self._increase_harmonics()
+                if not self.converged:
+                    self.last_RTot = self.RTot
+                    self._increase_harmonics()
 
             self._append_results()
             self.iters = 0
@@ -83,8 +84,16 @@ class Solver:
         bar.finish()
         self.results = self._package_results()
 
-    def _increase_harmonics(self, factor=1.3):
-        pass
+    def _increase_harmonics(self, factor=1):
+        n_harmonics = np.array(self.n_harmonics)
+        n_harmonics *= factor
+        n_harmonics += 2
+        even_elements = np.logical_not((n_harmonics % 2).astype(bool))
+        n_harmonics[even_elements] -= 1
+        if n_harmonics.size == 1:
+            self.n_harmonics = int(n_harmonics)
+        else:
+            self.n_harmonics = tuple(n_harmonics)
 
     def _check_converged(self):
         converged = False
