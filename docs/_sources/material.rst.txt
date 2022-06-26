@@ -24,7 +24,7 @@ The `Material` class handles materials whose material properties (permittivity, 
 
 **4. Using a materials database - tabulated or dispersion formula**
 
-    The refractiveindex.info database is supported by default, and contains many user-specified materials (i.e. :code:`Si`, :code:`SiO2`, :code:`Ti`, :code:`Pt`. This database provides both tabulated data and dispersion formulas, depending on the material used. CAUTION: if using this database, wavelength units must be specified in micrometers. 
+    The refractiveindex.info database is supported by default, and contains many user-specified materials (i.e. :code:`Si`, :code:`SiO2`, :code:`Ti`, :code:`Pt`. This database provides both tabulated data and dispersion formulas (see `dispersion formulas <https://refractiveindex.info/database/doc/Dispersion%20formulas.pdf>`_), depending on the material used. CAUTION: if using this database, wavelength units must be specified in micrometers. 
 
 Interpolation and Extrapolation
 -------------------------------------

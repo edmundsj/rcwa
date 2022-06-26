@@ -33,3 +33,9 @@ Rectangular Lattice Photonic Crystal with Triangular Shape
 
 .. literalinclude:: ../../rcwa/examples/triangular_photonic_crystal.py
    :language: python
+
+Rectangular Diffraction Grating
+-----------------------------------------------------------
+
+.. literalinclude:: ../../rcwa/examples/diffraction_grating_1D.py
+   :language: python
