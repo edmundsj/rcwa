@@ -39,11 +39,11 @@ def solve_system():
     wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
             stepWavelength)
 
-    TMMSolver.solve(wavelength=wavelengths)
-    return TMMSolver
+    results = TMMSolver.solve(wavelength=wavelengths)
+    return results
 
-if __name__ == 'main':
-    TMMSolver = solve_system()
+if __name__ == '__main__':
+    results = solve_system()
     #Plotter.plotEllipsometrySpectra(TMMSolver1.results)
-    Plotter.plotRTSpectra(TMMSolver.results)
+    Plotter.plotRTSpectra(results)
     plt.show()

@@ -30,16 +30,16 @@ def solve_system():
     layerStack = LayerStack(layer1, incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
     rcwa_solver = Solver(layerStack, source, numberHarmonics)
-    rcwa_solver.solve()
-    return rcwa_solver
+    results = rcwa_solver.solve()
+    return results
 
 
-if __name__ == 'main':
-    solver = solve_system()
+if __name__ == '__main__':
+    results = solve_system()
     # Get the amplitude reflection and transmission coefficients
-    (rxCalculated, ryCalculated, rzCalculated) = (solver.rx, solver.ry, solver.rz)
-    (txCalculated, tyCalculated, tzCalculated) = (solver.tx, solver.ty, solver.tz)
+    (rxCalculated, ryCalculated, rzCalculated) = (results['rx'], results['ry'], results['rz'])
+    (txCalculated, tyCalculated, tzCalculated) = (results['tx'], results['ty'], results['tz'])
 
     # Get the diffraction efficiencies R and T and overall reflection and transmission coefficients R and T
-    (R, T, RTot, TTot) = (solver.R, solver.T, solver.RTot, solver.TTot)
-    print(RTot, TTot, RTot+TTot)
+    (R, T, RTot, TTot) = (results['R'], results['T'], results['RTot'], results['TTot'])
+    print(RTot, TTot, RTot + TTot)

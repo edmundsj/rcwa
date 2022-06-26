@@ -28,11 +28,12 @@ def solve_system():
         wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
                 stepWavelength)
 
-        TMMSolver.solve(wavelength=wavelengths)
+        results = TMMSolver.solve(wavelength=wavelengths)
         #Plotter.plotEllipsometrySpectra(TMMSolver.results)
         fig, ax = Plotter.plotRTSpectra(TMMSolver.results)
-        return TMMSolver
+        return results
 
-if __name__ == 'main':
-        solve_system()
+
+if __name__ == '__main__':
+        results = solve_system()
         plt.show()

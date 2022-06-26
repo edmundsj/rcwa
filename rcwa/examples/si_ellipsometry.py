@@ -36,6 +36,6 @@ def solve_system():
         return fig, ax
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
         fig, ax = solve_system()
         plt.show()

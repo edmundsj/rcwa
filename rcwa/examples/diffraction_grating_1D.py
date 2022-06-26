@@ -27,17 +27,17 @@ def solve_system():
     layer_stack = LayerStack(grating_layer, incident_layer=reflection_layer, transmission_layer=transmission_layer)
 
     solver_1d = Solver(layer_stack, source, N_harmonics)
-    solver_1d.solve()
+    results = solver_1d.solve()
 
-    return solver_1d
+    return results
 
-if __name__ == 'main':
-    solver = solve_system()
+if __name__ == '__main__':
+    results = solve_system()
 
     # Get the amplitude reflection and transmission coefficients
-    (rxCalculated, ryCalculated, rzCalculated) = (solver.rx, solver.ry, solver.rz)
-    (txCalculated, tyCalculated, tzCalculated) = (solver.tx, solver.ty, solver.tz)
+    (rxCalculated, ryCalculated, rzCalculated) = (results['rx'], results['ry'], results['rz'])
+    (txCalculated, tyCalculated, tzCalculated) = (results['tx'], results['ty'], results['tz'])
 
     # Get the diffraction efficiencies R and T and overall reflection and transmission coefficients R and T
-    (R, T, RTot, TTot) = (solver.R, solver.T, solver.RTot, solver.TTot)
+    (R, T, RTot, TTot) = (results['R'], results['T'], results['RTot'], results['TTot'])
     print(RTot, TTot, RTot+TTot)

@@ -10,26 +10,31 @@ from matplotlib import pyplot as plt
 
 def solve_system():
         startWavelength = 0.25
-        stopWavelength = 0.85
+        stopWavelength = 0.8
         stepWavelength = 0.001
 
+        # Setup the source
         source = Source(wavelength=startWavelength)
-        si = Material(name='Si')
-        data = pd.DataFrame({'Wavelength (um):': si.wavelengths, 'er': si._er_dispersive, 'n': si._n_dispersive})
-        print(data)
 
+        # Setup the materials and geometry
+        si = Material(name='Si')
+
+        # Setup the interface
         reflectionLayer = Layer(n=1) # Free space
         transmissionLayer = Layer(material=si)
         stack = LayerStack(incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
-        print("Solving system...")
+        # Setup the solver
         TMMSolver = Solver(stack, source, (1, 1))
+
+        # Setup and run the sweep
         wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
                 stepWavelength)
-        TMMSolver.solve(wavelength=wavelengths)
+        results = TMMSolver.solve(wavelength=wavelengths)
         Plotter.plotRTSpectra(TMMSolver.results)
-        return TMMSolver
 
-if __name__ == 'main':
-        solver = solve_system()
+        return results
+
+if __name__ == '__main__':
+        results = solve_system()
         plt.show()

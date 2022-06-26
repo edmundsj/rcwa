@@ -10,10 +10,10 @@ from rcwa.examples.si_ellipsometry import solve_system as solve_si_ellipsometry
 from rcwa.examples.thin_film_dispersive import solve_system as solve_thin_film_dispersive
 from rcwa.examples.triangular_photonic_crystal_2D import solve_system as solve_triangular_photonic_crystal
 from rcwa.examples.grating_sweep import solve_system as solve_grating_sweep
+from rcwa.examples.wavelength_angle_sweep import solve_system as wavelength_angle_sweep
 
 def test_bragg_mirror():
-    solver = solve_bragg()
-    results = solver.results
+    results = solve_bragg()
     assert isinstance(results, dict)
     assert 'wavelength' in results.keys()
     assert 'RTot' in results.keys()
@@ -26,9 +26,7 @@ def test_bragg_mirror():
     assert_allclose(RTot_actual_subset, RTot_desired_subset, atol=1e-7)
 
 def test_rectangular_1d():
-    solver = solve_rectangular_1d()
-    assert hasattr(solver, 'results')
-    results = solver.results
+    results = solve_rectangular_1d()
     assert 'rx' in results.keys()
     rx_actual =  results['rx']
     rx_desired = np.array([-0.01165311-0.00861393j, -0.03160784-0.01872845j,
@@ -40,10 +38,9 @@ def test_rectangular_1d():
     assert_allclose(rx_actual, rx_desired, atol=1e-7)
 
 def test_triangular_1d():
-    solver = solve_triangular_1d()
-    results = solver.results
+    results = solve_triangular_1d()
     assert 'rx' in results.keys()
-    rx_actual = solver.results['rx']
+    rx_actual = results['rx']
     rx_desired = np.array([
         -1.12636392e-06+2.34933208e-07j, -6.91060869e-06+4.53669748e-06j,
         -5.59890347e-05+6.17713486e-05j, -5.80226897e-04+6.80539196e-04j,
@@ -54,15 +51,12 @@ def test_triangular_1d():
     assert_allclose(rx_actual, rx_desired, atol=1e-7)
 
 def test_solve_si_dispersive():
-    with pytest.warns(Warning):
-        solver = solve_si_dispersive()
-        assert hasattr(solver, 'results')
-        results = solver.results
-        assert 'wavelength' in results.keys()
+    results = solve_si_dispersive()
+    assert 'wavelength' in results.keys()
 
-        wavelengths_subset_desired = np.array([0.25 , 0.251, 0.252, 0.253, 0.254, 0.255, 0.256, 0.257, 0.258])
-        wavelengths_subset_actual = results['wavelength'][0:len(wavelengths_subset_desired)]
-        assert_equal(wavelengths_subset_actual, wavelengths_subset_desired)
+    wavelengths_subset_desired = np.array([0.25 , 0.251, 0.252, 0.253, 0.254, 0.255, 0.256, 0.257, 0.258])
+    wavelengths_subset_actual = results['wavelength'][0:len(wavelengths_subset_desired)]
+    assert_equal(wavelengths_subset_actual, wavelengths_subset_desired)
 
 def test_solve_si_ellipsometry():
     with pytest.warns(Warning):
@@ -71,9 +65,7 @@ def test_solve_si_ellipsometry():
         assert ax is not None
 
 def test_solve_siO2_dispersive():
-    solver = solve_siO2_dispersive()
-    assert hasattr(solver, 'results')
-    results = solver.results
+    results = solve_siO2_dispersive()
     assert 'wavelength' in results.keys()
 
     wavelengths_subset_desired = np.array([0.25 , 0.251, 0.252, 0.253, 0.254, 0.255, 0.256, 0.257, 0.258])
@@ -82,9 +74,7 @@ def test_solve_siO2_dispersive():
 
 def test_solve_thin_film_dispersive():
     with pytest.warns(Warning):
-        solver = solve_thin_film_dispersive()
-        assert hasattr(solver, 'results')
-        results = solver.results
+        results = solve_thin_film_dispersive()
         assert 'wavelength' in results.keys()
 
         wavelengths_subset_desired = np.array([0.25 , 0.251, 0.252, 0.253, 0.254, 0.255, 0.256, 0.257, 0.258])
@@ -92,9 +82,7 @@ def test_solve_thin_film_dispersive():
         assert_equal(wavelengths_subset_actual, wavelengths_subset_desired)
 
 def test_solve_triangular_pc():
-    solver = solve_triangular_photonic_crystal()
-    assert hasattr(solver, 'results')
-    results = solver.results
+    results = solve_triangular_photonic_crystal()
     for x in ['conservation', 'rx', 'RTot']:
         assert x in results
     rx_desired = np.array([ 0.0194899 +0.01175673j, -0.05570714+0.03010019j,
@@ -109,10 +97,13 @@ def test_solve_triangular_pc():
     assert_allclose(results['rx'], rx_desired, atol=1e-8, rtol=1e-5)
 
 def test_grating_sweep():
-    solver = solve_grating_sweep()
-    assert hasattr(solver, 'results')
-    results = solver.results
+    results = solve_grating_sweep()
     assert 'thickness' in results.keys()
-    assert_equal(results['thickness'],  [0.3, 0.4, 0.5])
     assert len(np.unique(results['RTot'])) == len(results['thickness'])
+
+def test_wavelength_angle():
+    results = wavelength_angle_sweep()
+    assert 'theta' in results.keys()
+    assert 'wavelength' in results.keys()
+    assert len(np.unique(results['RTot'])) == len(results['theta'])
 

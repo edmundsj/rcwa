@@ -83,6 +83,7 @@ class Solver:
 
         bar.finish()
         self.results = self._package_results()
+        return self.results
 
     def _increase_harmonics(self, factor=1):
         n_harmonics = np.array(self.n_harmonics)
