@@ -6,8 +6,7 @@ nk_data = glob.glob('rcwa/nkData/**', recursive=True)
 test_data = glob.glob('rcwa/test/**', recursive=True)
 example_data = glob.glob('rcwa/examples/*')
 source_data = glob.glob('rcwa/source/*.py')
-netlist_data = glob.glob('rcwa/netlist/*')
-total_data = nk_data + test_data + example_data + source_data + netlist_data
+total_data = nk_data + test_data + example_data + source_data
 package_data = [x.strip('rcwa/') for x in total_data]
 
 
@@ -16,7 +15,7 @@ with open("README.md", "r") as fh:
 
 	setuptools.setup(
 		name="rcwa",
-		version="0.1." + str(os.environ['GITHUB_RUN_NUMBER']),
+		version="1.0" + str(os.environ['GITHUB_RUN_NUMBER']-161),
 		author="Jordan Edmunds",
 		author_email="jordan.e@berkeley.edu",
 		description="Python Implementation of Rigorous Coupled Wave Analysis",
@@ -40,7 +39,8 @@ with open("README.md", "r") as fh:
 				'pandas>=0.24.0',
 				'scipy>=1.2.2',
 				'pyyaml>=5.0.0',
-				'progressbar2',
+                'pytest>6.2.2',
+                'progressbar2',
 		],
 	license="MIT",
 	)

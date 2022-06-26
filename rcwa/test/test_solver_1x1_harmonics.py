@@ -10,139 +10,139 @@ class TestSolver1x1(unittest.TestCase):
 
     def testSetupSource(self):
         kIncidentActual = self.kIncident
-        kIncidentCalculated = self.solver.source.kIncident
-        assertAlmostEqual(kIncidentActual, kIncidentCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: kIncident")
+        kIncidentCalculated = self.solver.source.k_incident
+        assert_almost_equal(kIncidentActual, kIncidentCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: kIncident")
 
     def testSetupKMatrices(self):
         KxActual = self.Kx
         KxCalculated = self.solver.Kx
-        assertAlmostEqual(KxActual, KxCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: Kx")
+        assert_almost_equal(KxActual, KxCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: Kx")
 
         KyActual = self.Ky
         KyCalculated = self.solver.Ky
-        assertAlmostEqual(KyActual, KyCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: Ky")
+        assert_almost_equal(KyActual, KyCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: Ky")
 
         KzActual = self.KzReflectionRegion
         KzCalculated = self.solver.KzReflectionRegion
-        assertAlmostEqual(KzActual, KzCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: KzReflectionRegion")
+        assert_almost_equal(KzActual, KzCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: KzReflectionRegion")
 
         KzActual = self.KzTransmissionRegion
         KzCalculated = self.solver.KzTransmissionRegion
-        assertAlmostEqual(KzActual, KzCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: KzTransmissionRegion")
+        assert_almost_equal(KzActual, KzCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: KzTransmissionRegion")
 
         KzActual = self.KzGapRegion
         KzCalculated = self.solver.KzGapRegion
-        assertAlmostEqual(KzActual, KzCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: KzGapRegion")
+        assert_almost_equal(KzActual, KzCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: KzGapRegion")
 
     def testEdgeSMatrices(self):
-        self.solver.Solve()
+        self.solver.solve()
         SActual = self.SReflectionRegion
         SCalculated = self.solver.SReflection
-        assertAlmostEqual(SActual, SCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: SReflection")
+        assert_almost_equal(SActual, SCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: SReflection")
 
-        self.solver.Solve()
+        self.solver.solve()
         SActual = self.STransmissionRegion
         SCalculated = self.solver.STransmission
-        assertAlmostEqual(SActual, SCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: STransmission")
+        assert_almost_equal(SActual, SCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: STransmission")
 
     def testInternalSMatrices(self):
-        self.solver.Solve()
+        self.solver.solve()
         SActual = self.SLayer1
         SCalculated = self.solver.Si[0]
-        assertAlmostEqual(SActual, SCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: Si[0]")
+        assert_almost_equal(SActual, SCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: Si[0]")
 
         SActual = self.SLayer2
         SCalculated = self.solver.Si[1]
-        assertAlmostEqual(SActual, SCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: Si[1]")
+        assert_almost_equal(SActual, SCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: Si[1]")
 
     def testrtAmplitudeCoefficients(self):
-        self.solver.Solve()
+        self.solver.solve()
         rxActual = self.rx
         ryActual = self.ry
         rzActual = self.rz
         (rxCalculated, ryCalculated, rzCalculated) = (self.solver.rx, self.solver.ry, self.solver.rz)
 
-        assertAlmostEqual(rxActual, rxCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rx")
-        assertAlmostEqual(ryActual, ryCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: ry")
-        assertAlmostEqual(rzActual, rzCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rz")
+        assert_almost_equal(rxActual, rxCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rx")
+        assert_almost_equal(ryActual, ryCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: ry")
+        assert_almost_equal(rzActual, rzCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rz")
 
         txActual = self.tx
         tyActual = self.ty
         tzActual = self.tz
         (txCalculated, tyCalculated, tzCalculated) = (self.solver.tx, self.solver.ty, self.solver.tz)
-        assertAlmostEqual(txActual, txCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tx")
-        assertAlmostEqual(tyActual, tyCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: ty")
-        assertAlmostEqual(tzActual, tzCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tz")
+        assert_almost_equal(txActual, txCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tx")
+        assert_almost_equal(tyActual, tyCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: ty")
+        assert_almost_equal(tzActual, tzCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tz")
 
         rTEActual = self.rTE
         rTMActual = self.rTM
         rTECalculated = self.solver.rTEM[0]
         rTMCalculated = self.solver.rTEM[1]
-        assertAlmostEqual(rTEActual, rTECalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rTE")
-        assertAlmostEqual(rTMActual, rTMCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rTM")
+        assert_almost_equal(rTEActual, rTECalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rTE")
+        assert_almost_equal(rTMActual, rTMCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: rTM")
 
     def testEllipsometryData(self):
-        self.solver.Solve()
+        self.solver.solve()
         tanPsiActual = self.tanPsi
         cosDeltaActual = self.cosDelta
         deltaActual = self.delta
 
-        tanPsiCalculated = self.solver.results[0]['tanPsi']
-        deltaCalculated = self.solver.results[0]['delta']
-        cosDeltaCalculated = self.solver.results[0]['cosDelta']
+        tanPsiCalculated = self.solver.results['tanPsi']
+        deltaCalculated = self.solver.results['delta']
+        cosDeltaCalculated = self.solver.results['cosDelta']
 
-        assertAlmostEqual(tanPsiActual, tanPsiCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tanPsi")
-        assertAlmostEqual(deltaActual, deltaCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: delta")
-        assertAlmostEqual(cosDeltaActual, cosDeltaCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: cosDelta")
+        assert_almost_equal(tanPsiActual, tanPsiCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: tanPsi")
+        assert_almost_equal(deltaActual, deltaCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: delta")
+        assert_almost_equal(cosDeltaActual, cosDeltaCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: cosDelta")
 
     def testRT(self):
-        self.solver.Solve()
+        self.solver.solve()
         RActual = self.R
         TActual = self.T
         (RCalculated, TCalculated) = (self.solver.R, self.solver.T)
-        assertAlmostEqual(RActual, RCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: R")
-        assertAlmostEqual(TActual, TCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: T")
+        assert_almost_equal(RActual, RCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: R")
+        assert_almost_equal(TActual, TCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: T")
 
         RTotActual= self.R
         TTotActual = self.T
         (RTotCalculated, TTotCalculated) = (self.solver.RTot, self.solver.TTot)
-        assertAlmostEqual(RTotActual, RTotCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: R")
-        assertAlmostEqual(TTotActual, TTotCalculated,
-                self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: T")
+        assert_almost_equal(RTotActual, RTotCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: R")
+        assert_almost_equal(TTotActual, TTotCalculated,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: T")
 
     def testPackageResults(self):
         """ UNFINISHED """
-        self.solver.Solve()
+        self.solver.solve()
         RActual = self.R
         TActual = self.T
 
     def testIntegrationMultiWavelength(self):
         testWavelengths = self.solver.source.wavelength*np.arange(0.2,2,0.01)
-        self.solver.Solve(testWavelengths)
+        self.solver.solve(wavelength=testWavelengths)
 
     def setUp(self):
         self.absoluteTolerance = 1e-4
@@ -167,9 +167,9 @@ class TestSolver1x1(unittest.TestCase):
 
         numberHarmonics = (1,1)
 
-        layer1 = Layer(er=2.0, ur=1.0, L=thicknessLayer1)
-        layer2 = Layer(er=1.0, ur=3.0, L=thicknessLayer2)
-        layerStack = LayerStack(reflectionLayer, layer1, layer2, transmissionLayer)
+        layer1 = Layer(er=2.0, ur=1.0, thickness=thicknessLayer1)
+        layer2 = Layer(er=1.0, ur=3.0, thickness=thicknessLayer2)
+        layerStack = LayerStack(layer1, layer2, incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
         self.solver = Solver(layerStack, source, numberHarmonics)
 

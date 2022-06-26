@@ -8,26 +8,33 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-designWavelength = 1.3
-startWavelength = 0.25
-stopWavelength = 0.85
-stepWavelength = 0.001
+def solve_system():
+        startWavelength = 0.25
+        stopWavelength = 0.8
+        stepWavelength = 0.001
 
-source = Source(wavelength=designWavelength)
-si = Material(name='Si')
-data = pd.DataFrame({'Wavelength (um):': si.wavelengths, 'er': si._er, 'n': si._n})
-print(data)
+        # Setup the source
+        source = Source(wavelength=startWavelength)
 
-reflectionLayer = Layer(n=1) # Free space
-transmissionLayer = Layer(material=si)
-stack = LayerStack(reflectionLayer, transmissionLayer)
+        # Setup the materials and geometry
+        si = Material(name='Si')
 
-print("Solving system...")
-TMMSolver = Solver(stack, source, (1, 1))
-wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
-        stepWavelength)
+        # Setup the interface
+        reflectionLayer = Layer(n=1) # Free space
+        transmissionLayer = Layer(material=si)
+        stack = LayerStack(incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
 
-TMMSolver.Solve(wavelengths=wavelengths)
-#Plotter.plotEllipsometrySpectra(TMMSolver.results)
-Plotter.plotRTSpectra(TMMSolver.results)
-plt.show()
+        # Setup the solver
+        TMMSolver = Solver(stack, source, (1, 1))
+
+        # Setup and run the sweep
+        wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
+                stepWavelength)
+        results = TMMSolver.solve(wavelength=wavelengths)
+        Plotter.plotRTSpectra(TMMSolver.results)
+
+        return results
+
+if __name__ == '__main__':
+        results = solve_system()
+        plt.show()

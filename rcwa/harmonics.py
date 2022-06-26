@@ -1,103 +1,145 @@
 from rcwa.shorthand import *
 
-def calculateZeroHarmonicLocation(numberHarmonics):
-    zeroHarmonicLocations = [];
+
+def zero_harmonic(numberHarmonics):
+    zeroHarmonicLocations = []
     for num in numberHarmonics:
         zeroHarmonicLocations.append(math.floor(num / 2));
 
-    return zeroHarmonicLocations;
+    return zeroHarmonicLocations
 
-def calculateMinHarmonic(numberHarmonics):
-    minHarmonics = [];
-    for num in numberHarmonics:
-        minHarmonics.append(- math.floor(num / 2));
 
-    return minHarmonics;
+def min_harmonic(numberHarmonics):
+    minHarmonics = []
+    if np.isscalar(numberHarmonics):
+        minHarmonics = - math.floor(numberHarmonics/2)
+    else:
+        for num in numberHarmonics:
+            minHarmonics.append(- math.floor(num / 2));
 
-def calculateMaxHarmonic(numberHarmonics):
-    maxHarmonics = [];
-    for num in numberHarmonics:
-        if(num % 2 == 0):
-            maxHarmonics.append(math.floor(num / 2) - 1);
+    return minHarmonics
+
+
+def max_harmonic(numberHarmonics):
+    max_harmonics = []
+    if np.isscalar(numberHarmonics):
+        if(numberHarmonics % 2 == 0):
+            max_harmonics = math.floor(numberHarmonics / 2) - 1
         else:
-            maxHarmonics.append(math.floor(num / 2));
-    return maxHarmonics;
+            max_harmonics = math.floor(numberHarmonics / 2)
+    else:
+        for num in numberHarmonics:
+            if(num % 2 == 0):
+                max_harmonics.append(math.floor(num / 2) - 1)
+            else:
+                max_harmonics.append(math.floor(num / 2))
 
-def getXComponents(*args):
-    xComponents = [];
+    return max_harmonics;
+
+
+def x_components(*args):
+    x = []
     for a in args:
-        if(a.shape == (3,) or a.shape == (2,)): # element is a row vector
-            xComponents.append(a[0]);
-        elif(a.shape == (3,1) or a.shape == (2,1)): # element is a column vector
-            xComponents.append(a[0,0]);
+        if a.shape == (3,) or a.shape == (2,): # element is a row vector
+            x.append(a[0])
+        elif a.shape == (3, 1) or a.shape == (2, 1): # element is a column vector
+            x.append(a[0, 0])
 
-    return xComponents;
+    if len(x) == 1:
+        x = x[0]
 
-def getYComponents(*args):
-    yComponents = [];
+    return x
+
+
+def y_components(*args):
+    y = []
 
     for a in args:
-        if(a.shape == (3,) or a.shape == (2,)):
-            yComponents.append(a[1]);
-        elif(a.shape == (3,1) or a.shape == (2,1)):
-            yComponents.append(a[1,0]);
+        if a.shape == (3,) or a.shape == (2,):
+            y.append(a[1])
+        elif a.shape == (3, 1) or a.shape == (2, 1):
+            y.append(a[1, 0])
 
-    return yComponents;
+    if len(y) == 1:
+        y = y[0]
+    return y
 
-def generateKxMatrix(source, crystal, numberHarmonics):
+
+def kx_matrix(source, crystal, n_harmonics):
+    return _k_matrix(source, crystal, n_harmonics, component='x')
+
+
+def ky_matrix(source, crystal, n_harmonics):
+    return _k_matrix(source, crystal, n_harmonics, component='y')
+
+
+def _k_matrix(source, crystal, n_harmonics, component):
     if crystal is not None:
-        if crystal.dimensions == 2:
-            return generateKxMatrix2D(source, crystal, numberHarmonics[0:2])
+        if crystal.dimensions == 1:
+            K_matrix = _k_matrix_1D(source, crystal, n_harmonics, component=component)
+        elif crystal.dimensions == 2:
+            K_matrix = _k_matrix_2D(source, crystal, n_harmonics[0:2], component=component)
         else:
             raise NotImplementedError
-    else:
-        return source.kIncident[0]
 
-def generateKxMatrix2D(source, crystal, numberHarmonics):
+        return K_matrix
+    else:
+        if component == 'x':
+            kIncident_component = x_components(source.k_incident)
+        elif component == 'y':
+            kIncident_component = y_components(source.k_incident)
+        else:
+            raise ValueError(f'Component can only be x or y, not {component}')
+
+        return kIncident_component
+
+def _k_matrix_1D(source, crystal, numberHarmonics, component):
     matrixSize = np.prod(numberHarmonics)
     matrixShape = (matrixSize, matrixSize);
-    KxMatrix = complexZeros(matrixShape)
+    KMatrix = complexZeros(matrixShape)
+    T1 = crystal.reciprocalLatticeVectors[0]
+
+    if component == 'x':
+        (incidentWaveVectorxy, T1xy) = x_components(source.k_incident, T1);
+    elif component == 'y':
+        (incidentWaveVectorxy, T1xy) = y_components(source.k_incident, T1);
+    else:
+        raise ValueError
+
+    minHarmonicT1 = min_harmonic(numberHarmonics)
+    maxHarmonicT1 = max_harmonic(numberHarmonics)
+
+    diagonalIndex = 0;
+    for desiredHarmonicT1 in range(minHarmonicT1, maxHarmonicT1 + 1):
+
+        KMatrix[diagonalIndex][diagonalIndex] = incidentWaveVectorxy - \
+                desiredHarmonicT1*T1xy
+        diagonalIndex += 1;
+
+    return KMatrix
+
+def _k_matrix_2D(source, crystal, numberHarmonics, component):
+    matrixSize = np.prod(numberHarmonics)
+    matrixShape = (matrixSize, matrixSize);
+    KMatrix = complexZeros(matrixShape)
 
     (T1, T2) = np.array(crystal.reciprocalLatticeVectors) / source.k0
-    (incidentWaveVectorx, T1x, T2x) = getXComponents(source.kIncident, T1, T2);
-    (minHarmonicT1, minHarmonicT2) = calculateMinHarmonic(numberHarmonics)
-    (maxHarmonicT1, maxHarmonicT2) = calculateMaxHarmonic(numberHarmonics)
+    if component == 'x':
+        (incidentWaveVectorxy, T1xy, T2xy) = x_components(source.k_incident, T1, T2);
+    elif component == 'y':
+        (incidentWaveVectorxy, T1xy, T2xy) = y_components(source.k_incident, T1, T2);
+    else:
+        raise ValueError
+
+    (minHarmonicT1, minHarmonicT2) = min_harmonic(numberHarmonics)
+    (maxHarmonicT1, maxHarmonicT2) = max_harmonic(numberHarmonics)
 
     diagonalIndex = 0;
     for desiredHarmonicT2 in range(minHarmonicT2, maxHarmonicT2 + 1):
         for desiredHarmonicT1 in range(minHarmonicT1, maxHarmonicT1 + 1):
 
-            KxMatrix[diagonalIndex][diagonalIndex] = incidentWaveVectorx - \
-                    desiredHarmonicT1*T1x - desiredHarmonicT2*T2x
+            KMatrix[diagonalIndex][diagonalIndex] = incidentWaveVectorxy - \
+                    desiredHarmonicT1*T1xy - desiredHarmonicT2*T2xy
             diagonalIndex += 1;
 
-    return KxMatrix
-
-def generateKyMatrix(source, crystal, numberHarmonics):
-    if crystal is not None:
-        if crystal.dimensions == 2:
-            return generateKyMatrix2D(source, crystal, numberHarmonics[0:2])
-        else:
-            raise NotImplementedError
-    else:
-        return source.kIncident[1]
-
-def generateKyMatrix2D(source, crystal, numberHarmonics):
-    matrixSize = np.prod(numberHarmonics)
-    matrixShape = (matrixSize, matrixSize);
-    KyMatrix = complexZeros(matrixShape)
-
-    (T1, T2) = np.array(crystal.reciprocalLatticeVectors) / source.k0
-    (incidentWaveVectory, T1y, T2y) = getYComponents(source.kIncident, T1, T2);
-    (minHarmonicT1, minHarmonicT2) = calculateMinHarmonic(numberHarmonics)
-    (maxHarmonicT1, maxHarmonicT2) = calculateMaxHarmonic(numberHarmonics)
-
-    diagonalIndex = 0;
-    for desiredHarmonicT2 in range(minHarmonicT2, maxHarmonicT2 + 1):
-        for desiredHarmonicT1 in range(minHarmonicT1, maxHarmonicT1 + 1):
-
-            KyMatrix[diagonalIndex][diagonalIndex] = incidentWaveVectory - \
-                    desiredHarmonicT1*T1y - desiredHarmonicT2*T2y
-            diagonalIndex += 1;
-
-    return KyMatrix;
+    return KMatrix;

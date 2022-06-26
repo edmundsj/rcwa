@@ -9,64 +9,64 @@ class testHarmonicFunctions(unittest.TestCase):
     def testGetXComponents(self):
         testVector1 = complexArray([0.163, 0.5, 0.888]);
         testVector2 = complexArray([0.246, 0.99, 0.2]);
-        xComponentsCalculated = getXComponents(testVector1, testVector2);
+        xComponentsCalculated = x_components(testVector1, testVector2);
         xComponentsActual = [0.163, 0.246];
-        assertAlmostEqual(xComponentsActual, xComponentsCalculated);
+        assert_almost_equal(xComponentsActual, xComponentsCalculated);
 
         testVector1 = complexArray([[0.183], [0.5], [0.888]]);
         testVector2 = complexArray([[0.266], [0.99], [0.2]]);
-        xComponentsCalculated = getXComponents(testVector1, testVector2);
+        xComponentsCalculated = x_components(testVector1, testVector2);
         xComponentsActual = [0.183, 0.266];
-        assertAlmostEqual(xComponentsActual, xComponentsCalculated);
+        assert_almost_equal(xComponentsActual, xComponentsCalculated);
 
         testVector1 = complexArray([[1.173], [0.7]]);
         testVector2 = complexArray([1.256, 1.99]);
-        xComponentsCalculated = getXComponents(testVector1, testVector2);
+        xComponentsCalculated = x_components(testVector1, testVector2);
         xComponentsActual = [1.173, 1.256];
-        assertAlmostEqual(xComponentsActual, xComponentsCalculated);
+        assert_almost_equal(xComponentsActual, xComponentsCalculated);
 
     def testGetYComponents(self):
         testVector1 = complexArray([0.173, 0.4, 0.888]);
         testVector2 = complexArray([0.256, 0.89, 0.2]);
-        yComponentsCalculated = getYComponents(testVector1, testVector2);
+        yComponentsCalculated = y_components(testVector1, testVector2);
         yComponentsActual = [0.4, 0.89];
-        assertAlmostEqual(yComponentsActual, yComponentsCalculated);
+        assert_almost_equal(yComponentsActual, yComponentsCalculated);
 
         testVector1 = complexArray([[0.173], [0.5], [0.888]]);
         testVector2 = complexArray([[0.256], [0.99], [0.2]]);
-        yComponentsCalculated = getYComponents(testVector1, testVector2);
+        yComponentsCalculated = y_components(testVector1, testVector2);
         yComponentsActual = [0.5, 0.99];
-        assertAlmostEqual(yComponentsActual, yComponentsCalculated);
+        assert_almost_equal(yComponentsActual, yComponentsCalculated);
 
         testVector1 = complexArray([[0.173], [0.7]]);
         testVector2 = complexArray([0.256, 1.99]);
-        yComponentsCalculated = getYComponents(testVector1, testVector2);
+        yComponentsCalculated = y_components(testVector1, testVector2);
         yComponentsActual = [0.7, 1.99];
-        assertAlmostEqual(yComponentsActual, yComponentsCalculated);
+        assert_almost_equal(yComponentsActual, yComponentsCalculated);
 
     def testCalculateZeroHarmonicLocation(self):
         harmonicNumber1 = 5;
         harmonicNumber2 = 6;
         numberHarmonics = (harmonicNumber1, harmonicNumber2)
-        zeroHarmonicLocationsCalculated = calculateZeroHarmonicLocation(numberHarmonics)
+        zeroHarmonicLocationsCalculated = zero_harmonic(numberHarmonics)
         zeroHarmonicLocationsActual = [2, 3];
-        assertAlmostEqual(zeroHarmonicLocationsActual, zeroHarmonicLocationsCalculated);
+        assert_almost_equal(zeroHarmonicLocationsActual, zeroHarmonicLocationsCalculated);
 
     def testCalculateMinHarmonic(self):
         harmonicNumber1 = 5;
         harmonicNumber2 = 6;
         numberHarmonics = (harmonicNumber1, harmonicNumber2)
-        minHarmonicCalculated= calculateMinHarmonic(numberHarmonics)
+        minHarmonicCalculated= min_harmonic(numberHarmonics)
         minHarmonicActual = [-2, -3];
-        assertAlmostEqual(minHarmonicActual, minHarmonicCalculated);
+        assert_almost_equal(minHarmonicActual, minHarmonicCalculated);
 
     def testCalculateMaxHarmonic(self):
         harmonicNumber1 = 5;
         harmonicNumber2 = 6;
         numberHarmonics = (harmonicNumber1, harmonicNumber2)
-        maxHarmonicCalculated= calculateMaxHarmonic(numberHarmonics)
+        maxHarmonicCalculated= max_harmonic(numberHarmonics)
         maxHarmonicActual = [2, 2];
-        assertAlmostEqual(maxHarmonicActual, maxHarmonicCalculated);
+        assert_almost_equal(maxHarmonicActual, maxHarmonicCalculated);
 
     # ALL THESE TESTS WILL FAIL BECAUSE I NOW NEED TO PASS IN A SOURCE WHICH HAS AN UNKNOWN K0.
     def testGenerateKxMatrix(self):
@@ -76,28 +76,28 @@ class testHarmonicFunctions(unittest.TestCase):
         # Test our KX matrix at the gamma point
         kxMatrixActual = self.KxMatrixGPoint;
         sourceGPoint = Source()
-        sourceGPoint.kIncident = self.incidentKVectorGPoint
+        sourceGPoint._k_incident = self.incidentKVectorGPoint
         sourceGPoint.k0 = 1
-        kxMatrixCalculated = generateKxMatrix(sourceGPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance,
+        kxMatrixCalculated = kx_matrix(sourceGPoint, self.crystal, self.numberHarmonics)
+        assert_almost_equal(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance,
                 "testHarmonics: Kx at Gamma Point");
 
         # Test our KX matrix at the X point
         kxMatrixActual = self.KxMatrixXPoint;
         sourceXPoint = Source()
-        sourceXPoint.kIncident = self.incidentKVectorXPoint
+        sourceXPoint._k_incident = self.incidentKVectorXPoint
         sourceXPoint.k0 = 1
-        kxMatrixCalculated = generateKxMatrix(sourceXPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance,
+        kxMatrixCalculated = kx_matrix(sourceXPoint, self.crystal, self.numberHarmonics)
+        assert_almost_equal(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance,
                 "testHarmonics: Kx at X Point");
 
         # Test our KX matrix at the M point
         kxMatrixActual = self.KxMatrixMPoint;
         sourceMPoint = Source()
-        sourceMPoint.kIncident = self.incidentKVectorMPoint
+        sourceMPoint._k_incident = self.incidentKVectorMPoint
         sourceMPoint.k0 = 1
-        kxMatrixCalculated = generateKxMatrix(sourceMPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance,
+        kxMatrixCalculated = kx_matrix(sourceMPoint, self.crystal, self.numberHarmonics)
+        assert_almost_equal(kxMatrixActual, kxMatrixCalculated, absoluteTolerance, relativeTolerance,
                 "testHarmonics: Kx at M Point");
 
     def testGenerateKyMatrix(self):
@@ -107,28 +107,28 @@ class testHarmonicFunctions(unittest.TestCase):
         # Test our KY matrix at the gamma point
         kyMatrixActual = self.KyMatrixGPoint;
         sourceGPoint = Source()
-        sourceGPoint.kIncident = self.incidentKVectorGPoint
+        sourceGPoint._k_incident = self.incidentKVectorGPoint
         sourceGPoint.k0 = 1
-        kyMatrixCalculated = generateKyMatrix(sourceGPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance,
+        kyMatrixCalculated = ky_matrix(sourceGPoint, self.crystal, self.numberHarmonics)
+        assert_almost_equal(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance,
                 "testHarmonics: Ky at Gamma Point");
 
         # Test our KY matrix at the X point
         kyMatrixActual = self.KyMatrixXPoint;
         sourceXPoint = Source()
-        sourceXPoint.kIncident = self.incidentKVectorXPoint
+        sourceXPoint._k_incident = self.incidentKVectorXPoint
         sourceXPoint.k0 = 1
-        kyMatrixCalculated = generateKyMatrix(sourceXPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance,
+        kyMatrixCalculated = ky_matrix(sourceXPoint, self.crystal, self.numberHarmonics)
+        assert_almost_equal(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance,
                 "testHarmonics: Ky at X Point");
 
         # Test our KY matrix at the M point
         kyMatrixActual = self.KyMatrixMPoint;
         sourceMPoint = Source()
-        sourceMPoint.kIncident = self.incidentKVectorMPoint
+        sourceMPoint._k_incident = self.incidentKVectorMPoint
         sourceMPoint.k0 = 1
-        kyMatrixCalculated = generateKyMatrix(sourceMPoint, self.crystal, self.numberHarmonics)
-        assertAlmostEqual(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance,
+        kyMatrixCalculated = ky_matrix(sourceMPoint, self.crystal, self.numberHarmonics)
+        assert_almost_equal(kyMatrixActual, kyMatrixCalculated, absoluteTolerance, relativeTolerance,
                 "testHarmonics: Ky at M Point");
 
     def setUp(self):
@@ -163,7 +163,7 @@ class testHarmonicFunctions(unittest.TestCase):
         self.ER = (self.er-1) * np.heaviside(sq(X) + sq(Y) - sq(self.r),1)
         self.ER = self.ER + 1;
         source = Source()
-        self.crystal = Crystal(self.ER, self.UR, self.t1, self.t2)
+        self.crystal = Crystal(self.t1, self.t2, er=self.ER, ur=self.UR)
 
         # The data for Kx, Ky, and Kz will be re-used at each point of key symmetry
         self.KxMatrixGPoint = complexZeros(self.matrixShape);

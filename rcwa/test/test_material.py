@@ -22,12 +22,12 @@ def testLoadFromDatabase():
     Ag = Material('Ag', source=source)
     n_desired = 1.07+1.212j
     n_observed = Ag.n
-    assertAlmostEqual(n_desired, n_observed, absoluteTolerance=1e-3)
+    assert_almost_equal(n_desired, n_observed, absoluteTolerance=1e-3)
 
     source.wavelength=0.2262
     n_desired = 1.26+1.344j
     n_observed = Ag.n
-    assertAlmostEqual(n_desired, n_observed, absoluteTolerance=1e-3)
+    assert_almost_equal(n_desired, n_observed, absoluteTolerance=1e-3)
 
 def testLoadFromFile():
     source = Source(wavelength=1.25)
@@ -44,7 +44,7 @@ def testnk(silicon):
     nDesired = 1.737 + 3.9932j
     silicon.source.wavelength = 0.26
     nCalculated = silicon.n
-    assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n1", absoluteTolerance=1e-3)
+    assert_almost_equal(nCalculated, nDesired, errorMessage="material: testnk: n1", absoluteTolerance=1e-3)
 
 
     # Case 3: wavelength is larger than one we have in database - extrapolate linearly
@@ -53,39 +53,39 @@ def testnk(silicon):
     with pytest.warns(Warning) as warning:
         nCalculated = silicon.n
 
-    assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n3", absoluteTolerance=1e-3)
+    assert_almost_equal(nCalculated, nDesired, errorMessage="material: testnk: n3", absoluteTolerance=1e-3)
 
     # Case 4: wavelength is smaller than one we have in database - extrapolate in the opposite direction
     silicon.source.wavelength = 0.23
     nDesired = 1.437 + 2.7803j
     with pytest.warns(Warning) as warning:
         nCalculated = silicon.n
-    assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n4", absoluteTolerance=1e-3)
+    assert_almost_equal(nCalculated, nDesired, errorMessage="material: testnk: n4", absoluteTolerance=1e-3)
 
 def testnkInterpolate(silicon):
     # Case 2: wavelength located between two points in the database - interpolate 
     nDesired = 4.2620000000000005 + 0.0461865j
     silicon.source.wavelength = 0.505
     nCalculated = silicon.n
-    assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n21", absoluteTolerance=1e-3)
+    assert_almost_equal(nCalculated, nDesired, errorMessage="material: testnk: n21", absoluteTolerance=1e-3)
 
     # Case 2 repeated: wavelength located between two points in the database - interpolate 
     nDesired = 4.2485 + 0.0450088J
     silicon.source.wavelength = 0.5075
     nCalculated = silicon.n
-    assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n22", absoluteTolerance=1e-3)
+    assert_almost_equal(nCalculated, nDesired, errorMessage="material: testnk: n22", absoluteTolerance=1e-3)
 
     # Case 2 software is having issues with: wavelength of 0.495 to 0.496. First 0.495
     nDesired = 4.319 + 0.051176j
     silicon.source.wavelength = 0.495
     nCalculated = silicon.n
-    assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n23", absoluteTolerance=1e-3)
+    assert_almost_equal(nCalculated, nDesired, errorMessage="material: testnk: n23", absoluteTolerance=1e-3)
 
     # Now 0.496
     nDesired = 4.313 + 0.0506492j
     silicon.source.wavelength = 0.496
     nCalculated = silicon.n
-    assertAlmostEqual(nCalculated, nDesired, errorMessage="material: testnk: n24", absoluteTolerance=1e-3)
+    assert_almost_equal(nCalculated, nDesired, errorMessage="material: testnk: n24", absoluteTolerance=1e-3)
 
 """ Tests for discontinuities in the Aspnes data, which I haven't found in Schinke for Si"""
 def testAvoidDiscontinuities():
@@ -94,75 +94,75 @@ def testAvoidDiscontinuities():
 
     n_desired = 4.325778947368422 + 0.07380526315789473j
     n_observed = silicon.n
-    assertAlmostEqual(n_observed, n_desired, errorMessage="material: testnk: n25", absoluteTolerance=1e-6)
+    assert_almost_equal(n_observed, n_desired, errorMessage="material: testnk: n25", absoluteTolerance=1e-6)
 
     source.wavelength = 0.496
     n_desired = 4.319492753623189 + 0.07293719806763285j
     n_observed = silicon.n
-    assertAlmostEqual(n_observed, n_desired, errorMessage="material: testnk: n26", absoluteTolerance=1e-6)
+    assert_almost_equal(n_observed, n_desired, errorMessage="material: testnk: n26", absoluteTolerance=1e-6)
 
 def testEr(silicon):
     # Case 1: wavelength is exactly identical to one we have in database
     erDesired = sq(1.737 + 3.9932j)
     silicon.source.wavelength = 0.26
     erCalculated = silicon.er
-    assertAlmostEqual(erCalculated, erDesired, errorMessage="material: testnk: er1")
+    assert_almost_equal(erCalculated, erDesired, errorMessage="material: testnk: er1")
 
     # Case 2: wavelength interpolated between two points in the database
     silicon.source.wavelength = 0.264
     erDesired = -14.557277+15.787005j
     erCalculated = silicon.er
-    assertAlmostEqual(erCalculated, erDesired, errorMessage="material: testnk: er2", absoluteTolerance=1e-5)
+    assert_almost_equal(erCalculated, erDesired, errorMessage="material: testnk: er2", absoluteTolerance=1e-5)
 
     # Case 3: wavelength is larger than one we have in database - extrapolate linearly
     silicon.source.wavelength = 1.47
     erDesired = sq(3.487 + 1.09e-13j) - 0.01395
     with pytest.warns(Warning) as warning:
         erCalculated = silicon.er
-    assertAlmostEqual(erCalculated, erDesired, absoluteTolerance=1e-5, errorMessage="material: testnk: er3")
+    assert_almost_equal(erCalculated, erDesired, absoluteTolerance=1e-5, errorMessage="material: testnk: er3")
 
     # Case 4: wavelength is smaller than one we have in database
     silicon.source.wavelength = 0.23
     erDesired = -4.744348+7.505422j
     with pytest.warns(Warning) as warning:
         erCalculated = silicon.er
-    assertAlmostEqual(erCalculated, erDesired, absoluteTolerance = 1e-5,errorMessage="material: testnk: er4")
+    assert_almost_equal(erCalculated, erDesired, absoluteTolerance = 1e-5, errorMessage="material: testnk: er4")
 
 def testUr(silicon):
     # Case 1: wavelength is exactly identical to one we have in database
     urDesired = 1
     silicon.wavelength = 0.27
     urCalculated = silicon.ur
-    assertAlmostEqual(urCalculated, urDesired, errorMessage="material: testnk: ur1")
+    assert_almost_equal(urCalculated, urDesired, errorMessage="material: testnk: ur1")
 
     # Case 2: wavelength is nearly identical to one we have in database
     wavelength = 0.264
     urDesired = 1
     urCalculated = silicon.ur
-    assertAlmostEqual(urCalculated, urDesired, errorMessage="material: testnk: ur2")
+    assert_almost_equal(urCalculated, urDesired, errorMessage="material: testnk: ur2")
 
     # Case 3: wavelength is larger than one we have in database - extrapolate linearly
     wavelength = 1.47
     urDesired = 1
     urCalculated = silicon.ur
-    assertAlmostEqual(urCalculated, urDesired, absoluteTolerance=1e-5, errorMessage="material: testnk: ur3")
+    assert_almost_equal(urCalculated, urDesired, absoluteTolerance=1e-5, errorMessage="material: testnk: ur3")
 
     # Case 4: wavelength is smaller than one we have in database
     wavelength = 0.23
     urDesired = 1
     urCalculated = silicon.ur
-    assertAlmostEqual(urCalculated, urDesired, absoluteTolerance = 1e-5,errorMessage="material: testnk: ur4")
+    assert_almost_equal(urCalculated, urDesired, absoluteTolerance = 1e-5, errorMessage="material: testnk: ur4")
 
 def test_extract_dispersion_formula_2():
     src = Source(wavelength=0.5)
     SiO2 = Material(database_path='main/SiO2/Ghosh-e.yml', source=src)
     n_desired = 1.5580
     n_actual = SiO2.n
-    assertAlmostEqual(n_actual, n_desired, absoluteTolerance=1e-5)
+    assert_almost_equal(n_actual, n_desired, absoluteTolerance=1e-5)
 
 def test_extract_dispersion_formula_1():
     src = Source(wavelength=0.5)
     SiO2 = Material(database_path='main/SiO2/Radhakrishnan-o.yml', source=src)
     n_desired = 1.548755
     n_actual = SiO2.n
-    assertAlmostEqual(n_actual, n_desired, absoluteTolerance=1e-5)
+    assert_almost_equal(n_actual, n_desired, absoluteTolerance=1e-5)

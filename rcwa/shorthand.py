@@ -46,7 +46,12 @@ def complexOnes(matrixDimensionsTuple):
     return np.ones(matrixDimensionsTuple, dtype=np.cdouble);
 
 def reshapeLowDimensionalData(data):
-    dataShape = data.shape;
+    if hasattr(data, '__len__'):
+        dataShape = data.shape;
+    else:
+        dataShape = [1]
+        data = np.array([data])
+
     if(len(dataShape) == 1): # we have only x-data.
         Nx = dataShape[0];
         data = data.reshape(Nx, 1, 1);

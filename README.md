@@ -15,7 +15,7 @@ And that's it!
 
 Hello World Program
 ----------------------
-To run a simple example, run:
+To see a simple example, run:
 
 ```
 python -m rcwa.examples.bragg_mirror
@@ -30,13 +30,14 @@ Features
 - Implements 1D Transfer Matrix Method for homogenous layers
 - Implements full rectangular 2D RCWA for periodic layers
 - Huge material database for n/k values in optical range built-in based on [refractiveindex.info](https://refractiveindex.info/), including metals, plastics, glass, and ceramics
+- Easy to use class-based syntax 
+- Integrated parameter sweeps of any simulation parameter: geometry, materials, wavelength, angle of incidence, etc.
 - Compute reflection and transmission spectra at arbitrary incidence and polarization
 - Compute spectroscopic ellipsometry curves
-- Exactly solves Maxwell's Equations for arbitrary layer stacks of any thickness
 - Compute reflected power, transmitted power, and S-parameters
-- Easy to use class-based syntax 
 - Large, fast-to-run test suite
 - Extremely fast narrowband, rigorously correct simulations well suited for resonant devices
+- Built-in convergence testing 
 
 Example Uses
 ==============
@@ -46,6 +47,106 @@ Example Uses
 - Find diffraction efficiencies for a 1D or 2D diffraction grating
 - Compute reflected power from a metallic mirror
 
+Examples
+============
+All examples are in the `examples/` directory in your locally installed `rcwa` package, or in `rcwa/examples/` on this repository.
+
+Reflection off Dispersive Materials
+---------------------------------------
+
+The below example demonstrates the reflection spectra you get reflecting off a bare surface of silicon, using the built-in materials database.
+
+```
+from rcwa import Material, Layer, LayerStack, Source, Solver, Plotter
+
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+startWavelength = 0.25
+stopWavelength = 0.8
+stepWavelength = 0.001
+
+# Setup the source
+source = Source(wavelength=startWavelength)
+
+# Setup the materials and geometry
+si = Material(name='Si')
+
+# Setup the interface
+reflectionLayer = Layer(n=1) # Free space
+transmissionLayer = Layer(material=si)
+stack = LayerStack(incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
+
+# Setup the solver
+TMMSolver = Solver(stack, source, (1, 1))
+
+# Setup and run the sweep
+wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
+        stepWavelength)
+results = TMMSolver.solve(wavelength=wavelengths)
+Plotter.plotRTSpectra(TMMSolver.results)
+plt.show()
+```
+![Dispersive Si Plot](/images/si_dispersive.png)
+
+Source Wavelength / Angle Sweeps
+----------------------------------
+```
+import numpy as np
+from rcwa import Material, Layer, LayerStack, Source, Solver, Plotter
+
+# Setup the source
+startWavelength = 0.25
+stopWavelength = 0.8
+stepWavelength = 0.02
+wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
+        stepWavelength)
+thetas = np.linspace(0, np.pi/4,10)
+
+source = Source(wavelength=startWavelength)
+
+thin_film = Layer(thickness=0.1, n=2)
+substrate = Layer(n=4)
+stack = LayerStack(thick_film, transmission_layer=substrate)
+
+solver = Solver(stack, source)
+
+results = solver.solve(wavelength=wavelengths, theta=thetas)
+angles, wavelengths, R = results['theta'], results['wavelength'], results['RTot']
+
+plt.plot(wavelengths, R)
+plt.show()
+```
+![Reflectance vs Wavelength with varying angle](/images/wavelength_angle_sweep.png)
+
+Geometry Sweeps
+-------------------------------------------------------------------------------
+Here, we set up a simulation with a rectangular grating on a substrate with a relative permittivity of 9, and a wavelength of 0.5 units (microns, meters, whatever you like!). This can be found in the `grating_sweep.py` example. In this example we are sweeping the thickness, but we could have swept the period or refractive index or permittivity.
+
+```
+from rcwa import Source, Layer, LayerStack, Crystal, Solver, RectangularGrating
+import numpy as np
+from matplotlib import pyplot as plt
+
+reflection_layer = Layer(er=1.0, ur=1.0)
+transmission_layer = Layer(er=9.0, ur=1.0)
+
+wavelength = 0.5
+source = Source(wavelength=wavelength)
+
+N_harmonics = 11
+
+grating_layer = RectangularGrating(period=2, thickness=0.5, n=4, n_void=1, nx=500)
+layer_stack = LayerStack(grating_layer, incident_layer=reflection_layer, transmission_layer=transmission_layer)
+
+solver_1d = Solver(layer_stack, source, N_harmonics)
+results = solver_1d.solve((grating_layer, {'thickness': np.linspace(0.3, 0.5, 100)}))
+
+plt.plot(results['thickness'], results['RTot'])
+plt.show()
+```
+![Reflectance vs Thickness](/images/reflectance_vs_thickness.png)
+
 Documentation
 ================
 This  project is documented on [Github Pages](https://edmundsj.github.io/rcwa/). For additional information, including downloading examples, you can view this project on [github](https://github.com/edmundsj/RCWA). 
@@ -53,6 +154,11 @@ This  project is documented on [Github Pages](https://edmundsj.github.io/rcwa/).
 Author: Jordan Edmunds, UC Irvine Alumnus, UC Berkeley Ph.D. Student
 
 Date Started: 2020/01/05
+
+Frequently Asked Questions
+=============================
+Q: How do I tell the solver to use the Transfer Matrix Method or Rigorous Coupled Wave Analysis?
+A: Don't worry, it will figure it out for you.
 
 License
 =========
