@@ -141,8 +141,6 @@ def calculateKVector(source, layer):
     kz = layer.n * cos(source.theta);
     return complexArray([kx, ky, kz]);
 
-# TODO: MUST BE MODIFIED TO HANDLE HOMOGENOUS LAYERS AND NOT DIRECTLY SOLVE THE 
-# EIGENVALUE PROBLEM, BUT PROVIDE THE KNOWN SOLUTION.
 def calculateVWXMatrices(kx, ky, layer, source=zeroSource):
     if isinstance(kx, np.ndarray):
         return calculateVWXMatricesNHarmonics(kx, ky, layer, source)

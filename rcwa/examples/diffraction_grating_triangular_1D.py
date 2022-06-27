@@ -4,8 +4,6 @@ from rcwa.shorthand import complexArray
 import numpy as np
 
 def solve_system():
-    permittivity_data = np.array([1, 1, 1, 1, 3, 3, 3, 3])
-    permeability_data = 1 + 0 * permittivity_data
 
     reflection_layer = Layer(er=1.0, ur=1.0)
     transmission_layer = Layer(er=9.0, ur=1.0)
