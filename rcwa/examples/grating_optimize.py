@@ -4,7 +4,10 @@ from rcwa import Source, Layer, LayerStack, Crystal, Solver, RectangularGrating
 import numpy as np
 from matplotlib import pyplot as plt
 
-def solve_inner(thickness):
+def loss_func(results):
+    return results['RTot']
+
+def solve_system():
     reflection_layer = Layer(er=1.0, ur=1.0)
     transmission_layer = Layer(er=9.0, ur=1.0)
 
@@ -13,16 +16,15 @@ def solve_inner(thickness):
 
     N_harmonics = 11
 
-    grating_layer = RectangularGrating(period=2, thickness=thickness, n=4, n_void=1, nx=500)
+    grating_layer = RectangularGrating(period=2, thickness=0.5, n=4, n_void=1, nx=500)
     layer_stack = LayerStack(grating_layer, incident_layer=reflection_layer, transmission_layer=transmission_layer)
 
     solver_1d = Solver(layer_stack, source, N_harmonics)
-    results = solver_1d.solve()
-    return results
 
-def loss_func(thickness):
-    results = solve_inner(thickness)
-    return results['RTot']
+    grad_func = solver_1d.grad(loss_func, (grating_layer, 'thickness'))
+    thickness_gradient = grad_func(0.5)
+
+    return thickness_gradient
 
 
 def solve_system():
