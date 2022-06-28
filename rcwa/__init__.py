@@ -12,9 +12,11 @@ from rcwa import utils
 from rcwa.material import Material
 from rcwa.crystal import Crystal
 from rcwa.layer import LayerStack, Layer, freeSpaceLayer
+from rcwa.results import Results
 from rcwa.slicer import Slicer
 from rcwa.grating import RectangularGrating, TriangularGrating, Grating
 from rcwa.source import Source, zeroSource
 from rcwa.solver import Solver
 from rcwa.utils import Plotter
 from rcwa.shorthand import complexArray
+

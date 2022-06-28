@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from rcwa import Results
 from numpy.testing import assert_allclose, assert_equal
 from rcwa.examples.bragg_mirror import solve_system as solve_bragg
 from rcwa.examples.diffraction_grating_1D import solve_system as solve_rectangular_1d
@@ -14,7 +15,7 @@ from rcwa.examples.wavelength_angle_sweep import solve_system as wavelength_angl
 
 def test_bragg_mirror():
     results = solve_bragg()
-    assert isinstance(results, dict)
+    assert isinstance(results, Results)
     assert 'wavelength' in results.keys()
     assert 'RTot' in results.keys()
     assert 'TTot' in results.keys()
@@ -84,7 +85,7 @@ def test_solve_thin_film_dispersive():
 def test_solve_triangular_pc():
     results = solve_triangular_photonic_crystal()
     for x in ['conservation', 'rx', 'RTot']:
-        assert x in results
+        assert x in results.keys()
     rx_desired = np.array([ 0.0194899 +0.01175673j, -0.05570714+0.03010019j,
        -0.03797483-0.03124727j, -0.03920141+0.01425774j,
         0.20357306-0.00134404j, -0.01196725-0.02682893j,

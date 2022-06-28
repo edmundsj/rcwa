@@ -3,6 +3,7 @@ from rcwa.utils import Plotter
 from rcwa.shorthand import complexArray
 import numpy as np
 
+
 def solve_system():
 
     reflection_layer = Layer(er=1.0, ur=1.0)

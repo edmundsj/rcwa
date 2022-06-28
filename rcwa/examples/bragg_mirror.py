@@ -42,8 +42,8 @@ def solve_system():
     results = TMMSolver.solve(wavelength=wavelengths)
     return results
 
+
 if __name__ == '__main__':
     results = solve_system()
-    #Plotter.plotEllipsometrySpectra(TMMSolver1.results)
-    Plotter.plotRTSpectra(results)
+    fig, ax = results.plot(x='wavelength', y=['RTot', 'TTot', 'conservation'])
     plt.show()

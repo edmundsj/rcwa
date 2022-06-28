@@ -1,7 +1,7 @@
 from rcwa.shorthand import *
 from rcwa.matrices import *
 from rcwa.harmonics import *
-from rcwa import Layer, LayerStack
+from rcwa import Layer, LayerStack, Results
 from copy import deepcopy
 from progressbar import ProgressBar, Bar, Counter, ETA
 from itertools import product
@@ -188,6 +188,7 @@ class Solver:
         else:
             new_results = self.results[0]
 
+        new_results = Results(new_results)
         return new_results
 
     def _append_results(self):
