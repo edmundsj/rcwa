@@ -1,5 +1,6 @@
 from rcwa.shorthand import *
 from rcwa import Material
+import matplotlib.pyplot as plt
 
 # TODO: Convolution matrix generation must be refactored. It's a hot mess and hard to understand.
 
@@ -26,14 +27,11 @@ class Layer:
 
         if crystal is not None:
             self.homogenous = False
-            #if numberHarmonics is not None:
-
-                #self.setConvolutionMatrix(numberHarmonics)
         else:
             self.homogenous = True
 
-    # Note: these are all just transparent wrappers for underlying material
 
+    # Note: these are all just transparent wrappers for underlying material
     @property
     def er(self):
         return self.material.er
@@ -176,9 +174,6 @@ class LayerStack:
             internal_string += str(layer) + '\n'
         return top_string + internal_string
 
-    def __repr__(self):
-        return self.__str__()
-
     @property
     def source(self):
         return self._source
@@ -196,9 +191,9 @@ class LayerStack:
         self.gapLayer.ur = 1
 
     # set all convolution matrices for all interior layers
-    def set_convolution_matrices(self, numberHarmonics):
+    def set_convolution_matrices(self, n_harmonics):
         for layer in self.internal_layers:
-            layer.set_convolution_matrices(numberHarmonics)
+            layer.set_convolution_matrices(n_harmonics)
 
     @property
     def crystal(self):
@@ -206,6 +201,15 @@ class LayerStack:
             if self.internal_layers[i].crystal is not None:
                 return self.internal_layers[i].crystal
         return None
+
+    def plot(self, fig=None, ax=None):
+        if fig is None and ax is None:
+            fig, ax = plt.subplots()
+        elif fig is not None and ax is None:
+            ax = fig.add_subplot()
+
+        # z = 0 will be defined at the start of the top-most layer.
+
 
 
 emptyStack = LayerStack()
