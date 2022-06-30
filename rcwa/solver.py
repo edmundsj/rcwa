@@ -217,6 +217,7 @@ class Solver:
         tempResults['crystal'] = deepcopy(self.base_crystal)
         tempResults['source'] = deepcopy(self.source)
         tempResults['S'] = deepcopy(self.SGlobal)
+        tempResults['Si'] = deepcopy(self.Si)
 
         if self.TMMSimulation:
             tempResults['rTE'] = self.rTEM[0]
