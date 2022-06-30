@@ -1,6 +1,10 @@
-name: Build
+name: Test and Build
 
-on: [push]
+on: [push, pull_request]
+  pull_request:
+    branches:
+      - master
+      - develop
 
 jobs:
   build-linux:
