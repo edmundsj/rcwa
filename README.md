@@ -91,8 +91,7 @@ TMMSolver = Solver(stack, source, (1, 1))
 wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
         stepWavelength)
 results = TMMSolver.solve(wavelength=wavelengths)
-Plotter.plotRTSpectra(TMMSolver.results)
-plt.show()
+results.plot(x='wavelength', y='RTot', show=True)
 ```
 ![Dispersive Si Plot](/images/si_dispersive.png)
 
@@ -119,10 +118,8 @@ stack = LayerStack(thick_film, transmission_layer=substrate)
 solver = Solver(stack, source)
 
 results = solver.solve(wavelength=wavelengths, theta=thetas)
-angles, wavelengths, R = results['theta'], results['wavelength'], results['RTot']
+results.plot(x='wavelength', y='RTot', show=True)
 
-plt.plot(wavelengths, R)
-plt.show()
 ```
 ![Reflectance vs Wavelength with varying angle](/images/wavelength_angle_sweep.png)
 
@@ -149,8 +146,7 @@ layer_stack = LayerStack(grating_layer, incident_layer=reflection_layer, transmi
 solver_1d = Solver(layer_stack, source, N_harmonics)
 results = solver_1d.solve((grating_layer, {'thickness': np.linspace(0.3, 0.5, 100)}))
 
-plt.plot(results['thickness'], results['RTot'])
-plt.show()
+results.plot(x='thickness', y='RTot', show=True)
 ```
 ![Reflectance vs Thickness](/images/reflectance_vs_thickness.png)
 
