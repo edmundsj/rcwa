@@ -22,7 +22,35 @@ class Test1DGrating(unittest.TestCase):
         convolutionMatrixActual = self.erConvolutionMatrixLayer
         convolutionMatrixCalculated = dummyLayer.er
         assert_almost_equal(convolutionMatrixActual, convolutionMatrixCalculated, self.absoluteTolerance,
-                            self.relativeTolerance, "UR convolution matrices for layer 1 not equal")
+                            self.relativeTolerance, "UR convolution matrices for layer not equal")
+
+    def testPMatrix(self):
+        PActual = self.PLayer
+        PCalculated = calculatePMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
+        assert_almost_equal(PActual, PCalculated, self.absoluteTolerance, self.relativeTolerance,
+                "P matrix layer");
+
+    def testQMatrix(self):
+        QActual = self.QLayer
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
+        assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
+                "Q matrix Layer");
+
+        QActual = self.QReflectionRegion
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.incident_layer)
+        assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
+                "Q Reflection Region");
+
+        QActual = self.QTransmissionRegion
+        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.transmission_layer)
+        assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
+                "Q Transmission Region");
+
+    def testOmegaSquaredMatrix(self):
+        OmegaSquaredActual = self.OmegaSquaredLayer
+        OmegaSquaredCalculated = calculateOmegaSquaredMatrix(self.PLayer, self.QLayer)
+        assert_almost_equal(OmegaSquaredActual, OmegaSquaredCalculated,
+                            self.absoluteTolerance, self.relativeTolerance);
 
     @classmethod
     def setUpClass(self):
@@ -59,6 +87,9 @@ class Test1DGrating(unittest.TestCase):
 
         self.Kx = np.diag(complexArray([7.096982989,0.813797681]))
         self.Ky = np.diag(complexArray([0.296198133,0.296198133]))
+        # As with other tests this is a bit of a hack, but that's good for test purposes.
+        self.layerStack.internal_layers[0].er = self.erConvolutionMatrixLayer
+        self.layerStack.internal_layers[0].ur = urConvolutionMatrixLayer
 
         self.KzReflectionRegion = \
              self.KzTransmissionRegion = \
