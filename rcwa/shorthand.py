@@ -35,7 +35,10 @@ def complexArray(arrayInListForm):
 
 def complexIdentity(matrixSize):
     """ Wrapper for numpy identity declaration that forces arrays to be complex doubles """
-    return np.identity(matrixSize, dtype=np.cdouble);
+    if matrixSize == 1:
+        return 1
+    else:
+        return np.identity(matrixSize, dtype=np.cdouble);
 
 def complexZeros(matrixDimensionsTuple):
     """ Wrapper for numpy zeros declaration that forces arrays to be complex doubles """

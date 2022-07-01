@@ -3,6 +3,7 @@ from rcwa.testing import *
 import numpy as np
 import pytest
 from numpy.testing import assert_equal
+from rcwa.shorthand import complexArray, complexIdentity
 
 @pytest.fixture
 def crystal_1D():
@@ -45,3 +46,68 @@ def test_empty_stack():
     for key, desired_val in desired_defaults.items():
         actual_val = getattr(empty_stack, key)
         assert actual_val == desired_val
+
+def test_set_Kx():
+    layer1 = Layer()
+    layer2 = Layer()
+    layer3 = Layer()
+    incident_layer = Layer()
+    transmission_layer = Layer()
+    stack = LayerStack(layer1, layer2, layer3, incident_layer=incident_layer, transmission_layer=transmission_layer)
+    Kx = np.array([[1,  2], [3, 4]])
+    stack.Kx = Kx
+    assert stack.Kx is  Kx
+    assert layer1.Kx is Kx
+    assert layer2.Kx is Kx
+    assert layer3.Kx is Kx
+    assert incident_layer.Kx is Kx
+    assert transmission_layer.Kx is Kx
+    assert stack.gapLayer.Kx is Kx
+
+def test_set_Ky():
+    layer1 = Layer()
+    layer2 = Layer()
+    layer3 = Layer()
+    incident_layer = Layer()
+    transmission_layer = Layer()
+    stack = LayerStack(layer1, layer2, layer3, incident_layer=incident_layer, transmission_layer=transmission_layer)
+    Ky = np.array([[1, 2], [3, 4]])
+    stack.Ky = Ky
+    assert stack.Ky is Ky
+    assert layer1.Ky is Ky
+    assert layer2.Ky is Ky
+    assert layer3.Ky is Ky
+    assert incident_layer.Ky is Ky
+    assert transmission_layer.Ky is Ky
+    assert stack.gapLayer.Ky is Ky
+
+
+def test_all_layers():
+    layer1 = Layer()
+    i_layer = Layer()
+    t_layer = Layer()
+    stack = LayerStack(layer1, incident_layer=i_layer, transmission_layer=t_layer)
+    all_layers = stack.all_layers
+    assert len(all_layers) == 3
+    assert all_layers[0] is i_layer
+    assert all_layers[1] is layer1
+    assert all_layers[2] is t_layer
+
+
+def test_set_gap_layer():
+    layer_i = Layer()
+    layer_t = Layer()
+    layer = Layer()
+    stack = LayerStack(layer, incident_layer=layer_i, transmission_layer=layer_t)
+    stack.Kx = 1.0006267892837541
+    stack.Ky = 0.42474087247562836
+    stack.set_gap_layer()
+    WGap = complexIdentity(2)
+    VGap = complexArray([
+        [0 - 0.4250j, 0 - 1.1804j],
+        [0 + 2.0013j, 0 + 0.4250j]])
+    for layer in [layer_i, layer_t, layer]:
+        assert_almost_equal(WGap, layer.Wg, absoluteTolerance=1e-4)
+        assert_almost_equal(VGap, layer.Vg, absoluteTolerance=1e-4)
+
+

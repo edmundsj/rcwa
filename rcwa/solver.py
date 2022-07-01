@@ -247,35 +247,28 @@ class Solver:
         """
         self.Kx = kx_matrix(self.source, self.base_crystal, self.n_harmonics)
         self.Ky = ky_matrix(self.source, self.base_crystal, self.n_harmonics)
+        self.layer_stack.Kx = self.Kx
+        self.layer_stack.Ky = self.Ky
 
-        if self.TMMSimulation: # Ensure that Kz for the gap layer is 1
-            self.layer_stack.gapLayer = Layer(er=1 + sq(self.Kx) + sq(self.Ky), ur=1, thickness=0)
-
-        self.KzReflectionRegion = Kz_backward(self.Kx, self.Ky, self.layer_stack.incident_layer)
-        self.KzTransmissionRegion = Kz_forward(self.Kx, self.Ky, self.layer_stack.transmission_layer)
-        self.KzGapRegion = Kz_forward(self.Kx, self.Ky, self.layer_stack.gapLayer)
+        self.KzReflectionRegion = self.layer_stack.incident_layer.Kz_backward()
+        self.KzTransmissionRegion = self.layer_stack.transmission_layer.Kz_forward()
 
     def _outer_matrices(self):
         self.WReflectionRegion = complexIdentity(self._s_element_dimension)
         self.WTransmissionRegion = complexIdentity(self._s_element_dimension)
 
     def _gap_matrices(self):
-        self.WGap = complexIdentity(self._s_element_dimension)
-        QGap = Q_matrix(self.Kx, self.Ky, self.layer_stack.gapLayer)
-        LambdaGap = lambda_matrix(self.KzGapRegion)
-        self.VGap = QGap @ inv(LambdaGap)
+        self.layer_stack.set_gap_layer()
+        self.KzGapRegion = self.layer_stack.gapLayer.Kz_gap()
 
     def _inner_s_matrix(self):
-        for i in range(len(self.layer_stack.internal_layers)):
-            self.Si[i] = S_matrix_internal(self.Kx, self.Ky, self.layer_stack.internal_layers[i],
-                                           self.source, self.WGap, self.VGap)
+        for i, layer in enumerate(self.layer_stack.internal_layers):
+            self.Si[i] = layer.S_matrix(self.source)
             self.SGlobal = redheffer_product(self.SGlobal, self.Si[i])
 
     def _global_s_matrix(self):
-        self.STransmission = calculateTransmissionRegionSMatrix(self.Kx, self.Ky, self.layer_stack,
-                                                                self.WGap, self.VGap)
-        self.SReflection = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.layer_stack,
-                                                            self.WGap, self.VGap)
+        self.STransmission = self.layer_stack.transmission_layer.S_matrix(self.source)
+        self.SReflection = self.layer_stack.incident_layer.S_matrix(self.source)
         self.SGlobal = redheffer_product(self.SGlobal, self.STransmission)
         self.SGlobal = redheffer_product(self.SReflection, self.SGlobal)
 

@@ -1,5 +1,4 @@
 from rcwa.shorthand import *
-from rcwa import Source, zeroSource
 from numpy.linalg import pinv as pinv
 
 def s_incident(source, numberHarmonics):
@@ -24,86 +23,6 @@ def redheffer_product(SA, SB):
     SAB[1,1] = SB[1,1] +  F @ SA[1,1] @ SB[0,1];
     return SAB;
 
-def P_matrix(kx, ky, layer):
-    if isinstance(kx, np.ndarray):
-        return P_matrix_general(kx, ky, layer)
-    else:
-        return P_matrix_homogenous(kx, ky, layer)
-
-def P_matrix_homogenous(kx, ky, layer):
-    P = complexZeros((2, 2));
-
-    P[0,0] = kx*ky;
-    P[0,1] = layer.er*layer.ur - np.square(kx);
-    P[1,0] = sq(ky) - layer.er*layer.ur
-    P[1,1] = - kx*ky;
-    P /= layer.er;
-    return P
-
-def P_matrix_general(Kx, Ky, layer):
-    erInverse = pinv(layer.er)
-    KMatrixDimension = Kx.shape[0]
-    matrixShape = (2 *KMatrixDimension, 2 * KMatrixDimension)
-    P = complexZeros(matrixShape)
-
-    P[:KMatrixDimension,:KMatrixDimension] = Kx @ erInverse @ Ky
-    P[:KMatrixDimension,KMatrixDimension:] = layer.ur - Kx @ erInverse @ Kx
-    P[KMatrixDimension:,:KMatrixDimension] = Ky @ erInverse @ Ky - layer.ur
-    P[KMatrixDimension:,KMatrixDimension:] = - Ky @ erInverse @ Kx
-    return P
-
-def Q_matrix(kx, ky, layer):
-    if isinstance(kx, np.ndarray):
-        if isinstance(layer.er, np.ndarray):
-            return Q_matrix_general(kx, ky, layer)
-        else:
-            return Q_matrix_semi_infinite(kx, ky, layer)
-    else:
-        return Q_matrix_homogenous(kx, ky, layer)
-
-def Q_matrix_homogenous(kx, ky, layer):
-    Q = complexZeros((2,2));
-
-    Q[0,0] = kx * ky;
-    Q[0,1] = layer.er*layer.ur- sq(kx);
-    Q[1,0] = sq(ky) - layer.er*layer.ur;
-    Q[1,1] = - kx * ky;
-    Q = Q / layer.ur;
-    return Q;
-
-def Q_matrix_general(Kx, Ky, layer):
-    urInverse = pinv(layer.ur)
-    KMatrixDimension = Kx.shape[0]
-    matrixShape = (2 *KMatrixDimension, 2 * KMatrixDimension)
-    Q = complexZeros(matrixShape)
-
-    Q[:KMatrixDimension,:KMatrixDimension] = Kx @ urInverse @ Ky
-    Q[:KMatrixDimension,KMatrixDimension:] = layer.er - Kx @ urInverse @ Kx
-    Q[KMatrixDimension:,:KMatrixDimension] = Ky @ urInverse @ Ky - layer.er
-    Q[KMatrixDimension:,KMatrixDimension:] = - Ky @ urInverse @ Kx
-    return Q
-
-def Q_matrix_semi_infinite(Kx, Ky, layer):
-    KDimension = Kx.shape[0]
-    Q = complexZeros((KDimension * 2, KDimension*2))
-    Q[:KDimension, :KDimension] = Kx @ Ky
-    Q[:KDimension, KDimension:] = layer.ur * layer.er *complexIdentity(KDimension) - Kx @ Kx
-    Q[KDimension:, :KDimension] = Ky @ Ky - layer.ur*layer.er*complexIdentity(KDimension)
-    Q[KDimension:, KDimension:] = - Ky @ Kx
-    Q /= layer.ur
-    return Q
-
-def lambda_matrix(kz):
-    if isinstance(kz, np.ndarray):
-        KzDimension = kz.shape[0]
-        LambdaShape = (KzDimension*2, KzDimension*2)
-        Lambda = complexZeros(LambdaShape)
-        Lambda[:KzDimension, :KzDimension] = 1j*kz
-        Lambda[KzDimension:, KzDimension:] = 1j*kz
-        return Lambda
-    else:
-        return complexIdentity(2)* (0 + 1j)*kz;
-
 def omega_squared_matrix(P, Q):
     return P @ Q
 
@@ -123,139 +42,11 @@ def D_matrix_redheffer(SA, SB):
 def F_matrix(SA, SB):
     return SB[1,0] @ pinv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
 
-def Kz_backward(kx, ky, layer):
-    if isinstance(kx, np.ndarray):
-        return -conj(sqrt(conj(layer.er*layer.ur)*complexIdentity(kx.shape[0]) - kx @ kx - ky @ ky))
-    else:
-        return sqrt(layer.er*layer.ur - sq(kx) - sq(ky))
-
-def Kz_forward(kx, ky, layer):
-    if isinstance(kx, np.ndarray):
-        return conj(sqrt(conj(layer.er*layer.ur)*complexIdentity(kx.shape[0]) - kx @ kx - ky @ ky))
-    else:
-        return sqrt(layer.er*layer.ur - sq(kx) - sq(ky))
-
-
 def k_vector(source, layer):
     kx = layer.n * sin(source.theta) * cos(source.phi);
     ky = layer.n * sin(source.theta) * sin(source.phi);
     kz = layer.n * cos(source.theta);
     return complexArray([kx, ky, kz]);
-
-
-def VWX_matrices(kx, ky, layer, source=zeroSource):
-    if not isinstance(kx, np.ndarray):
-        kz = Kz_forward(kx, ky, layer)
-        return VWX_matrices_homogenous(kx, ky, kz, layer, source)
-    else:
-        return VWX_matrices_general(kx, ky, layer, source)
-
-
-def VWX_matrices_homogenous(kx, ky, kz, layer, source):
-    Q = Q_matrix(kx, ky, layer);
-    O = lambda_matrix(kz);
-    OInverse = pinv(O);
-    W = complexIdentity(2)
-    X = matrixExponentiate(O * source.k0 * layer.thickness)
-    V = Q @ W @ OInverse;
-
-    return (V, W, X);
-
-
-def VWX_matrices_general(Kx, Ky, layer, source):
-    P = P_matrix(Kx, Ky, layer)
-    Q = Q_matrix(Kx, Ky, layer)
-    OmegaSquared = omega_squared_matrix(P, Q)
-
-    if layer.homogenous:
-        Kz = Kz_forward(Kx, Ky, layer)
-        Lambda = lambda_matrix(Kz)
-        LambdaInverse = pinv(Lambda)
-        W = complexIdentity(2 * Kz.shape[0])
-        V = Q @ W @ LambdaInverse
-        X = matrixExponentiate(-Lambda * source.k0 * layer.thickness)
-        return (V, W, X)
-    else:
-        eigenValues, W = eig(OmegaSquared)
-        Lambda = np.diag(sqrt(eigenValues))
-        LambdaInverse = np.diag(np.reciprocal(sqrt(eigenValues)))
-        V = Q @ W @ LambdaInverse
-        X = matrixExponentiate(-Lambda * source.k0 * layer.thickness)
-        return (V, W, X)
-
-def S_matrix_internal(kx, ky, layer, source, Wg, Vg):
-    (Vi, Wi, Xi) = VWX_matrices(kx, ky, layer, source);
-    Ai = A_matrix(Wi, Wg, Vi, Vg);
-    Bi = B_matrix(Wi, Wg, Vi, Vg);
-    Di = D_matrix(Ai, Bi, Xi);
-
-    Si = calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di);
-    return Si;
-
-def calculateReflectionRegionSMatrix(kx, ky, layerStack, Wg, Vg):
-    if isinstance(kx, np.ndarray):
-        return calculateReflectionRegionSMatrixNHarmonics(kx, ky, layerStack, Wg, Vg)
-    else:
-        return calculateReflectionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg)
-
-def calculateReflectionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg):
-    kz = Kz_forward(kx, ky, layerStack.incident_layer);
-    (Vi, Wi, X) = VWX_matrices(kx, ky, layerStack.incident_layer);
-    Ai = A_matrix(Wg, Wi, Vg, Vi);
-    Bi = B_matrix(Wg, Wi, Vg, Vi);
-
-    Si = calculateReflectionRegionSMatrixFromRaw(Ai, Bi);
-    return Si;
-
-def calculateReflectionRegionSMatrixNHarmonics(Kx, Ky, layerStack, Wg, Vg):
-    KDimension = Kx.shape[0]
-    lambdaRef = complexZeros((KDimension*2, KDimension*2))
-    Wi = complexIdentity(KDimension * 2)
-    Q = Q_matrix(Kx, Ky, layerStack.incident_layer)
-
-    # I have no idea why we conjugate ur * er and then conjugate the whole thing.
-    Kz = conj(sqrt (conj(layerStack.incident_layer.er * layerStack.incident_layer.ur) * \
-                    complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
-    lambdaRef[:KDimension, :KDimension] = 1j*Kz
-    lambdaRef[KDimension:,KDimension:] = 1j*Kz
-    Vi = Q @ pinv(lambdaRef)
-    Ai = A_matrix(Wg, Wi, Vg, Vi)
-    Bi = B_matrix(Wg, Wi, Vg, Vi)
-
-    Sref = calculateReflectionRegionSMatrixFromRaw(Ai, Bi)
-    return Sref
-
-def calculateTransmissionRegionSMatrix(kx, ky, layerStack, Wg, Vg):
-    if isinstance(kx, np.ndarray):
-        return calculateTransmissionRegionSMatrixNHarmonics(kx, ky, layerStack, Wg, Vg)
-    else:
-        return calculateTransmissionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg)
-
-def calculateTransmissionRegionSMatrix1Harmonic(kx, ky, layerStack, Wg, Vg):
-    (Vi, Wi, X) = VWX_matrices(kx, ky, layerStack.transmission_layer)
-    Ai = A_matrix(Wg, Wi, Vg, Vi);
-    Bi = B_matrix(Wg, Wi, Vg, Vi);
-
-    Si = calculateTransmissionRegionSMatrixFromRaw(Ai, Bi);
-    return Si;
-
-def calculateTransmissionRegionSMatrixNHarmonics(Kx, Ky, layerStack, Wg, Vg):
-    KDimension = Kx.shape[0]
-    lambdaRef = complexZeros((KDimension*2, KDimension*2))
-    Wi = complexIdentity(KDimension * 2)
-    Q = Q_matrix(Kx, Ky, layerStack.transmission_layer)
-
-    # I have no idea why we conjugate ur * er and then conjugate the whole thing.
-    Kz = conj(sqrt (conj(layerStack.transmission_layer.er * layerStack.transmission_layer.ur) * \
-                    complexIdentity(KDimension) - Kx @ Kx - Ky @ Ky))
-    lambdaRef[:KDimension, :KDimension] = 1j*Kz
-    lambdaRef[KDimension:,KDimension:] = 1j*Kz
-    Vi = Q @ pinv(lambdaRef)
-    Ai = A_matrix(Wg, Wi, Vg, Vi)
-    Bi = B_matrix(Wg, Wi, Vg, Vi)
-
-    Strn = calculateTransmissionRegionSMatrixFromRaw(Ai, Bi)
-    return Strn
 
 def calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di):
     AiInverse = pinv(Ai)
@@ -291,6 +82,7 @@ def calculateTransmissionRegionSMatrixFromRaw(ATransmissionRegion, BTransmission
     S[1,0] = 2* AInverse;
     S[1,1] = - AInverse @ B;
     return S;
+
 
 # NOTE - this can only be used for 1D (TMM-type) simulations. rTE/rTM are not meaningful quantities otherwise.
 def calculateTEMReflectionCoefficientsFromXYZ(source, rx, ry, rz):
@@ -380,3 +172,232 @@ def calculateRT(kzReflectionRegion, kzTransmissionRegion,
             (kzReflectionRegion / urReflectionRegion);
 
     return (R, T);
+
+
+class MatrixCalculator:
+    """
+    Superclass of Layer which is used purely for the calculation of matrices
+    """
+
+    def P_matrix(self):
+        if isinstance(self.Kx, np.ndarray):
+            return self._P_matrix_general()
+        else:
+            return self._P_matrix_homogenous()
+
+    def _P_matrix_homogenous(self):
+        P = complexZeros((2, 2));
+
+        P[0,0] = self.Kx*self.Ky;
+        P[0,1] = self.er*self.ur - np.square(self.Kx);
+        P[1,0] = sq(self.Ky) - self.er*self.ur
+        P[1,1] = - self.Kx*self.Ky;
+        P /= self.er;
+        return P
+
+    def _P_matrix_general(self):
+        erInverse = pinv(self.er)
+        KMatrixDimension = self.Kx.shape[0]
+        matrixShape = (2 *KMatrixDimension, 2 * KMatrixDimension)
+        P = complexZeros(matrixShape)
+
+        P[:KMatrixDimension,:KMatrixDimension] = self.Kx @ erInverse @ self.Ky
+        P[:KMatrixDimension,KMatrixDimension:] = self.ur - self.Kx @ erInverse @ self.Kx
+        P[KMatrixDimension:,:KMatrixDimension] = self.Ky @ erInverse @ self.Ky - self.ur
+        P[KMatrixDimension:,KMatrixDimension:] = - self.Ky @ erInverse @ self.Kx
+        return P
+
+    def Q_matrix(self):
+        if isinstance(self.Kx, np.ndarray):
+            if isinstance(self.er, np.ndarray):
+                return self._Q_matrix_general()
+            else:
+                return self._Q_matrix_semi_infinite()
+        else:
+            return self._Q_matrix_homogenous()
+
+    def _Q_matrix_homogenous(self):
+        Q = complexZeros((2,2));
+
+        Q[0,0] = self.Kx * self.Ky;
+        Q[0,1] = self.er*self.ur - sq(self.Kx);
+        Q[1,0] = sq(self.Ky) - self.er*self.ur;
+        Q[1,1] = - self.Kx * self.Ky;
+        Q = Q / self.ur;
+        return Q;
+
+    def _Q_matrix_general(self):
+        urInverse = pinv(self.ur)
+        KMatrixDimension = self.Kx.shape[0]
+        matrixShape = (2 *KMatrixDimension, 2 * KMatrixDimension)
+        Q = complexZeros(matrixShape)
+
+        Q[:KMatrixDimension,:KMatrixDimension] = self.Kx @ urInverse @ self.Ky
+        Q[:KMatrixDimension,KMatrixDimension:] = self.er - self.Kx @ urInverse @ self.Kx
+        Q[KMatrixDimension:,:KMatrixDimension] = self.Ky @ urInverse @ self.Ky - self.er
+        Q[KMatrixDimension:,KMatrixDimension:] = - self.Ky @ urInverse @ self.Kx
+        return Q
+
+    def _Q_matrix_semi_infinite(self):
+        KDimension = self.Kx.shape[0]
+        Q = complexZeros((KDimension * 2, KDimension*2))
+        Q[:KDimension, :KDimension] = self.Kx @ self.Ky
+        Q[:KDimension, KDimension:] = self.ur * self.er * complexIdentity(KDimension) - self.Kx @ self.Kx
+        Q[KDimension:, :KDimension] = self.Ky @ self.Ky - self.ur*self.er*complexIdentity(KDimension)
+        Q[KDimension:, KDimension:] = - self.Ky @ self.Kx
+        Q /= self.ur
+        return Q
+
+    def lambda_matrix(self):
+        Kz = self.Kz_forward() # I am a little unsure about this particular line. Why is Kz_backward never used?
+
+        if isinstance(Kz, np.ndarray):
+            KzDimension = Kz.shape[0]
+            LambdaShape = (KzDimension*2, KzDimension*2)
+            Lambda = complexZeros(LambdaShape)
+            Lambda[:KzDimension, :KzDimension] = 1j*Kz
+            Lambda[KzDimension:, KzDimension:] = 1j*Kz
+            return Lambda
+        else:
+            return complexIdentity(2)* (0 + 1j)*Kz;
+
+    def Kz_backward(self):
+        if isinstance(self.Kx, np.ndarray):
+            return -conj(sqrt(conj(self.er*self.ur)*complexIdentity(self.Kx.shape[0]) - self.Kx @ self.Kx - self.Ky @ self.Ky))
+        else:
+            return sqrt(self.er*self.ur - sq(self.Kx) - sq(self.Ky))
+
+    def Kz_forward(self):
+        if isinstance(self.Kx, np.ndarray):
+            return conj(sqrt(conj(self.er*self.ur)*complexIdentity(self.Kx.shape[0]) - self.Kx @ self.Kx - self.Ky @ self.Ky))
+        else:
+            return sqrt(self.er*self.ur - sq(self.Kx) - sq(self.Ky))
+
+    def Kz_gap(self):
+        if isinstance(self.Kx, np.ndarray):
+            return conj(sqrt(complexIdentity(self.Kx.shape[0]) - self.Kx @ self.Kx - self.Ky @ self.Ky))
+        else:
+            return sqrt(self.er*self.ur - sq(self.Kx) - sq(self.Ky))
+
+    def VWX_matrices(self, source):
+        if not isinstance(self.Kx, np.ndarray):
+            return self._VWX_matrices_homogenous(source)
+        else:
+            return self._VWX_matrices_general(source)
+
+    def _VWX_matrices_homogenous(self, source):
+        Kz = self.Kz_forward()
+        Q = self.Q_matrix()
+        O = self.lambda_matrix()
+        OInverse = pinv(O)
+        W = complexIdentity(2)
+        X = matrixExponentiate(O * source.k0 * self.thickness)
+        V = Q @ W @ OInverse
+
+        return (V, W, X)
+
+    def _VWX_matrices_general(self, source):
+        P = self.P_matrix()
+        Q = self.Q_matrix()
+        OmegaSquared = omega_squared_matrix(P, Q)
+
+        if self.homogenous:
+            Kz = self.Kz_forward()
+            Lambda = self.lambda_matrix()
+            LambdaInverse = pinv(Lambda)
+            W = complexIdentity(2 * Kz.shape[0])
+            V = Q @ W @ LambdaInverse
+            X = matrixExponentiate(-Lambda * source.k0 * self.thickness)
+            return (V, W, X)
+        else:
+            eigenValues, W = eig(OmegaSquared)
+            Lambda = np.diag(sqrt(eigenValues))
+            LambdaInverse = np.diag(np.reciprocal(sqrt(eigenValues)))
+            V = Q @ W @ LambdaInverse
+            X = matrixExponentiate(-Lambda * source.k0 * self.thickness)
+            return (V, W, X)
+
+    def S_matrix(self, source):
+        if self.thickness > 0:
+            return self._S_matrix_internal(source)
+        elif self.thickness == 0:
+
+            if self.incident:
+                return self._S_matrix_reflection(source)
+            elif self.transmission:
+                return self._S_matrix_transmission(source)
+            else:
+                raise ValueError('''Semi-infinite film appears to be neither incident or transmissive. 
+                Cannot compute S-matrix''')
+
+    def _S_matrix_internal(self, source):
+        (Vi, Wi, Xi) = self.VWX_matrices(source)
+        Ai = A_matrix(Wi, self.Wg, Vi, self.Vg)
+        Bi = B_matrix(Wi, self.Wg, Vi, self.Vg)
+        Di = D_matrix(Ai, Bi, Xi)
+
+        Si = calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di);
+        return Si;
+
+    def _S_matrix_reflection(self, source):
+        if isinstance(self.Kx, np.ndarray):
+            return self._S_matrix_reflection_general(source)
+        else:
+            return self._S_matrix_reflection_homogenous(source)
+
+    def _S_matrix_reflection_homogenous(self, source):
+        (Vi, Wi, X) = self.VWX_matrices(source)
+        Ai = A_matrix(self.Wg, Wi, self.Vg, Vi)
+        Bi = B_matrix(self.Wg, Wi, self.Vg, Vi)
+
+        Si = calculateReflectionRegionSMatrixFromRaw(Ai, Bi)
+        return Si
+
+    def _S_matrix_reflection_general(self, source):
+        KDimension = self.Kx.shape[0]
+        lambdaRef = complexZeros((KDimension*2, KDimension*2))
+        Wi = complexIdentity(KDimension * 2)
+        Q = self.Q_matrix()
+
+        # I have no idea why we conjugate ur * er and then conjugate the whole thing.
+        Kz = conj(sqrt (conj(self.er * self.ur) * \
+                        complexIdentity(KDimension) - self.Kx @ self.Kx - self.Ky @ self.Ky))
+        lambdaRef[:KDimension, :KDimension] = 1j*Kz
+        lambdaRef[KDimension:, KDimension:] = 1j*Kz
+        Vi = Q @ pinv(lambdaRef)
+        Ai = A_matrix(self.Wg, Wi, self.Vg, Vi)
+        Bi = B_matrix(self.Wg, Wi, self.Vg, Vi)
+
+        Sref = calculateReflectionRegionSMatrixFromRaw(Ai, Bi)
+        return Sref
+
+    def _S_matrix_transmission(self, source):
+        if isinstance(self.Kx, np.ndarray):
+            return self._S_matrix_transmission_general(source)
+        else:
+            return self._S_matrix_transmission_homogenous(source)
+
+    def _S_matrix_transmission_homogenous(self, source):
+        (Vi, Wi, X) = self.VWX_matrices(source)
+        Ai = A_matrix(self.Wg, Wi, self.Vg, Vi);
+        Bi = B_matrix(self.Wg, Wi, self.Vg, Vi);
+
+        Si = calculateTransmissionRegionSMatrixFromRaw(Ai, Bi);
+        return Si;
+
+    def _S_matrix_transmission_general(self, source):
+        KDimension = self.Kx.shape[0]
+        lambdaRef = complexZeros((KDimension*2, KDimension*2))
+        Wi = complexIdentity(KDimension * 2)
+        Q = self.Q_matrix()
+
+        # I have no idea why we conjugate ur * er and then conjugate the whole thing.
+        Kz = conj(sqrt (conj(self.er * self.ur) * complexIdentity(KDimension) - self.Kx @ self.Kx - self.Ky @ self.Ky))
+        lambdaRef[:KDimension, :KDimension] = 1j*Kz
+        lambdaRef[KDimension:,KDimension:] = 1j*Kz
+        Vi = Q @ pinv(lambdaRef)
+        Ai = A_matrix(self.Wg, Wi, self.Vg, Vi)
+        Bi = B_matrix(self.Wg, Wi, self.Vg, Vi)
+
+        Strn = calculateTransmissionRegionSMatrixFromRaw(Ai, Bi)
+        return Strn

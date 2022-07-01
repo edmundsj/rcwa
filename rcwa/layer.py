@@ -1,10 +1,10 @@
 from rcwa.shorthand import *
-from rcwa import Material
+from rcwa import Material, MatrixCalculator
 
 # TODO: Convolution matrix generation must be refactored. It's a hot mess and hard to understand.
 
 
-class Layer:
+class Layer(MatrixCalculator):
     """
     Class for defining a single layer of a layer stack used in a simulation
 
@@ -23,14 +23,13 @@ class Layer:
 
         self.thickness = thickness
         self.crystal = crystal
+        self.incident = False  # Whether this is a transmission layer
+        self.transmission = False  # Whether this is an incident layer
 
-        if crystal is not None:
-            self.homogenous = False
-            #if numberHarmonics is not None:
-
-                #self.setConvolutionMatrix(numberHarmonics)
-        else:
+        if crystal is None:
             self.homogenous = True
+        else:
+            self.homogenous = False
 
     # Note: these are all just transparent wrappers for underlying material
 
@@ -127,9 +126,6 @@ class Layer:
     def __str__(self):
         return f'Layer with\n\ter: {self.er}\n\tur: {self.ur}\n\tL: {self.thickness}\n\tn: {self.n}\n\tcrystal: {self.crystal}'
 
-    def __repr__(self):
-        return f'Layer with\n\ter: {self.er}\n\tur: {self.ur}\n\tL: {self.thickness}\n\tn: {self.n}\n\tcrystal: {self.crystal}'
-
 
 freeSpaceLayer = Layer(1,1)
 
@@ -142,15 +138,19 @@ class LayerStack:
     :param incident_layer: Semi-infinite layer of incident region. Defaults to free space
     :param transmission_layer: Semi-infinite layer of transmission region. Defaults to free space
     """
-    def __init__(self, *internal_layers, incident_layer=freeSpaceLayer, transmission_layer=freeSpaceLayer):
+    def __init__(self, *internal_layers, incident_layer=Layer(er=1, ur=1), transmission_layer=Layer(er=1, ur=1)):
         if len(internal_layers) == 1:
             if isinstance(internal_layers[0], list):
                 internal_layers = internal_layers[0]
-        self.gapLayer = Layer(er=1,ur=1)
+        self.gapLayer = Layer(er=1, ur=1)
         self.incident_layer = incident_layer
+        self.incident_layer.incident = True
         self.transmission_layer = transmission_layer
+        self.transmission_layer.transmission = True
 
         self.internal_layers = list(internal_layers)
+        self._Kx = None
+        self._Ky = None
 
     def __eq__(self, other):
         if not isinstance(other, LayerStack):
@@ -176,8 +176,47 @@ class LayerStack:
             internal_string += str(layer) + '\n'
         return top_string + internal_string
 
-    def __repr__(self):
-        return self.__str__()
+    @property
+    def _k_dimension(self):
+        if isinstance(self.Kx, np.ndarray):
+            return self.Kx.shape[0]
+        else:
+            return 1
+
+    @property
+    def _s_element_dimension(self):
+        s_dim = self._k_dimension * 2
+        return s_dim
+
+    @property
+    def all_layers(self):
+        return [self.incident_layer, *self.internal_layers, self.transmission_layer]
+
+    @property
+    def Kx(self):
+        return self._Kx
+
+    @Kx.setter
+    def Kx(self, kx):
+        self._Kx = kx
+        self.incident_layer.Kx = kx
+        self.transmission_layer.Kx = kx
+        self.gapLayer.Kx = kx
+        for layer in self.internal_layers:
+            layer.Kx = kx
+
+    @property
+    def Ky(self):
+        return self._Ky
+
+    @Ky.setter
+    def Ky(self, ky):
+        self._Ky = ky
+        self.incident_layer.Ky = ky
+        self.transmission_layer.Ky = ky
+        self.gapLayer.Ky = ky
+        for layer in self.internal_layers:
+            layer.Ky = ky
 
     @property
     def source(self):
@@ -191,9 +230,19 @@ class LayerStack:
         self.incident_layer.source = source
         self.transmission_layer.source = source
 
-    def _set_gap_layer(self, kx, ky):
-        self.gapLayer.er = 1 + sq(kx) + sq(ky)
-        self.gapLayer.ur = 1
+    def set_gap_layer(self):
+        self.gapLayer.er = complexIdentity(self._k_dimension) + sq(self.Kx) + sq(self.Ky)
+        self.gapLayer.ur = complexIdentity(self._k_dimension)
+        self.gapLayer.thickness = 0
+
+        self.Wg = complexIdentity(self._s_element_dimension)
+        Qg = self.gapLayer.Q_matrix()
+        lambda_gap = self.gapLayer.lambda_matrix()
+        self.Vg = Qg @ inv(lambda_gap)
+
+        for layer in self.all_layers:
+            layer.Wg = self.Wg
+            layer.Vg = self.Vg
 
     # set all convolution matrices for all interior layers
     def set_convolution_matrices(self, numberHarmonics):
