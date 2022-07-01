@@ -15,7 +15,7 @@ with open("README.md", "r") as fh:
 
 	setuptools.setup(
 		name="rcwa",
-		version="1.0." + str(int(os.environ['GITHUB_RUN_NUMBER'])),
+		version="1.0." + str(5 +  int(os.environ['GITHUB_RUN_NUMBER'])),
 		author="Jordan Edmunds",
 		author_email="jordan.e@berkeley.edu",
 		description="Python Implementation of Rigorous Coupled Wave Analysis",
