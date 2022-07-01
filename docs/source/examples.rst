@@ -31,7 +31,7 @@ Ellipsometry of bare Si wafer [BROKEN]
 Rectangular Lattice Photonic Crystal with Triangular Shape
 -----------------------------------------------------------
 
-.. literalinclude:: ../../rcwa/examples/triangular_photonic_crystal.py
+.. literalinclude:: ../../rcwa/examples/triangular_photonic_crystal_2D.py
    :language: python
 
 Rectangular Diffraction Grating

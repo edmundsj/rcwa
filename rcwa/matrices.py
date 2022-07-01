@@ -135,18 +135,21 @@ def calculateKzForward(kx, ky, layer):
     else:
         return sqrt(layer.er*layer.ur - sq(kx) - sq(ky))
 
+
 def calculateKVector(source, layer):
     kx = layer.n * sin(source.theta) * cos(source.phi);
     ky = layer.n * sin(source.theta) * sin(source.phi);
     kz = layer.n * cos(source.theta);
     return complexArray([kx, ky, kz]);
 
+
 def calculateVWXMatrices(kx, ky, layer, source=zeroSource):
     if isinstance(kx, np.ndarray):
         return calculateVWXMatricesNHarmonics(kx, ky, layer, source)
     else:
-        kz = calculateKzForward(kx, ky, layer) # This *should* work.
+        kz = calculateKzForward(kx, ky, layer)
         return calculateVWXMatrices1Harmonic(kx, ky, kz, layer, source)
+
 
 def calculateVWXMatrices1Harmonic(kx, ky, kz, layer, source):
     Q = calculateQMatrix(kx, ky, layer);
@@ -158,7 +161,8 @@ def calculateVWXMatrices1Harmonic(kx, ky, kz, layer, source):
 
     return (V, W, X);
 
-# TODO - INCORPORATE CONVOLUTION MATRIX INTO THE LAYERS
+
+
 def calculateVWXMatricesNHarmonics(Kx, Ky, layer, source):
     P = calculatePMatrix(Kx, Ky, layer)
     Q = calculateQMatrix(Kx, Ky, layer)

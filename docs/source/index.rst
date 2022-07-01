@@ -13,6 +13,7 @@ Documentation for Rigorous Coupled Wave Analysis
    examples
    api
    material
+   mathematics
 
 Getting Started
 ------------------

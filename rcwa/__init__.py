@@ -19,4 +19,3 @@ from rcwa.source import Source, zeroSource
 from rcwa.solver import Solver
 from rcwa.utils import Plotter
 from rcwa.shorthand import complexArray
-
