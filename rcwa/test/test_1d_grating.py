@@ -26,41 +26,41 @@ class Test1DGrating(unittest.TestCase):
 
     def testPMatrix(self):
         PActual = self.PLayer
-        PCalculated = calculatePMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
+        PCalculated = P_matrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
         assert_almost_equal(PActual, PCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "P matrix layer");
 
     def testQMatrix(self):
         QActual = self.QLayer
-        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
+        QCalculated = Q_matrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
         assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q matrix Layer");
 
         QActual = self.QReflectionRegion
-        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.incident_layer)
+        QCalculated = Q_matrix(self.Kx, self.Ky, self.layerStack.incident_layer)
         assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q Reflection Region");
 
         QActual = self.QTransmissionRegion
-        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.transmission_layer)
+        QCalculated = Q_matrix(self.Kx, self.Ky, self.layerStack.transmission_layer)
         assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q Transmission Region");
 
     def testOmegaSquaredMatrix(self):
         OmegaSquaredActual = self.OmegaSquaredLayer
-        OmegaSquaredCalculated = calculateOmegaSquaredMatrix(self.PLayer, self.QLayer)
+        OmegaSquaredCalculated = omega_squared_matrix(self.PLayer, self.QLayer)
         assert_almost_equal(OmegaSquaredActual, OmegaSquaredCalculated,
                             self.absoluteTolerance, self.relativeTolerance);
 
     def testWMatrix(self):
-        (V, WCalculated, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[0],
-                                                   self.source)
+        (V, WCalculated, X) = VWX_matrices(self.Kx, self.Ky, self.layerStack.internal_layers[0],
+                                           self.source)
         WActual = self.WLayer
         assert_almost_equal(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer");
 
     def testXMatrix(self):
-        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[0], self.source)
+        (V, W, XCalculated) = VWX_matrices(self.Kx, self.Ky, self.layerStack.internal_layers[0], self.source)
         XActual = self.XLayer
 
         # Numerical error is causing accidental conjugation. To match the test data we need
@@ -75,20 +75,20 @@ class Test1DGrating(unittest.TestCase):
     def testAMatrix(self):
         V = self.VLayer
         W = self.WLayer
-        ACalculated = calculateScatteringAMatrix(W, self.WFreeSpace, V, self.VFreeSpace);
+        ACalculated = A_matrix(W, self.WFreeSpace, V, self.VFreeSpace);
         AActual = self.ALayer
         assert_almost_equal(AActual, ACalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testBMatrix(self):
         W = self.WLayer
         V = self.VLayer
-        BCalculated = calculateScatteringBMatrix(W, self.WFreeSpace, V, self.VFreeSpace);
+        BCalculated = B_matrix(W, self.WFreeSpace, V, self.VFreeSpace);
         BActual = self.BLayer
         assert_almost_equal(BActual, BCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testScatteringMatrixFromRaw(self):
         SMatrixLayerCalculated = calculateInternalSMatrixFromRaw(self.ALayer, self.BLayer,
-                self.XLayer, calculateScatteringDMatrix(self.ALayer, self.BLayer, self.XLayer))
+                                                                 self.XLayer, D_matrix(self.ALayer, self.BLayer, self.XLayer))
         S11Actual = self.S11Layer
         S11Calculated = SMatrixLayerCalculated[0,0];
         assert_almost_equal(S11Actual, S11Calculated, self.absoluteTolerance, self.relativeTolerance,
@@ -115,8 +115,8 @@ class Test1DGrating(unittest.TestCase):
                 "S22 for Layer");
 
     def testSMatrixFromFundamentals(self):
-        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0],
-                                                self.source, self.WFreeSpace, self.VFreeSpace)
+        SiCalculated = S_matrix_internal(self.Kx, self.Ky, self.layerStack.internal_layers[0],
+                                         self.source, self.WFreeSpace, self.VFreeSpace)
 
         S11Actual = self.S11Layer
         S11Calculated = SiCalculated[0,0]

@@ -8,12 +8,12 @@ from rcwa.matrices import *
 
 class Test1x1Harmonic(unittest.TestCase):
     def testCalculateKz(self):
-        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.incident_layer)
+        KzCalculated = Kz_forward(self.Kx, self.Ky, self.layerStack.incident_layer)
         KzActual = np.float64(self.KzReflectionRegion)
         assert_almost_equal(KzActual, KzCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "Kz in Reflection region not correct")
 
-        KzCalculated = calculateKzForward(self.Kx, self.Ky, self.layerStack.transmission_layer)
+        KzCalculated = Kz_forward(self.Kx, self.Ky, self.layerStack.transmission_layer)
         KzActual = self.KzTransmissionRegion
         assert_almost_equal(KzActual, KzCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "Kz in transmission region not correct")
@@ -46,13 +46,13 @@ class Test1x1Harmonic(unittest.TestCase):
     def testTransparentSMatrix(self):
 
         SActual = self.transparentSMatrix
-        SCalculated = generateTransparentSMatrix((2,2));
+        SCalculated = S_matrix_transparent((2, 2));
 
         assert_almost_equal(SActual, SCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testCalculateKVector(self):
         kVectorActual = complexArray([self.Kx, self.Ky, self.KzReflectionRegion])
-        kVectorCalculated = calculateKVector(self.source, self.layerStack.incident_layer)
+        kVectorCalculated = k_vector(self.source, self.layerStack.incident_layer)
         assert_almost_equal(kVectorActual, kVectorCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testCalcEz(self):
@@ -82,57 +82,57 @@ class Test1x1Harmonic(unittest.TestCase):
         PActual = complexArray([
             [0.212504, 0.499373],
             [-0.909798, -0.212504]])
-        PCalculated = calculatePMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
+        PCalculated = P_matrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
         assert_almost_equal(PActual, PCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "P matrix layer 1");
 
     def testQMatrix(self):
         QActual = complexArray([[0.4250, 0.9987],[-1.8196, -0.4250]]);
-        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
+        QCalculated = Q_matrix(self.Kx, self.Ky, self.layerStack.internal_layers[0])
         assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q matrix Layer 1");
 
         QActual = complexArray([[0.1417, 0.6662],[-0.9399, -0.1417]]);
-        QCalculated = calculateQMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[1])
+        QCalculated = Q_matrix(self.Kx, self.Ky, self.layerStack.internal_layers[1])
         assert_almost_equal(QActual, QCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Q matrix layer 2")
 
     def testLambdaMatrix(self):
         OActual = complexArray([[0 + 0.9046j, 0+0j],[0+0j,0+0.9046j]]);
-        OCalculated = calculateLambdaMatrix(self.KzLayer1);
+        OCalculated = lambda_matrix(self.KzLayer1);
         assert_almost_equal(OActual, OCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         OActual = complexArray([[0 + 1.3485j, 0+0j],[0+0j,0+1.3485j]]);
-        OCalculated = calculateLambdaMatrix(self.KzLayer2);
+        OCalculated = lambda_matrix(self.KzLayer2);
         assert_almost_equal(OActual, OCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testVMatrix(self):
-        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.gapLayer)
+        (VCalculated, W, X) = VWX_matrices(self.Kx, self.Ky, self.layerStack.gapLayer)
         VActual = complexArray([[0 - 0.4250j, 0 - 1.1804j], [0 + 2.0013j, 0 + 0.4250j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[0])
+        (VCalculated, W, X) = VWX_matrices(self.Kx, self.Ky, self.layerStack.internal_layers[0])
         VActual = complexArray([[0-0.4698j,0-1.1040j],[0+2.0114j,0+0.4698j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[1])
+        (VCalculated, W, X) = VWX_matrices(self.Kx, self.Ky, self.layerStack.internal_layers[1])
         VActual = complexArray([[0-0.1051j,0-0.4941j],[0+0.6970j,0+0.1051j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (VCalculated, W_ref, X) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.incident_layer)
+        (VCalculated, W_ref, X) = VWX_matrices(self.Kx, self.Ky, self.layerStack.incident_layer)
         VActual = complexArray([
             [0 - 0.5017j, 0 - 0.8012j],
             [0 + 1.7702j, 0 + 0.5017j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testXMatrix(self):
-        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[0],
-                                                   self.source)
+        (V, W, XCalculated) = VWX_matrices(self.Kx, self.Ky, self.layerStack.internal_layers[0],
+                                           self.source)
         XActual = complexArray([[0.1493+0.9888j, 0+0j],[0+0j,0.1493+0.9888j]]);
         assert_almost_equal(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
 
-        (V, W, XCalculated) = calculateVWXMatrices(self.Kx, self.Ky, self.layerStack.internal_layers[1],
-                                                   self.source)
+        (V, W, XCalculated) = VWX_matrices(self.Kx, self.Ky, self.layerStack.internal_layers[1],
+                                           self.source)
         XActual = complexArray([[-0.4583 - 0.8888j, 0+0j],[0+0j, -0.4583 - 0.8888j]]);
         assert_almost_equal(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
 
@@ -143,7 +143,7 @@ class Test1x1Harmonic(unittest.TestCase):
         V1 = complexArray([[0 - 0.4698j, 0 - 1.1040j],[0 + 2.0114j, 0 + 0.4698j]]);
         Vg = complexArray([[0 - 0.4250j, 0 - 1.1804j], [0 + 2.0013j, 0 + 0.4250j]]);
 
-        ACalculated = calculateScatteringAMatrix(W1, Wg, V1, Vg);
+        ACalculated = A_matrix(W1, Wg, V1, Vg);
         AActual = self.ALayer1
         assert_almost_equal(AActual, ACalculated, self.absoluteTolerance, self.relativeTolerance);
 
@@ -152,7 +152,7 @@ class Test1x1Harmonic(unittest.TestCase):
         V2 = complexArray([[0 - 0.1051j, 0 - 0.4941j],[0 + 0.6970j, 0 + 0.1051j]]);
         Vg = complexArray([[0 - 0.4250j, 0 - 1.1804j],[0 + 2.0013j, 0 + 0.4250j]]);
 
-        ACalculated = calculateScatteringAMatrix(W2, Wg, V2, Vg);
+        ACalculated = A_matrix(W2, Wg, V2, Vg);
         AActual = self.ALayer2
         assert_almost_equal(AActual, ACalculated, self.absoluteTolerance, self.relativeTolerance);
 
@@ -161,7 +161,7 @@ class Test1x1Harmonic(unittest.TestCase):
         Wg = complexIdentity(2);
         V1 = complexArray([[0 - 0.4698j, 0 - 1.1040j],[0 + 2.0114j, 0 + 0.4698j]]);
         Vg = complexArray([[0 - 0.4250j, 0 - 1.1804j], [0 + 2.0013j, 0 + 0.4250j]]);
-        BCalculated = calculateScatteringBMatrix(W1, Wg, V1, Vg);
+        BCalculated = B_matrix(W1, Wg, V1, Vg);
         BActual = complexArray([[-0.0049, 0.0427],[0.0427, -0.0873]]);
         assert_almost_equal(BActual, BCalculated, self.absoluteTolerance, self.relativeTolerance);
 
@@ -170,7 +170,7 @@ class Test1x1Harmonic(unittest.TestCase):
         V2 = complexArray([[0 - 0.1051j, 0 - 0.4941j],[0 + 0.6970j, 0 + 0.1051j]]);
         Vg = complexArray([[0 - 0.4250j, 0 - 1.1804j],[0 + 2.0013j, 0 + 0.4250j]]);
 
-        BCalculated = calculateScatteringBMatrix(W2, Wg, V2, Vg);
+        BCalculated = B_matrix(W2, Wg, V2, Vg);
         BActual = complexArray([[-1.8324, -0.2579],[-0.2579, -1.3342]]);
         assert_almost_equal(BActual, BCalculated, self.absoluteTolerance, self.relativeTolerance);
 
@@ -181,7 +181,7 @@ class Test1x1Harmonic(unittest.TestCase):
         A = complexArray([[2.0049, -0.0427], [-0.0427, 2.0873]]);
         B = complexArray([[-0.0049, 0.0427], [0.0427, -0.0873]]);
         X = complexArray([[0.1493 + 0.9888j, 0+0j],[0+0j, 0.4193 + 0.9888j]]);
-        DCalculated = calculateScatteringDMatrix(A, B, X);
+        DCalculated = D_matrix(A, B, X);
         DActual = complexArray([[2.0057 - 0.0003j, -0.0445 + 0.0006j],[-0.0445 + 0.0006j, 2.0916 - 0.0013j]])
         assert_almost_equal(DActual, DCalculated, absoluteTolerance, relativeTolerance);
 
@@ -191,7 +191,7 @@ class Test1x1Harmonic(unittest.TestCase):
         B = complexArray([[-1.8324, -0.2579], [-0.2579, -1.3342]]);
         X = complexArray([[-0.4583 - 0.8888j, 0+0j],[0+0j, -0.4583 - 0.8888j]]);
 
-        DCalculated = calculateScatteringDMatrix(A, B, X);
+        DCalculated = D_matrix(A, B, X);
         DActual = complexArray([[4.3436 - 0.7182j, 0.3604 - 0.1440j], [0.3604 - 0.1440j, 3.6475 - 0.4401j]]);
         assert_almost_equal(DActual, DCalculated, self.absoluteTolerance, self.relativeTolerance);
 
@@ -241,7 +241,7 @@ class Test1x1Harmonic(unittest.TestCase):
         SA = self.transparentSMatrix
         SB = self.SLayer1
         DRedhefferMatrixActual = complexArray([[1,0],[0,1]])
-        DRedhefferMatrixCalculated = calculateRedhefferDMatrix(SA, SB)
+        DRedhefferMatrixCalculated = D_matrix_redheffer(SA, SB)
         assert_almost_equal(DRedhefferMatrixActual, DRedhefferMatrixCalculated, self.absoluteTolerance,
                             self.relativeTolerance, "Layer 1 D matrix")
 
@@ -250,7 +250,7 @@ class Test1x1Harmonic(unittest.TestCase):
         DRedhefferMatrixActual = complexArray([
             [0.1506 + 0.9886j, -0.0163 - 0.0190j],
             [-0.0163 - 0.0190j, 0.1822 + 1.0253j]]);
-        DRedhefferMatrixCalculated = calculateRedhefferDMatrix(SA, SB)
+        DRedhefferMatrixCalculated = D_matrix_redheffer(SA, SB)
         assert_almost_equal(DRedhefferMatrixActual, DRedhefferMatrixCalculated, self.absoluteTolerance,
                             self.relativeTolerance, "Layer 2 D matrix")
 
@@ -260,7 +260,7 @@ class Test1x1Harmonic(unittest.TestCase):
         FRedhefferMatrixActual = complexArray([
             [0.1490 + 0.9880j, 0.0005 + 0.0017j],
             [0.0005 + 0.0017j, 0.148 + 0.9848j]]);
-        FRedhefferMatrixCalculated = calculateRedhefferFMatrix(SA, SB)
+        FRedhefferMatrixCalculated = F_matrix(SA, SB)
         assert_almost_equal(FRedhefferMatrixActual, FRedhefferMatrixCalculated, self.absoluteTolerance,
                             self.relativeTolerance, "Layer 1 F matrix")
 
@@ -269,7 +269,7 @@ class Test1x1Harmonic(unittest.TestCase):
         FRedhefferMatrixActual = complexArray([
             [-0.2117 - 0.6413j, 0.0471 + 0.0518j],
             [0.0471 + 0.0518j, -0.3027 - 0.7414j]]);
-        FRedhefferMatrixCalculated = calculateRedhefferFMatrix(SA, SB)
+        FRedhefferMatrixCalculated = F_matrix(SA, SB)
         assert_almost_equal(FRedhefferMatrixActual, FRedhefferMatrixCalculated, self.absoluteTolerance,
                             self.relativeTolerance, "Layer 2 F matrix")
 
@@ -277,7 +277,7 @@ class Test1x1Harmonic(unittest.TestCase):
         SA = self.transparentSMatrix
         SB = self.SLayer1
         SABActual = self.SLayer1
-        SABCalculated = calculateRedhefferProduct(SA, SB)
+        SABCalculated = redheffer_product(SA, SB)
         assert_almost_equal(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer product with Layer 1 and transparent matrix")
 
@@ -296,20 +296,20 @@ class Test1x1Harmonic(unittest.TestCase):
         SABActual[1,1] = complexArray([
             [0.6971 - 0.2216j, 0.0672 - 0.0211j],
             [0.0672 - 0.0211j, 0.5673 - 0.1808j]]);
-        SABCalculated = calculateRedhefferProduct(SA, SB)
+        SABCalculated = redheffer_product(SA, SB)
         assert_almost_equal(SABActual, SABCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "Redheffer product with Layer 1 Layer 2")
 
     def testSMatrixFromFundamentals(self):
         SiActual = self.SLayer1
-        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[0],
-                                                self.source, self.WGap, self.VGap)
+        SiCalculated = S_matrix_internal(self.Kx, self.Ky, self.layerStack.internal_layers[0],
+                                         self.source, self.WGap, self.VGap)
         assert_almost_equal(SiActual, SiCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
         SiActual = self.SLayer2
-        SiCalculated = calculateInternalSMatrix(self.Kx, self.Ky, self.layerStack.internal_layers[1],
-                                                self.source, self.WGap, self.VGap)
+        SiCalculated = S_matrix_internal(self.Kx, self.Ky, self.layerStack.internal_layers[1],
+                                         self.source, self.WGap, self.VGap)
         assert_almost_equal(SiActual, SiCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 

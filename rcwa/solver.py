@@ -251,9 +251,9 @@ class Solver:
         if self.TMMSimulation: # Ensure that Kz for the gap layer is 1
             self.layer_stack.gapLayer = Layer(er=1 + sq(self.Kx) + sq(self.Ky), ur=1, thickness=0)
 
-        self.KzReflectionRegion = calculateKzBackward(self.Kx, self.Ky, self.layer_stack.incident_layer)
-        self.KzTransmissionRegion = calculateKzForward(self.Kx, self.Ky, self.layer_stack.transmission_layer)
-        self.KzGapRegion = calculateKzForward(self.Kx, self.Ky, self.layer_stack.gapLayer)
+        self.KzReflectionRegion = Kz_backward(self.Kx, self.Ky, self.layer_stack.incident_layer)
+        self.KzTransmissionRegion = Kz_forward(self.Kx, self.Ky, self.layer_stack.transmission_layer)
+        self.KzGapRegion = Kz_forward(self.Kx, self.Ky, self.layer_stack.gapLayer)
 
     def _outer_matrices(self):
         self.WReflectionRegion = complexIdentity(self._s_element_dimension)
@@ -261,23 +261,23 @@ class Solver:
 
     def _gap_matrices(self):
         self.WGap = complexIdentity(self._s_element_dimension)
-        QGap = calculateQMatrix(self.Kx, self.Ky, self.layer_stack.gapLayer)
-        LambdaGap = calculateLambdaMatrix(self.KzGapRegion)
+        QGap = Q_matrix(self.Kx, self.Ky, self.layer_stack.gapLayer)
+        LambdaGap = lambda_matrix(self.KzGapRegion)
         self.VGap = QGap @ inv(LambdaGap)
 
     def _inner_s_matrix(self):
         for i in range(len(self.layer_stack.internal_layers)):
-            self.Si[i] = calculateInternalSMatrix(self.Kx, self.Ky, self.layer_stack.internal_layers[i],
-                                                  self.source, self.WGap, self.VGap)
-            self.SGlobal = calculateRedhefferProduct(self.SGlobal, self.Si[i])
+            self.Si[i] = S_matrix_internal(self.Kx, self.Ky, self.layer_stack.internal_layers[i],
+                                           self.source, self.WGap, self.VGap)
+            self.SGlobal = redheffer_product(self.SGlobal, self.Si[i])
 
     def _global_s_matrix(self):
         self.STransmission = calculateTransmissionRegionSMatrix(self.Kx, self.Ky, self.layer_stack,
                                                                 self.WGap, self.VGap)
         self.SReflection = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.layer_stack,
                                                             self.WGap, self.VGap)
-        self.SGlobal = calculateRedhefferProduct(self.SGlobal, self.STransmission)
-        self.SGlobal = calculateRedhefferProduct(self.SReflection, self.SGlobal)
+        self.SGlobal = redheffer_product(self.SGlobal, self.STransmission)
+        self.SGlobal = redheffer_product(self.SReflection, self.SGlobal)
 
     def _initialize(self):
         if self.base_crystal is None:
@@ -285,7 +285,7 @@ class Solver:
         else:
             self.TMMSimulation = False
 
-        self.SGlobal = generateTransparentSMatrix(self._s_element_shape)
+        self.SGlobal = S_matrix_transparent(self._s_element_shape)
         self.rx, self.ry, self.rz = None, None, None
         self.tx, self.ty, self.tz = None, None, None
         self.R, self.T, self.RTot, self.TTot, self.CTot = None, None, None, None, None
