@@ -58,14 +58,14 @@ class Test1DGrating(unittest.TestCase):
 
     def testWMatrix(self):
         layer = self.layerStack.internal_layers[0]
-        (V, WCalculated, X) = layer.VWX_matrices(self.source)
+        (V, WCalculated, X) = layer.VWX_matrices()
         WActual = self.WLayer
         assert_almost_equal(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer")
 
     def testXMatrix(self):
         layer = self.layerStack.internal_layers[0]
-        (V, W, XCalculated) = layer.VWX_matrices(self.source)
+        (V, W, XCalculated) = layer.VWX_matrices()
         XActual = self.XLayer
 
         # Numerical error is causing accidental conjugation. To match the test data we need
@@ -122,7 +122,7 @@ class Test1DGrating(unittest.TestCase):
     def testSMatrixFromFundamentals(self):
         layer = self.layerStack.internal_layers[0]
 
-        SiCalculated = layer.S_matrix(self.source)
+        SiCalculated = layer.S_matrix()
 
         S11Actual = self.S11Layer
         S11Calculated = SiCalculated[0,0]
@@ -195,6 +195,7 @@ class Test1DGrating(unittest.TestCase):
         self.Ky = np.diag(complexArray([0.296198133,0.296198133]))
         self.layerStack.Kx = self.Kx
         self.layerStack.Ky = self.Ky
+        self.layerStack.source = self.source
 
         # As with other tests this is a bit of a hack, but that's good for test purposes.
         self.layerStack.internal_layers[0].er = self.erConvolutionMatrixLayer

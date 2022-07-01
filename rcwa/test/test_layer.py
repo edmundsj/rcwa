@@ -111,3 +111,14 @@ def test_set_gap_layer():
         assert_almost_equal(VGap, layer.Vg, absoluteTolerance=1e-4)
 
 
+def  test_set_source():
+    layer_i = Layer()
+    layer_t = Layer()
+    layer = Layer()
+    source = Source()
+    stack = LayerStack(layer, incident_layer=layer_i, transmission_layer=layer_t)
+    stack.source = source
+    assert stack.source is source
+    assert stack.gapLayer.source is source
+    for layer in [layer_i, layer_t, layer]:
+        assert layer.source is source

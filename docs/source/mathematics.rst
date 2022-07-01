@@ -91,7 +91,6 @@ Just as with field coefficients, both the x- and y-components of the mode coeffi
 
 :math:`c_{i,x}^+` and :math:`c_{i,y}^+` are vectors with length equal to the total number of harmonics (i.e. for a 2D photonic crystal if :math:`N_x = 3` and :math:`N_y=3`, then :math:`N_{tot} = N_x * N_y = 9`, and the length of the total vector :math:`c_{i}^+` is 18.
 
-
 Scattering Matrices couple Mode Coefficients
 ------------------------------------------------
 The scattering matrix for the :math:`i^{th}` layer relates the forward- and backward propagating mode coefficients between the :math:`i^{th}` and :math:`i+1^{th}` layer in the following way:
@@ -122,7 +121,6 @@ The mode coefficients in the :math:`i^{th}` layer can be related to directly to 
            s_{i,x} \\
             s_{i,y}
    \end{bmatrix} = W . e^{- \lambda z} . c_{i}^+ + W . e^{- \lambda z} . c_{i}^-
-
 
 Magnetic Field Coefficients
 ___________________________________________

@@ -199,10 +199,8 @@ class LayerStack:
     @Kx.setter
     def Kx(self, kx):
         self._Kx = kx
-        self.incident_layer.Kx = kx
-        self.transmission_layer.Kx = kx
         self.gapLayer.Kx = kx
-        for layer in self.internal_layers:
+        for layer in self.all_layers:
             layer.Kx = kx
 
     @property
@@ -212,10 +210,8 @@ class LayerStack:
     @Ky.setter
     def Ky(self, ky):
         self._Ky = ky
-        self.incident_layer.Ky = ky
-        self.transmission_layer.Ky = ky
         self.gapLayer.Ky = ky
-        for layer in self.internal_layers:
+        for layer in self.all_layers:
             layer.Ky = ky
 
     @property
@@ -225,10 +221,9 @@ class LayerStack:
     @source.setter
     def source(self, source):
         self._source = source
-        for layer in self.internal_layers:
+        self.gapLayer.source = source
+        for layer in self.all_layers:
             layer.source = self.source
-        self.incident_layer.source = source
-        self.transmission_layer.source = source
 
     def set_gap_layer(self):
         self.gapLayer.thickness = 0

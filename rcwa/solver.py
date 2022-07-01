@@ -85,6 +85,32 @@ class Solver:
         self.results = self._package_results()
         return self.results
 
+    def fields(self, component='Ex', layer=None, x_min=0, x_max=0, y_min=0, y_max=0, z_min=0, z_max=0, N_x=1, N_y=1, N_z=1):
+        # First, we find the forward- and backward propagating waves in the incident region
+        V_inc, W_inc, _ = self.layer_stack.incident_layer.VWX_matrices(self.source)
+        c_incident = np.linalg.inv(W_inc) @ s_incident(self.source, self.n_harmonics)
+        c_reflected = self.SGlobal[0, 0] @ c_incident
+
+        if layer is self.layer_stack.incident_layer:
+            c_forward_target = c_incident
+            c_backward_target = c_reflected
+        elif layer is self.layer_stack.transmission_layer:
+            c_forward_target = self.SGlobal[1, 0] @ c_incident
+            c_backward_target = 0 * c_incident
+        else:
+            raise NotImplementedError
+
+        V_target, W_target, _ = self.layer_stack.incident_layer.VWX_matrices(self.source)
+        if 'E' in component:
+            pass
+
+        breakpoint()
+        return c_incident
+
+    @property
+    def base_crystal(self):
+        return self.layer_stack.crystal
+
     def _increase_harmonics(self, factor=1):
         n_harmonics = np.array(self.n_harmonics)
         n_harmonics *= factor
@@ -149,6 +175,7 @@ class Solver:
 
     def _couple_source(self):
         self.source.layer = self.layer_stack.incident_layer
+        self.layer_stack.source = self.source
 
     def _rt_quantities(self):
         self.rx, self.ry, self.rz = calculateReflectionCoefficient(self.SGlobal, self.Kx, self.Ky,
@@ -236,9 +263,7 @@ class Solver:
         s_shape = (s_dim, s_dim)
         return s_shape
 
-    @property
-    def base_crystal(self):
-        return self.layer_stack.crystal
+
 
     def _k_matrices(self):
         """
@@ -263,12 +288,12 @@ class Solver:
 
     def _inner_s_matrix(self):
         for i, layer in enumerate(self.layer_stack.internal_layers):
-            self.Si[i] = layer.S_matrix(self.source)
+            self.Si[i] = layer.S_matrix()
             self.SGlobal = redheffer_product(self.SGlobal, self.Si[i])
 
     def _global_s_matrix(self):
-        self.STransmission = self.layer_stack.transmission_layer.S_matrix(self.source)
-        self.SReflection = self.layer_stack.incident_layer.S_matrix(self.source)
+        self.STransmission = self.layer_stack.transmission_layer.S_matrix()
+        self.SReflection = self.layer_stack.incident_layer.S_matrix()
         self.SGlobal = redheffer_product(self.SGlobal, self.STransmission)
         self.SGlobal = redheffer_product(self.SReflection, self.SGlobal)
 

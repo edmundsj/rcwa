@@ -115,23 +115,22 @@ class Test1x1Harmonic(unittest.TestCase):
 
     def testVMatrix(self):
         layer = self.layerStack.gapLayer
-        empty_source = Source()
-        (VCalculated, W, X) = layer.VWX_matrices(empty_source)
+        (VCalculated, W, X) = layer.VWX_matrices()
         VActual = complexArray([[0 - 0.4250j, 0 - 1.1804j], [0 + 2.0013j, 0 + 0.4250j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         layer = self.layerStack.internal_layers[0]
-        (VCalculated, W, X) = layer.VWX_matrices(empty_source)
+        (VCalculated, W, X) = layer.VWX_matrices()
         VActual = complexArray([[0-0.4698j,0-1.1040j],[0+2.0114j,0+0.4698j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         layer = self.layerStack.internal_layers[1]
-        (VCalculated, W, X) = layer.VWX_matrices(empty_source)
+        (VCalculated, W, X) = layer.VWX_matrices()
         VActual = complexArray([[0-0.1051j,0-0.4941j],[0+0.6970j,0+0.1051j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         layer = self.layerStack.incident_layer
-        (VCalculated, W_ref, X) = layer.VWX_matrices(empty_source)
+        (VCalculated, W_ref, X) = layer.VWX_matrices()
         VActual = complexArray([
             [0 - 0.5017j, 0 - 0.8012j],
             [0 + 1.7702j, 0 + 0.5017j]]);
@@ -139,12 +138,12 @@ class Test1x1Harmonic(unittest.TestCase):
 
     def testXMatrix(self):
         layer = self.layerStack.internal_layers[0]
-        (V, W, XCalculated) = layer.VWX_matrices(self.source)
+        (V, W, XCalculated) = layer.VWX_matrices()
         XActual = complexArray([[0.1493+0.9888j, 0+0j],[0+0j,0.1493+0.9888j]]);
         assert_almost_equal(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         layer = self.layerStack.internal_layers[1]
-        (V, W, XCalculated) = layer.VWX_matrices(self.source)
+        (V, W, XCalculated) = layer.VWX_matrices()
         XActual = complexArray([[-0.4583 - 0.8888j, 0+0j],[0+0j, -0.4583 - 0.8888j]]);
         assert_almost_equal(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
 
@@ -315,13 +314,13 @@ class Test1x1Harmonic(unittest.TestCase):
     def testSMatrixFromFundamentals(self):
         SiActual = self.SLayer1
         layer = self.layerStack.internal_layers[0]
-        SiCalculated = layer.S_matrix(self.source)
+        SiCalculated = layer.S_matrix()
         assert_almost_equal(SiActual, SiCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
         SiActual = self.SLayer2
         layer = self.layerStack.internal_layers[1]
-        SiCalculated = layer.S_matrix(self.source)
+        SiCalculated = layer.S_matrix()
         assert_almost_equal(SiActual, SiCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
@@ -358,14 +357,14 @@ class Test1x1Harmonic(unittest.TestCase):
     def testReflectionRegionSMatrixFromFundamentals(self):
         SActual = self.SReflectionRegion
         layer = self.layerStack.incident_layer
-        SCalculated = layer.S_matrix(self.source)
+        SCalculated = layer.S_matrix()
         assert_almost_equal(SActual, SCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
     def testTransmissionRegionSMatrixFromFundamentals(self):
         SActual = self.STransmissionRegion
         layer = self.layerStack.transmission_layer
-        SCalculated = layer.S_matrix(self.source)
+        SCalculated = layer.S_matrix()
         assert_almost_equal(SActual, SCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "S Matrix layer 1")
 
@@ -421,6 +420,7 @@ class Test1x1Harmonic(unittest.TestCase):
         layer1 = Layer(er=erLayer1, ur=urLayer1, thickness=thicknessLayer1)
         layer2 = Layer(er=erLayer2, ur=urLayer2, thickness=thicknessLayer2)
         self.layerStack = LayerStack(layer1, layer2, incident_layer=reflectionLayer, transmission_layer=transmissionLayer)
+        self.layerStack.source = self.source
 
         self.Kx = reflectionLayer.n* sin(self.theta) * cos(self.phi)
         self.Ky = reflectionLayer.n* sin(self.theta) * sin(self.phi)
