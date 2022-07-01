@@ -8,8 +8,8 @@ Mathematics of RCWA
 
 This section is for developers who want to understand the implementation of this package, for example, to implement their own manipulations on top of it or extend functionality. It follows the formulation laid out by `Rumpf <https://empossible.net/wp-content/uploads/2019/08/Lecture-7a-RCWA-Formulation.pdf>`_. This is intended as a reference for developers with a fairly advanced electromagnetics and mathematics background, and assumes a knowledge of electromagnetic modes, vectors, matrices, matrix multiplication, and vectors and matrices composed of other vectors and matrices.
 
-Definitions
-----------------------
+Definitions and Conventions
+-----------------------------
 
    | :math:`N_{x}`: number of harmonics along x-direction
    | :math:`N_y`: number of harmonics along y-direction.
@@ -23,6 +23,8 @@ Definitions
    | :math:`c`: Mode coefficient
    | :math:`W`: Electric field coefficient mode matrix
    | :math:`V`: Magnetic field coefficient mode matrix
+
+Layer "0" is the incident layer. Layer "1" is the layer closest to the incident region.
 
 Fields and Field Coefficients
 ----------------------------------
@@ -107,12 +109,7 @@ The scattering matrix for the :math:`i^{th}` layer relates the forward- and back
       c_{i+1}^-
    \end{bmatrix}
 
-This can be rearranged to solve for the :math:`i+1^{th}` mode coefficients given the :math:`i^{th}` mode coefficients:
-
-.. math::
-
-   c_{i+1}^{-} = S_{i, 12}^{-1} c_i^{-} - S_{i, 12}^{-1} S_{i,11} c_i{+} \\
-   c_{i+1}^{+} = S_{i, 21} c_{i}^{+1} + S_{i,22} c_{i+1}{-}
+This can be rearranged to solve for the :math:`i+1^{th}` mode coefficients given the :math:`i^{th}` mode coefficients.
 
 Electric Field Coefficients
 ______________________________
@@ -143,6 +140,22 @@ Finding Mode coefficients inside an arbitrary layer
 -------------------------------------------------------
 Once the scattering matrices for each layer :math:`S_i` are known, the incident mode coefficients :math:`s_0` are known and the global scattering matrix :math:`S_{global}` is known, the mode coefficients in an arbitrary layer can be calculated.
 
+First, the mode coefficients in the incident region must be found. To do this, you can find the m. :math:`c_0^+` using the :math:`W_{incident}` matrix and :math:`s_{incident}` vector (which contains the x- and y-components of the zero-order harmonic), and :math:`c_0^-` can be calculated from the global scattering matrix. Note that :math:`s_{incident}` is not the same as :math:`s_0`, which also contains the reflected field coefficients.
+
+.. math::
+   c_0^+ = W_{incident}^{-1} s_{incident}
+   c_0^- = S_{global, 11} c_0^+
+
+Then, by applying the formula below as many times as is required, mode coefficients within the desired layer can be found:
+
+.. math::
+
+   c_{i+1}^{-} = S_{i, 12}^{-1} c_i^{-} - S_{i, 12}^{-1} S_{i,11} c_i{+} \\
+   c_{i+1}^{+} = S_{i, 21} c_{i}^{+1} + S_{i,22} c_{i+1}{-}
+
+Find E/H Coefficients inside an arbitrary Layer
+------------------------------------------------------
+Once the mode coefficients have been found, the electric and magnetic field coefficients can be found as described previously. Note that at this point, the field coefficients will still be a function of the z coordinate.
 
 Finding the electric and magnetic fields inside an arbitrary layer
 -----------------------------------------------------------------------
