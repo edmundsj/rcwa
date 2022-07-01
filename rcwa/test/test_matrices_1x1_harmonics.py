@@ -378,6 +378,20 @@ class Test1x1Harmonic(unittest.TestCase):
 
         # Next we test a super-simple interface against our analytic equations.
 
+    def test_set_gap_W_matrix(self):
+        self.layerStack.set_gap_layer()
+        W_actual = self.layerStack.Wg
+        W_desired = self.WGap
+        assert_almost_equal(W_actual, W_desired,
+                            self.absoluteTolerance, self.relativeTolerance)
+
+    def test_set_gap_V_matrix(self):
+        self.layerStack.set_gap_layer()
+        V_actual = self.layerStack.Vg
+        V_desired = self.VGap
+        assert_almost_equal(V_actual, V_desired,
+                            self.absoluteTolerance, self.relativeTolerance)
+
     @classmethod
     def setUpClass(self):
         deg = pi / 180
@@ -412,7 +426,7 @@ class Test1x1Harmonic(unittest.TestCase):
         self.Ky = reflectionLayer.n* sin(self.theta) * sin(self.phi)
         self.layerStack.Kx = self.Kx
         self.layerStack.Ky = self.Ky
-        self.layerStack.set_gap_layer() # Something is wrong with this function
+        self.layerStack.set_gap_layer()
         self.KzReflectionRegion = 0.705995
         self.KzTransmissionRegion = 1.3032
         self.KzLayer1 = 0.9046

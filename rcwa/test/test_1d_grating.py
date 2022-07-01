@@ -144,6 +144,20 @@ class Test1DGrating(unittest.TestCase):
         assert_almost_equal(S22Actual, S22Calculated,
                             self.absoluteTolerance, self.relativeTolerance, "S22 Matrix Layer")
 
+    def test_gap_W_matrix(self):
+        self.layerStack.set_gap_layer()
+        W_desired = self.WFreeSpace
+        W_actual = self.layerStack.Wg
+
+        assert_almost_equal(W_actual, W_desired, self.absoluteTolerance, self.relativeTolerance)
+
+    def test_gap_V_matrix(self):
+        self.layerStack.set_gap_layer()
+        V_desired = self.VFreeSpace
+        V_actual = self.layerStack.Vg
+
+        assert_almost_equal(V_actual, V_desired, self.absoluteTolerance, self.relativeTolerance)
+
     @classmethod
     def setUpClass(self):
         deg = pi / 180
@@ -200,9 +214,7 @@ class Test1DGrating(unittest.TestCase):
         "/1dGrating/freeSpace/VFreeSpace.txt")
 
         # Manually set the gap layer - it's wrong, but it's how our matrices were generated. And it shouldn't matter.
-        for layer in self.layerStack.all_layers:
-            layer.Wg = self.WFreeSpace
-            layer.Vg = self.VFreeSpace
+        self.layerStack.set_gap_layer()
 
         self.S11Transparent = complexZeros((4, 4))
         self.S22Transparent = complexZeros((4, 4))

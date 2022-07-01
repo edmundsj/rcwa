@@ -231,13 +231,21 @@ class LayerStack:
         self.transmission_layer.source = source
 
     def set_gap_layer(self):
-        self.gapLayer.er = complexIdentity(self._k_dimension) + sq(self.Kx) + sq(self.Ky)
-        self.gapLayer.ur = complexIdentity(self._k_dimension)
         self.gapLayer.thickness = 0
+        if self._k_dimension == 1:
+            self.gapLayer.er = 1 + sq(self.Kx) + sq(self.Ky)
+            self.gapLayer.ur = 1
+            Qg = self.gapLayer.Q_matrix()
+            lambda_gap = self.gapLayer.lambda_matrix()
+
+        else:
+            Kz = self.gapLayer.Kz_gap()
+            Qg = self.gapLayer.Q_matrix()
+            lambda_gap = complexIdentity(self._k_dimension * 2)
+            lambda_gap[:self._k_dimension, :self._k_dimension] = 1j * Kz
+            lambda_gap[self._k_dimension:, self._k_dimension:] = 1j * Kz
 
         self.Wg = complexIdentity(self._s_element_dimension)
-        Qg = self.gapLayer.Q_matrix()
-        lambda_gap = self.gapLayer.lambda_matrix()
         self.Vg = Qg @ inv(lambda_gap)
 
         for layer in self.all_layers:

@@ -41,14 +41,14 @@ class TestSolver(unittest.TestCase):
         assert_almost_equal(KzActual, KzCalculated, self.absoluteTolerance)
 
 
-    def testEdgeSMatrices(self):
+    def test_reflection_S_matrix(self):
         self.solver.solve()
-        SActual = self.SReflectionRegion
+        SDesired = self.SReflectionRegion
         SCalculated = self.solver.SReflection
-        breakpoint()
-        assert_almost_equal(SActual, SCalculated,
+        assert_almost_equal(SCalculated, SDesired,
                             self.absoluteTolerance, self.relativeTolerance, "testSolver: SReflection")
 
+    def test_transmission_S_matrix(self):
         self.solver.solve()
         SActual = self.STransmissionRegion
         SCalculated = self.solver.STransmission
@@ -78,11 +78,11 @@ class TestSolver(unittest.TestCase):
         S12_global_actual = self.solver.SGlobal[0,1]
         assert_almost_equal(S12_global_actual, S12_global_desired, self.absoluteTolerance, self.relativeTolerance)
 
-        S21_global_desired = self.SGlobal11
+        S21_global_desired = self.SGlobal21
         S21_global_actual = self.solver.SGlobal[1,0]
         assert_almost_equal(S21_global_actual, S21_global_desired, self.absoluteTolerance, self.relativeTolerance)
 
-        S22_global_desired = self.SGlobal11
+        S22_global_desired = self.SGlobal22
         S22_global_actual = self.solver.SGlobal[1,1]
         assert_almost_equal(S22_global_actual, S22_global_desired, self.absoluteTolerance, self.relativeTolerance)
 

@@ -444,6 +444,20 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         TCalculated = TCalculated
         assert_almost_equal(TActual, TCalculated, self.absoluteTolerance, self.relativeTolerance);
 
+    def test_gap_W_matrix(self):
+        self.layerStack.set_gap_layer()
+        W_desired = self.WFreeSpace
+        W_actual = self.layerStack.Wg
+
+        assert_almost_equal(W_actual, W_desired, self.absoluteTolerance, self.relativeTolerance)
+
+    def test_gap_V_matrix(self):
+        self.layerStack.set_gap_layer()
+        V_desired = self.VFreeSpace
+        V_actual = self.layerStack.Vg
+
+        assert_almost_equal(V_actual, V_desired, self.absoluteTolerance, self.relativeTolerance)
+
     @classmethod
     def setUpClass(self): # NOTE - self here refers to class
         self.absoluteTolerance = 1e-3
@@ -508,9 +522,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         self.VFreeSpace = numpyArrayFromSeparatedColumnsFile(test_dir +
                 "/matrixDataOblique/freeSpace/VFreeSpace.txt")
 
-        for layer in self.layerStack.all_layers:
-            layer.Wg = self.WFreeSpace
-            layer.Vg = self.VFreeSpace
+        self.layerStack.set_gap_layer()
 
         self.S11Transparent = complexZeros((18, 18))
         self.S22Transparent = complexZeros((18, 18))
