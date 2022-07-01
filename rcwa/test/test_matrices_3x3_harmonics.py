@@ -92,13 +92,13 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
     def testWMatrix(self):
         layer = self.layerStack.internal_layers[0]
-        (V, WCalculated, X) = layer.VWX_matrices()
+        (V, WCalculated, _, X) = layer.VWLX_matrices()
         WActual = self.WLayer1
         assert_almost_equal(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer 1");
 
         layer = self.layerStack.internal_layers[1]
-        (V, WCalculated, X) = layer.VWX_matrices()
+        (V, WCalculated, _, X) = layer.VWLX_matrices()
         WActual = self.WLayer2
         assert_almost_equal(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer 2");
@@ -112,7 +112,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
         significant.
         """
         layer = self.layerStack.internal_layers[0]
-        (VCalculated, W, X) = layer.VWX_matrices()
+        (VCalculated, W, _, X) = layer.VWLX_matrices()
         VActual = self.VLayer1
 
         # Because the physical quantity is lambda squared, the phase of many of the elements 
@@ -127,7 +127,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
                 "V matrix Layer 1");
 
         layer = self.layerStack.internal_layers[1]
-        (VCalculated, W, X) = layer.VWX_matrices()
+        (VCalculated, W, _, X) = layer.VWLX_matrices()
         VActual = self.VLayer2
 
         # Again do the same here.
@@ -140,7 +140,7 @@ class Test3x3HarmonicsOblique(unittest.TestCase):
 
     def testXMatrix(self):
         layer = self.layerStack.internal_layers[0]
-        (V, W, XCalculated) = layer.VWX_matrices()
+        (V, W, _, XCalculated) = layer.VWLX_matrices()
         XActual = self.XLayer1
 
         # Numerical error is causing accidental conjugation. To match the test data we need

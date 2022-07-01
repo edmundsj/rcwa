@@ -115,22 +115,22 @@ class Test1x1Harmonic(unittest.TestCase):
 
     def testVMatrix(self):
         layer = self.layerStack.gapLayer
-        (VCalculated, W, X) = layer.VWX_matrices()
+        (VCalculated, W, _, X) = layer.VWLX_matrices()
         VActual = complexArray([[0 - 0.4250j, 0 - 1.1804j], [0 + 2.0013j, 0 + 0.4250j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         layer = self.layerStack.internal_layers[0]
-        (VCalculated, W, X) = layer.VWX_matrices()
+        (VCalculated, W, _, X) = layer.VWLX_matrices()
         VActual = complexArray([[0-0.4698j,0-1.1040j],[0+2.0114j,0+0.4698j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         layer = self.layerStack.internal_layers[1]
-        (VCalculated, W, X) = layer.VWX_matrices()
+        (VCalculated, W, _, X) = layer.VWLX_matrices()
         VActual = complexArray([[0-0.1051j,0-0.4941j],[0+0.6970j,0+0.1051j]]);
         assert_almost_equal(VActual, VCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         layer = self.layerStack.incident_layer
-        (VCalculated, W_ref, X) = layer.VWX_matrices()
+        (VCalculated, W_ref, _, X) = layer.VWLX_matrices()
         VActual = complexArray([
             [0 - 0.5017j, 0 - 0.8012j],
             [0 + 1.7702j, 0 + 0.5017j]]);
@@ -138,12 +138,12 @@ class Test1x1Harmonic(unittest.TestCase):
 
     def testXMatrix(self):
         layer = self.layerStack.internal_layers[0]
-        (V, W, XCalculated) = layer.VWX_matrices()
+        (V, W, _, XCalculated) = layer.VWLX_matrices()
         XActual = complexArray([[0.1493+0.9888j, 0+0j],[0+0j,0.1493+0.9888j]]);
         assert_almost_equal(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
 
         layer = self.layerStack.internal_layers[1]
-        (V, W, XCalculated) = layer.VWX_matrices()
+        (V, W, _, XCalculated) = layer.VWLX_matrices()
         XActual = complexArray([[-0.4583 - 0.8888j, 0+0j],[0+0j, -0.4583 - 0.8888j]]);
         assert_almost_equal(XActual, XCalculated, self.absoluteTolerance, self.relativeTolerance);
 

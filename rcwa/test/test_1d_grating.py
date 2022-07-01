@@ -58,14 +58,14 @@ class Test1DGrating(unittest.TestCase):
 
     def testWMatrix(self):
         layer = self.layerStack.internal_layers[0]
-        (V, WCalculated, X) = layer.VWX_matrices()
+        (V, WCalculated, _, X) = layer.VWLX_matrices()
         WActual = self.WLayer
         assert_almost_equal(WActual, WCalculated, self.absoluteTolerance, self.relativeTolerance,
                 "W matrix Layer")
 
     def testXMatrix(self):
         layer = self.layerStack.internal_layers[0]
-        (V, W, XCalculated) = layer.VWX_matrices()
+        (V, W, _, XCalculated) = layer.VWLX_matrices()
         XActual = self.XLayer
 
         # Numerical error is causing accidental conjugation. To match the test data we need
