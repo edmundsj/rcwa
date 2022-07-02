@@ -113,6 +113,19 @@ class Solver:
     def base_crystal(self):
         return self.layer_stack.crystal
 
+    def grad(self, loss_func, obj, attribute):
+        """
+        Computes the gradient of a user-specified loss function with respect to an attribute
+        of an object in the simulation.
+
+        :param loss_func: The loss function you are trying to optimize. Should take a single argument
+        of the Solver Results object.
+        :param obj: The object whose attribute you want to tweak in order to do the optimization (i.e. layer3)
+        :param attribute: The attribute of the object you want to tweak (i.e. 'thickness' or 'er')
+        """
+        raise NotImplementedError
+
+
     def _increase_harmonics(self, factor=1):
         n_harmonics = np.array(self.n_harmonics)
         n_harmonics *= factor

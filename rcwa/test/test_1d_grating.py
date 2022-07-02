@@ -255,14 +255,14 @@ class Test1DGrating(unittest.TestCase):
         self.QReflectionRegion = self.QFreeSpace
         self.LambdaReflectionRegion = self.LambdaFreeSpace
         self.WReflectionRegion = self.WFreeSpace
-        self.VReflectionRegion = self.QReflectionRegion@np.diag(pinv(sqrt(self.LambdaFreeSpace)))
+        self.VReflectionRegion = self.QReflectionRegion@np.diag(np.linalg.inv(sqrt(self.LambdaFreeSpace)))
         self.LambdaReflectionRegion = self.LambdaFreeSpace
-        self.AReflectionRegion= pinv(self.WFreeSpace) @ self.WReflectionRegion + inv(self.VFreeSpace) @ self.VReflectionRegion
-        self.BReflectionRegion = pinv(self.WFreeSpace) @ self.WReflectionRegion - inv(self.VFreeSpace) @ self.VReflectionRegion
-        self.S11ReflectionRegion = -pinv(self.AReflectionRegion)@self.BReflectionRegion
-        self.S12ReflectionRegion = 2*pinv(self.AReflectionRegion)
-        self.S21ReflectionRegion = 0.5*(self.AReflectionRegion-self.BReflectionRegion@pinv(self.AReflectionRegion)@self.BReflectionRegion)
-        self.S22ReflectionRegion = self.BReflectionRegion@pinv(self.AReflectionRegion)
+        self.AReflectionRegion= np.linalg.inv(self.WFreeSpace) @ self.WReflectionRegion + inv(self.VFreeSpace) @ self.VReflectionRegion
+        self.BReflectionRegion = np.linalg.inv(self.WFreeSpace) @ self.WReflectionRegion - inv(self.VFreeSpace) @ self.VReflectionRegion
+        self.S11ReflectionRegion = -np.linalg.inv(self.AReflectionRegion)@self.BReflectionRegion
+        self.S12ReflectionRegion = 2*np.linalg.inv(self.AReflectionRegion)
+        self.S21ReflectionRegion = 0.5*(self.AReflectionRegion-self.BReflectionRegion@np.linalg.inv(self.AReflectionRegion)@self.BReflectionRegion)
+        self.S22ReflectionRegion = self.BReflectionRegion@np.linalg.inv(self.AReflectionRegion)
         self.SReflectionRegion = complexArray([
             [self.S11ReflectionRegion, self.S12ReflectionRegion],
             [self.S21ReflectionRegion, self.S22ReflectionRegion]])
@@ -270,14 +270,14 @@ class Test1DGrating(unittest.TestCase):
         self.QTransmissionRegion = self.QFreeSpace
         self.LambdaTransmissionRegion = self.LambdaFreeSpace
         self.WTransmissionRegion = self.WFreeSpace
-        self.VTransmissionRegion = self.QTransmissionRegion@np.diag(pinv(sqrt(self.LambdaFreeSpace)))
+        self.VTransmissionRegion = self.QTransmissionRegion@np.diag(np.linalg.inv(sqrt(self.LambdaFreeSpace)))
         self.LambdaTransmissionRegion = self.LambdaFreeSpace
-        self.ATransmissionRegion= pinv(self.WFreeSpace) @ self.WTransmissionRegion + inv(self.VFreeSpace) @ self.VTransmissionRegion
-        self.BTransmissionRegion = pinv(self.WFreeSpace) @ self.WTransmissionRegion - inv(self.VFreeSpace) @ self.VTransmissionRegion
-        self.S11TransmissionRegion = self.BTransmissionRegion@pinv(self.ATransmissionRegion)
-        self.S12TransmissionRegion = 0.5*(self.ATransmissionRegion-self.BTransmissionRegion@pinv(self.ATransmissionRegion)@self.BTransmissionRegion)
-        self.S21TransmissionRegion = 2*pinv(self.ATransmissionRegion)
-        self.S22TransmissionRegion = -pinv(self.ATransmissionRegion)@self.BTransmissionRegion
+        self.ATransmissionRegion= np.linalg.inv(self.WFreeSpace) @ self.WTransmissionRegion + inv(self.VFreeSpace) @ self.VTransmissionRegion
+        self.BTransmissionRegion = np.linalg.inv(self.WFreeSpace) @ self.WTransmissionRegion - inv(self.VFreeSpace) @ self.VTransmissionRegion
+        self.S11TransmissionRegion = self.BTransmissionRegion@np.linalg.inv(self.ATransmissionRegion)
+        self.S12TransmissionRegion = 0.5*(self.ATransmissionRegion-self.BTransmissionRegion@np.linalg.inv(self.ATransmissionRegion)@self.BTransmissionRegion)
+        self.S21TransmissionRegion = 2*np.linalg.inv(self.ATransmissionRegion)
+        self.S22TransmissionRegion = -np.linalg.inv(self.ATransmissionRegion)@self.BTransmissionRegion
 
         self.STransmissionRegion = complexArray([
             [self.S11TransmissionRegion, self.S12TransmissionRegion],

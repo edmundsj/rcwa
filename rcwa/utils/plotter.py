@@ -1,7 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
 
 class Plotter:
+    def __init__(self):
+        warnings.warn('''Plotter is now deprecated and will be removed in a future version. 
+        To plot results use results.plot()''')
 
     @staticmethod
     def plotRTSpectra(result):

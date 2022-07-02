@@ -1,5 +1,5 @@
 from rcwa.shorthand import *
-from numpy.linalg import pinv as pinv
+from autograd import numpy as np
 
 def s_incident(source, n_harmonics):
     totalNumberHarmonics = np.prod(n_harmonics)
@@ -13,69 +13,90 @@ def S_matrix_transparent(matrixShape):
     return STransparent;
 
 def redheffer_product(SA, SB):
-    SAB = complexZeros(SA.shape);
     D = D_matrix_redheffer(SA, SB)
     F = F_matrix(SA, SB)
 
-    SAB[0,0] = SA[0,0] + D @ SB[0,0] @ SA[1,0];
-    SAB[0,1] = D @ SB[0,1];
-    SAB[1,0] = F @ SA[1,0];
-    SAB[1,1] = SB[1,1] +  F @ SA[1,1] @ SB[0,1];
-    return SAB;
+    S11 = SA[0, 0] + D @ SB[0, 0] @ SA[1, 0];
+    S12 = D @ SB[0, 1];
+    S21 = F @ SA[1, 0];
+    S22 = SB[1, 1] + F @ SA[1, 1] @ SB[0, 1];
+
+    S =  np.array([[S11, S12], [S21, S22]])
+    return S
 
 def omega_squared_matrix(P, Q):
     return P @ Q
 
 def A_matrix(Wi, Wj, Vi, Vj):
-    return pinv(Wi) @ Wj + inv(Vi) @ Vj;
+    return np.linalg.inv(Wi) @ Wj + inv(Vi) @ Vj;
 
 def B_matrix(Wi, Wj, Vi, Vj):
-    return pinv(Wi) @ Wj - inv(Vi) @ Vj;
+    return np.linalg.inv(Wi) @ Wj - inv(Vi) @ Vj;
 
 def D_matrix(Ai, Bi, Xi):
-    AiInverse = pinv(Ai);
+    AiInverse = np.linalg.inv(Ai);
     return Ai - Xi @ Bi @ AiInverse @ Xi @ Bi;
 
 def D_matrix_redheffer(SA, SB):
-    return SA[0,1] @ pinv(complexIdentity(SA[0,0].shape[0]) - SB[0,0] @ SA[1,1])
+    return SA[0,1] @ np.linalg.inv(complexIdentity(SA[0,0].shape[0]) - SB[0,0] @ SA[1,1])
 
 def F_matrix(SA, SB):
-    return SB[1,0] @ pinv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
+    return SB[1,0] @ np.linalg.inv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
+
+def calculateOmegaSquaredMatrix(P, Q):
+    return P @ Q
+
+def calculateScatteringAMatrix(Wi, Wj, Vi, Vj):
+    return np.linalg.inv(Wi) @ Wj + inv(Vi) @ Vj;
+
+def calculateScatteringBMatrix(Wi, Wj, Vi, Vj):
+    return np.linalg.inv(Wi) @ Wj - inv(Vi) @ Vj;
+
+def calculateScatteringDMatrix(Ai, Bi, Xi):
+    AiInverse = np.linalg.inv(Ai);
+    return Ai - Xi @ Bi @ AiInverse @ Xi @ Bi;
+
+def calculateRedhefferDMatrix(SA, SB):
+    return SA[0,1] @ np.linalg.inv(complexIdentity(SA[0,0].shape[0]) - SB[0,0] @ SA[1,1])
+
+def calculateRedhefferFMatrix(SA, SB):
+    return SB[1,0] @ np.linalg.inv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
 
 def calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di):
-    AiInverse = pinv(Ai)
-    DiInverse = pinv(Di);
+    AiInverse = np.linalg.inv(Ai)
+    DiInverse = np.linalg.inv(Di);
 
-    S = complexZeros((2, 2) + Ai.shape)
-    S[0, 0] = DiInverse @ (Xi @ Bi @ AiInverse @ Xi @ Ai - Bi)
-    S[0, 1] = DiInverse @ Xi @ (Ai - Bi @ AiInverse @ Bi)
-    S[1, 0] = S[0, 1]
-    S[1, 1] = S[0, 0]
+    S11 = DiInverse @ (Xi @ Bi @ AiInverse @ Xi @ Ai - Bi)
+    S12 = DiInverse @ Xi @ (Ai - Bi @ AiInverse @ Bi)
+    S21 = S12
+    S22 = S11
+
+    S = np.array([[S11, S12],[S21, S22]])
     return S
 
 def calculateReflectionRegionSMatrixFromRaw(AReflectionRegion, BReflectionRegion):
-    S = complexZeros((2, 2) + AReflectionRegion.shape);
-    A = AReflectionRegion;
-    B = BReflectionRegion;
-    AInverse = pinv(A);
+    A = AReflectionRegion
+    B = BReflectionRegion
+    AInverse = np.linalg.inv(A)
 
-    S[0,0] = - AInverse @ B;
-    S[0,1] = 2 * AInverse;
-    S[1,0] = 0.5 * (A - B @ AInverse @ B)
-    S[1,1] = B @ AInverse;
-    return S;
+    S11 = - AInverse @ B
+    S12 = 2 * AInverse
+    S21 = 0.5 * (A - B @ AInverse @ B)
+    S22 = B @ AInverse
+    S = np.array([[S11,S12], [S21,S22]])
+    return S
 
 def calculateTransmissionRegionSMatrixFromRaw(ATransmissionRegion, BTransmissionRegion): # UNIT TESTS COMPLETE
-    A = ATransmissionRegion;
-    B = BTransmissionRegion;
-    AInverse = pinv(A);
+    A = ATransmissionRegion
+    B = BTransmissionRegion
+    AInverse = np.linalg.inv(A)
 
-    S = complexZeros((2, 2) + A.shape);
-    S[0,0] = B@ AInverse;
-    S[0,1] = 0.5* (A- (B @ AInverse @ B))
-    S[1,0] = 2* AInverse;
-    S[1,1] = - AInverse @ B;
-    return S;
+    S11 = B@ AInverse
+    S12 = 0.5* (A- (B @ AInverse @ B))
+    S21 = 2* AInverse
+    S22 = - AInverse @ B
+    S = np.array([[S11,S12],[S21,S22]])
+    return S
 
 
 # NOTE - this can only be used for 1D (TMM-type) simulations. rTE/rTM are not meaningful quantities otherwise.
@@ -91,15 +112,16 @@ def calculateTEMReflectionCoefficientsFromXYZ(source, rx, ry, rz):
 
 def calculateReflectionCoefficient(S, Kx, Ky, KzReflectionRegion,
         WReflectionRegion, source, numberHarmonics):
+
     incidentFieldHarmonics = s_incident(source, numberHarmonics)
-    rTransverse = WReflectionRegion @ S[0,0] @ pinv(WReflectionRegion) @ incidentFieldHarmonics
+    rTransverse = WReflectionRegion @ S[0,0] @ np.linalg.inv(WReflectionRegion) @ incidentFieldHarmonics
 
     rx, ry, rz = None, None, None
     if isinstance(Kx, np.ndarray):
         maxIndex = int(rTransverse.shape[0]/2)
         rx = rTransverse[0:maxIndex]
         ry = rTransverse[maxIndex:]
-        rz = - inv(KzReflectionRegion) @ (Kx @ rx + Ky @ ry)
+        rz = - np.linalg.inv(KzReflectionRegion) @ (Kx @ rx + Ky @ ry)
     else:
         rx = rTransverse[0]
         ry = rTransverse[1]
@@ -190,7 +212,7 @@ class MatrixCalculator:
         return P
 
     def _P_matrix_general(self):
-        erInverse = pinv(self.er)
+        erInverse = np.linalg.inv(self.er)
         KMatrixDimension = self.Kx.shape[0]
         matrixShape = (2 *KMatrixDimension, 2 * KMatrixDimension)
         P = complexZeros(matrixShape)
@@ -221,7 +243,7 @@ class MatrixCalculator:
         return Q;
 
     def _Q_matrix_general(self):
-        urInverse = pinv(self.ur)
+        urInverse = np.linalg.inv(self.ur)
         KMatrixDimension = self.Kx.shape[0]
         matrixShape = (2 *KMatrixDimension, 2 * KMatrixDimension)
         Q = complexZeros(matrixShape)
@@ -283,7 +305,7 @@ class MatrixCalculator:
         Kz = self.Kz_forward()
         Q = self.Q_matrix()
         O = self.lambda_matrix()
-        OInverse = pinv(O)
+        OInverse = np.linalg.inv(O)
         W = complexIdentity(2)
         X = matrixExponentiate(O * self.source.k0 * self.thickness)
         V = Q @ W @ OInverse
@@ -298,7 +320,7 @@ class MatrixCalculator:
         if self.homogenous:
             Kz = self.Kz_forward()
             Lambda = self.lambda_matrix()
-            LambdaInverse = pinv(Lambda)
+            LambdaInverse = np.linalg.inv(Lambda)
             W = complexIdentity(2 * Kz.shape[0])
             V = Q @ W @ LambdaInverse
             X = matrixExponentiate(-Lambda * self.source.k0 * self.thickness)
@@ -358,7 +380,7 @@ class MatrixCalculator:
                         complexIdentity(KDimension) - self.Kx @ self.Kx - self.Ky @ self.Ky))
         lambdaRef[:KDimension, :KDimension] = 1j*Kz
         lambdaRef[KDimension:, KDimension:] = 1j*Kz
-        Vi = Q @ pinv(lambdaRef)
+        Vi = Q @ np.linalg.inv(lambdaRef)
         Ai = A_matrix(self.Wg, Wi, self.Vg, Vi)
         Bi = B_matrix(self.Wg, Wi, self.Vg, Vi)
 
@@ -389,7 +411,7 @@ class MatrixCalculator:
         Kz = conj(sqrt (conj(self.er * self.ur) * complexIdentity(KDimension) - self.Kx @ self.Kx - self.Ky @ self.Ky))
         lambdaRef[:KDimension, :KDimension] = 1j*Kz
         lambdaRef[KDimension:,KDimension:] = 1j*Kz
-        Vi = Q @ pinv(lambdaRef)
+        Vi = Q @ np.linalg.inv(lambdaRef)
         Ai = A_matrix(self.Wg, Wi, self.Vg, Vi)
         Bi = B_matrix(self.Wg, Wi, self.Vg, Vi)
 

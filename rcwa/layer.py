@@ -1,5 +1,6 @@
 from rcwa.shorthand import *
 from rcwa import Material, MatrixCalculator
+import matplotlib.pyplot as plt
 
 # TODO: Convolution matrix generation must be refactored. It's a hot mess and hard to understand.
 
@@ -31,8 +32,8 @@ class Layer(MatrixCalculator):
         else:
             self.homogenous = False
 
-    # Note: these are all just transparent wrappers for underlying material
 
+    # Note: these are all just transparent wrappers for underlying material
     @property
     def er(self):
         return self.material.er
@@ -248,9 +249,9 @@ class LayerStack:
             layer.Vg = self.Vg
 
     # set all convolution matrices for all interior layers
-    def set_convolution_matrices(self, numberHarmonics):
+    def set_convolution_matrices(self, n_harmonics):
         for layer in self.internal_layers:
-            layer.set_convolution_matrices(numberHarmonics)
+            layer.set_convolution_matrices(n_harmonics)
 
     @property
     def crystal(self):
@@ -258,6 +259,15 @@ class LayerStack:
             if self.internal_layers[i].crystal is not None:
                 return self.internal_layers[i].crystal
         return None
+
+    def plot(self, fig=None, ax=None):
+        if fig is None and ax is None:
+            fig, ax = plt.subplots()
+        elif fig is not None and ax is None:
+            ax = fig.add_subplot()
+
+        # z = 0 will be defined at the start of the top-most layer.
+
 
 
 emptyStack = LayerStack()
