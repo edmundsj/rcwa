@@ -1,5 +1,6 @@
 from rcwa.shorthand import *
 from rcwa import freeSpaceLayer
+from rcwa.utils import k_vector
 
 
 class Source:
@@ -125,10 +126,11 @@ class Source:
         return self._k_incident
 
     def _set_k_incident(self):
-        n = sqrt(self.layer.er*self.layer.ur);
-        kx = n * sin(self.theta) * cos(self.phi);
-        ky = n * sin(self.theta) * sin(self.phi);
-        kz = n * cos(self.theta);
+        n = sqrt(self.layer.er*self.layer.ur)
+        kx = n * sin(self.theta) * cos(self.phi)
+        ky = n * sin(self.theta) * sin(self.phi)
+        kz = n * cos(self.theta)
+
         self._k_incident = complexArray([kx, ky, kz])
 
 zeroSource = Source(float("inf"))

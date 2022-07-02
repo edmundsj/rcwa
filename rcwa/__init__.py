@@ -11,7 +11,7 @@ example_dir = os.path.join(file_location, 'examples')
 from rcwa import utils
 from rcwa.material import Material
 from rcwa.crystal import Crystal
-from rcwa.matrices import MatrixCalculator, k_vector
+from rcwa.matrices import MatrixCalculator
 from rcwa.layer import LayerStack, Layer, freeSpaceLayer
 from rcwa.source import Source, zeroSource
 from rcwa.results import Results

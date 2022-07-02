@@ -42,12 +42,6 @@ def D_matrix_redheffer(SA, SB):
 def F_matrix(SA, SB):
     return SB[1,0] @ pinv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
 
-def k_vector(source, layer):
-    kx = layer.n * sin(source.theta) * cos(source.phi)
-    ky = layer.n * sin(source.theta) * sin(source.phi)
-    kz = layer.n * cos(source.theta)
-    return complexArray([kx, ky, kz])
-
 def calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di):
     AiInverse = pinv(Ai)
     DiInverse = pinv(Di);

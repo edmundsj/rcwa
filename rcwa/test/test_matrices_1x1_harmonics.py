@@ -1,6 +1,7 @@
 # Tests the matrices.py file, which is responsible for the creation and manipulation of scattering matrices
 import unittest
 from rcwa.testing import *
+from rcwa.utils import k_vector
 from rcwa.shorthand import *
 from rcwa import Source, Layer, LayerStack
 import numpy as np
@@ -54,7 +55,7 @@ class Test1x1Harmonic(unittest.TestCase):
 
     def testCalculateKVector(self):
         kVectorActual = complexArray([self.Kx, self.Ky, self.KzReflectionRegion])
-        kVectorCalculated = k_vector(self.source, self.layerStack.incident_layer)
+        kVectorCalculated = k_vector(self.source, self.layerStack.incident_layer, normalize=True)
         assert_almost_equal(kVectorActual, kVectorCalculated, self.absoluteTolerance, self.relativeTolerance);
 
     def testCalcEz(self):

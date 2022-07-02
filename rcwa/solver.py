@@ -87,7 +87,7 @@ class Solver:
 
     def fields(self, component='Ex', layer=None, x_min=0, x_max=0, y_min=0, y_max=0, z_min=0, z_max=0, N_x=1, N_y=1, N_z=1):
         # First, we find the forward- and backward propagating waves in the incident region
-        V_inc, W_inc, L_inc, _ = self.layer_stack.incident_layer.VWLX_matrices(self.source)
+        V_inc, W_inc, L_inc, _ = self.layer_stack.incident_layer.VWLX_matrices()
         c_incident = np.linalg.inv(W_inc) @ s_incident(self.source, self.n_harmonics)
         c_reflected = self.SGlobal[0, 0] @ c_incident
 
@@ -100,12 +100,14 @@ class Solver:
         else:
             raise NotImplementedError
 
-        V_target, W_target, L_target, _ = self.layer_stack.incident_layer.VWLX_matrices(self.source)
-        if 'E' in component:
-            pass
+        V_target, W_target, L_target, _ = self.layer_stack.incident_layer.VWLX_matrices()
+        z = z_min
 
-        breakpoint()
-        return c_incident
+        if 'E' in component:
+            field_target = W_target @ matrixExponentiate(-1 * L_target * self.source.k0 * z) @ c_forward_target + \
+                           W_target @ matrixExponentiate(L_target * self.source.k0 * z) @ c_backward_target
+
+        return field_target
 
     @property
     def base_crystal(self):
