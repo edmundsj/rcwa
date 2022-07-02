@@ -73,6 +73,7 @@ class Source:
     def _set_tem_vectors(self):
         deviceNormalUnitVector = complexArray([0, 0, -1])
         epsilon = 1e-3
+
         k_norm = self.k_incident / np.linalg.norm(self.k_incident)
 
         if abs(k_norm[0]) < epsilon and abs(k_norm[0]) < epsilon:
@@ -126,11 +127,6 @@ class Source:
         return self._k_incident
 
     def _set_k_incident(self):
-        n = sqrt(self.layer.er*self.layer.ur)
-        kx = n * sin(self.theta) * cos(self.phi)
-        ky = n * sin(self.theta) * sin(self.phi)
-        kz = n * cos(self.theta)
-
-        self._k_incident = complexArray([kx, ky, kz])
+        self._k_incident = k_vector(self, self.layer, normalize=True)
 
 zeroSource = Source(float("inf"))

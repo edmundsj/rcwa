@@ -6,7 +6,7 @@ from rcwa.shorthand import complexArray
 from rcwa.utils import rTE, k_vector
 
 @pytest.fixture
-def source():
+def source_normal():
     src = Source(wavelength=1, theta=0, phi=0, pTEM=[1, 0])
     yield src
 
@@ -21,14 +21,15 @@ def stack_interface():
     yield stack
 
 @pytest.fixture
-def solver_interface(stack_interface, source):
-    sol = Solver(layer_stack=stack_interface, source=source)
+def solver_interface_normal(stack_interface, source_normal):
+    sol = Solver(layer_stack=stack_interface, source=source_normal)
     sol.solve()
     yield sol
 
-def test_E_point(solver_interface):
-    stack = solver_interface.layer_stack
-    source = solver_interface.source
+def test_E_point(solver_interface_normal):
+    solver = solver_interface_normal
+    stack = solver.layer_stack
+    source = solver.source
     z0 = -0.0
 
     rte = rTE(source, stack.incident_layer, stack.transmission_layer)
@@ -36,10 +37,8 @@ def test_E_point(solver_interface):
     # NEED TO CONVERT FROM ANGLE OF SOURCE TO POLARIZATION ANGLE - I DONT TRUST THIS CURRENTLY.
     # WHY DOES PHI=0 CORRESPOND TO Y-POLARIZATION? I WOULD EXPECT IT TO CORRESPOND TO X.
 
-    field_desired_x = (1 + rte) * np.cos(source.theta) * np.sin(source.phi)
-    field_desired_y = (1 + rte) * np.cos(source.theta) * np.cos(source.phi)
-    field_desired = complexArray([field_desired_x, field_desired_y])
+    field_desired = (1 + rte) * source.aTE[0:2]
 
-    field_actual = solver_interface.fields(layer=stack.incident_layer, component='E', z_min=z0, z_max=z0)
+    field_actual = solver.fields(layer=stack.incident_layer, component='E', z_min=z0, z_max=z0)
 
-    assert_almost_equal(field_actual, field_desired)
+    assert_allclose(field_actual, field_desired, atol=1e-7)
