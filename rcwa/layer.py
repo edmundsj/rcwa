@@ -140,9 +140,6 @@ class LayerStack:
     :param transmission_layer: Semi-infinite layer of transmission region. Defaults to free space
     """
     def __init__(self, *internal_layers, incident_layer=Layer(er=1, ur=1), transmission_layer=Layer(er=1, ur=1)):
-        if len(internal_layers) == 1:
-            if isinstance(internal_layers[0], list):
-                internal_layers = internal_layers[0]
         self.gapLayer = Layer(er=1, ur=1)
         self.incident_layer = incident_layer
         self.incident_layer.incident = True
@@ -152,21 +149,6 @@ class LayerStack:
         self.internal_layers = list(internal_layers)
         self._Kx = None
         self._Ky = None
-
-    def __eq__(self, other):
-        if not isinstance(other, LayerStack):
-            return NotImplemented
-
-        reflection_layers_same = self.incident_layer == other.incident_layer
-        transmission_layers_same = self.transmission_layer == other.transmission_layer
-        internal_layers_same = False
-        if len(self.internal_layers) == len(other.internal_layers):
-            for i in range(len(self.internal_layers)):
-                if self.internal_layers[i] != other.internal_layers[i]:
-                    break
-            internal_layers_same = True
-
-        return internal_layers_same and reflection_layers_same and transmission_layers_same
 
     def __str__(self):
         top_string = f'\nReflection Layer:\n\t' + str(self.incident_layer) + \
@@ -267,6 +249,8 @@ class LayerStack:
             ax = fig.add_subplot()
 
         # z = 0 will be defined at the start of the top-most layer.
+
+        return fig, ax
 
 
 

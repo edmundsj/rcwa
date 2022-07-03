@@ -88,6 +88,7 @@ def testnkInterpolate(silicon):
     assert_almost_equal(nCalculated, nDesired, errorMessage="material: testnk: n24", absoluteTolerance=1e-3)
 
 """ Tests for discontinuities in the Aspnes data, which I haven't found in Schinke for Si"""
+@pytest.mark.unit
 def testAvoidDiscontinuities():
     source = Source(wavelength = 0.495)
     silicon = Material(database_path='main/Si/Aspnes.yml', source=source)
@@ -101,6 +102,8 @@ def testAvoidDiscontinuities():
     n_observed = silicon.n
     assert_almost_equal(n_observed, n_desired, errorMessage="material: testnk: n26", absoluteTolerance=1e-6)
 
+
+@pytest.mark.unit
 def testEr(silicon):
     # Case 1: wavelength is exactly identical to one we have in database
     erDesired = sq(1.737 + 3.9932j)
@@ -128,6 +131,8 @@ def testEr(silicon):
         erCalculated = silicon.er
     assert_almost_equal(erCalculated, erDesired, absoluteTolerance = 1e-5, errorMessage="material: testnk: er4")
 
+
+@pytest.mark.unit
 def testUr(silicon):
     # Case 1: wavelength is exactly identical to one we have in database
     urDesired = 1
@@ -153,6 +158,8 @@ def testUr(silicon):
     urCalculated = silicon.ur
     assert_almost_equal(urCalculated, urDesired, absoluteTolerance = 1e-5, errorMessage="material: testnk: ur4")
 
+
+@pytest.mark.unit
 def test_extract_dispersion_formula_2():
     src = Source(wavelength=0.5)
     SiO2 = Material(database_path='main/SiO2/Ghosh-e.yml', source=src)
@@ -160,9 +167,34 @@ def test_extract_dispersion_formula_2():
     n_actual = SiO2.n
     assert_almost_equal(n_actual, n_desired, absoluteTolerance=1e-5)
 
+
+@pytest.mark.unit
 def test_extract_dispersion_formula_1():
     src = Source(wavelength=0.5)
     SiO2 = Material(database_path='main/SiO2/Radhakrishnan-o.yml', source=src)
     n_desired = 1.548755
     n_actual = SiO2.n
     assert_almost_equal(n_actual, n_desired, absoluteTolerance=1e-5)
+
+
+@pytest.mark.unit
+def test_dispersive_func():
+    src = Source(wavelength=0.1)
+    mat = Material(er=lambda x: x, ur=lambda x: 2*x, source=src)
+    assert mat.er == 0.1
+    assert mat.ur == 0.2
+
+@pytest.mark.unit
+def test_dispersive_func_er():
+    src = Source(wavelength=0.1)
+    mat = Material(er=lambda x: x, ur=2, source=src)
+    assert mat.er == 0.1
+    assert mat.ur == 2
+
+
+@pytest.mark.unit
+def test_dispersive_func_ur():
+    src = Source(wavelength=0.1)
+    mat = Material(er=3, ur=lambda x: x, source=src)
+    assert mat.er == 3
+    assert mat.ur == 0.1

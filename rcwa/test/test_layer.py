@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 from numpy.testing import assert_equal
 from rcwa.shorthand import complexArray, complexIdentity
+from matplotlib import pyplot as plt
 
 @pytest.fixture
 def crystal_1D():
@@ -122,3 +123,38 @@ def  test_set_source():
     assert stack.gapLayer.source is source
     for layer in [layer_i, layer_t, layer]:
         assert layer.source is source
+
+
+def test_print_layer():
+    layer = Layer()
+    assert len(str(layer)) > 0
+
+
+def test_print_stack():
+    stack = LayerStack()
+    assert len(str(stack)) > 0
+
+
+def test_plot_newfigs():
+    stack = LayerStack()
+    fig, ax = stack.plot()
+    assert fig is not None
+    assert ax is not None
+
+
+def test_plot_noax():
+    stack = LayerStack()
+    fig, ax = plt.subplots()
+    new_fig, new_ax = stack.plot(fig=fig)
+    assert new_fig is fig
+    assert new_ax is not None
+    assert new_ax is not ax
+
+
+def test_plot_yesax():
+    stack = LayerStack()
+    fig, ax = plt.subplots()
+    new_fig, new_ax = stack.plot(fig=fig, ax=ax)
+    assert new_fig is fig
+    assert new_ax is ax
+

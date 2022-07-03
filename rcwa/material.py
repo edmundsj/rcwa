@@ -33,9 +33,6 @@ class Material:
             self.dispersive = True
             self._er_dispersive = er
             self._ur_dispersive = ur
-        else:
-            self._er = er
-            self._ur = ur
 
         if name is not None or database_path is not None:
             self.dispersive = True
@@ -43,6 +40,18 @@ class Material:
         elif filename is not None:
             self.dispersive = True
             self._load_from_nk_table(filename=filename)
+        elif callable(er) or callable(ur):
+            self.dispersive = True
+            self.dispersion_type = 'formula'
+            if callable(er):
+                self._er_dispersive = er
+            else:
+                self._er_dispersive = lambda x: er
+            if callable(ur):
+                self._ur_dispersive = ur
+            else:
+                self._ur_dispersive = lambda x: ur
+
         else:
             self.dispersive = False
             if n is None: # If the refractive index is not defined, go with the permittivity

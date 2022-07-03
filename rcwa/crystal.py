@@ -19,6 +19,8 @@ class Crystal:
 
         if len(raw_lattice_vectors[0]) < self.dimensions:
             raise ValueError('Lattice vector does not have enough dimensions. Needs at least {self.dimensions}')
+        if self.dimensions > 3:
+            raise ValueError('Crystal number of dimensions too high ({self.dimensions}). Can only implement up to 3D.')
 
         if self.dimensions == 1:
             self.lattice_vectors.append(raw_lattice_vectors[0, 0:2])
@@ -44,9 +46,6 @@ class Crystal:
             return self._reciprocal_lattice_vectors_2d()
         elif self.dimensions == 3:
             return self._reciprocal_lattice_vectors_3d()
-        else:
-            raise ValueError(f"Cannot calculate reciprocal lattice for {self.dimensions}D." +
-                    " Non-physical.")
 
     def _reciprocal_lattice_vectors_1d(self):
         t1 = self.lattice_vectors[0]
@@ -83,8 +82,6 @@ class Crystal:
             crystalType = self._crystal_type_2d()
         elif self.dimensions == 3:
             crystalType = self._crystal_type_3d()
-        else:
-            raise ValueError(f'Invalid number of crystal dimensions {self.dimensions}. Must be 1-3')
 
         return crystalType
 
