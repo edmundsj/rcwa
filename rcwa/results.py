@@ -17,17 +17,6 @@ class Results:
     def values(self):
         return self.inner_dict.values()
 
-    def fields(self, field='Ex', coordinates=None):
-        """
-        Calculate electromagnetic fields within or near the structure
-
-        :param field: Which component of the field to plot. Choices are Ex, Ey, Ez, Hx, Hy, Hz, Emag, Hmax
-        :param coordinates: Coordinates (in the form (x, y, z)) at which to evaluate the fields
-        :return fields: Array of fields evaluated at requested point
-        """
-
-        pass
-
     def plot(self, x='wavelength', y='RTot', c=None, fig=None, ax=None, show=False):
         """
         :param x: Variable to plot along the x-axis
