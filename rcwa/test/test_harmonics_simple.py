@@ -30,7 +30,7 @@ def test_generate_ky_0D(source):
 
 def test_generate_kx_1D(source, crystal_1D):
     kx_incident = x_components(source.k_incident)
-    reciprocal_vector_x = x_components(crystal_1D.reciprocalLatticeVectors[0])
+    reciprocal_vector_x = x_components(crystal_1D.reciprocal_lattice_vectors[0])
     Kx_desired = np.diag(kx_incident - reciprocal_vector_x * np.array([-1, 0, 1]))
     Kx_actual = kx_matrix(source, crystal_1D, 3)
 

@@ -97,7 +97,7 @@ def _k_matrix_1D(source, crystal, numberHarmonics, component):
     matrixSize = np.prod(numberHarmonics)
     matrixShape = (matrixSize, matrixSize);
     KMatrix = complexZeros(matrixShape)
-    T1 = crystal.reciprocalLatticeVectors[0]
+    T1 = crystal.reciprocal_lattice_vectors[0]
 
     if component == 'x':
         (incidentWaveVectorxy, T1xy) = x_components(source.k_incident, T1);
@@ -123,7 +123,7 @@ def _k_matrix_2D(source, crystal, numberHarmonics, component):
     matrixShape = (matrixSize, matrixSize);
     KMatrix = complexZeros(matrixShape)
 
-    (T1, T2) = np.array(crystal.reciprocalLatticeVectors) / source.k0
+    (T1, T2) = np.array(crystal.reciprocal_lattice_vectors) / source.k0
     if component == 'x':
         (incidentWaveVectorxy, T1xy, T2xy) = x_components(source.k_incident, T1, T2);
     elif component == 'y':

@@ -27,15 +27,15 @@ class Crystal:
             self.lattice_vectors.append(raw_lattice_vectors[0, 0:2])
             self.lattice_vectors.append(raw_lattice_vectors[1, 0:2])
 
+        if self.dimensions == 3:
+            self.lattice_vectors.append(raw_lattice_vectors[0])
+            self.lattice_vectors.append(raw_lattice_vectors[1])
+            self.lattice_vectors.append(raw_lattice_vectors[2])
+
         if self.dimensions > 0:
-            self.reciprocalLatticeVectors = self.calculateReciprocalLatticeVectors();
+            self.reciprocal_lattice_vectors = self.calculateReciprocalLatticeVectors();
             self.crystalType = self._crystal_type();
             self.latticeConstant = norm(self.lattice_vectors[0]) # TODO: Make this more general
-
-            if self.dimensions > 1:
-                self.symmetry_points, self.key_symmetry_names = self._key_symmetry_points()
-            else:
-                self.symmetry_points, self.key_symmetry_names = None, None
 
     def calculateReciprocalLatticeVectors(self):
         if self.dimensions == 1:
@@ -45,8 +45,8 @@ class Crystal:
         elif self.dimensions == 3:
             return self._reciprocal_lattice_vectors_3d()
         else:
-            raise NotImplementedError(f"Cannot calculate reciprocal lattice for {self.dimensions}D." +
-                    " Not currently implemented.")
+            raise ValueError(f"Cannot calculate reciprocal lattice for {self.dimensions}D." +
+                    " Non-physical.")
 
     def _reciprocal_lattice_vectors_1d(self):
         t1 = self.lattice_vectors[0]
@@ -81,16 +81,18 @@ class Crystal:
             crystalType = 'SQUARE'
         elif self.dimensions == 2:
             crystalType = self._crystal_type_2d()
+        elif self.dimensions == 3:
+            crystalType = self._crystal_type_3d()
         else:
-            raise NotImplementedError
+            raise ValueError(f'Invalid number of crystal dimensions {self.dimensions}. Must be 1-3')
 
         return crystalType
 
     def _crystal_type_2d(self):
         epsilon = 0.00001
-        sideLengthDifference = abs(norm(self.reciprocalLatticeVectors[0]) -
-                norm(self.reciprocalLatticeVectors[1]))
-        latticeVectorProjection = abs(dot(self.reciprocalLatticeVectors[0], self.reciprocalLatticeVectors[1]))
+        sideLengthDifference = abs(norm(self.reciprocal_lattice_vectors[0]) -
+                                   norm(self.reciprocal_lattice_vectors[1]))
+        latticeVectorProjection = abs(dot(self.reciprocal_lattice_vectors[0], self.reciprocal_lattice_vectors[1]))
 
         if sideLengthDifference < epsilon and latticeVectorProjection < epsilon:
             return "SQUARE"
@@ -101,11 +103,32 @@ class Crystal:
         else:
             raise NotImplementedError;
 
-    def _key_symmetry_points(self):
+    def _crystal_type_3d(self):
+        epsilon = 0.00001
+        difference_1 =  abs(norm(self.reciprocal_lattice_vectors[0]) - norm(self.reciprocal_lattice_vectors[1]))
+        difference_2 = abs(norm(self.reciprocal_lattice_vectors[0]) - norm(self.reciprocal_lattice_vectors[2]))
+        max_difference = max(difference_1, difference_2)
+
+        proj_01 = abs(dot(self.reciprocal_lattice_vectors[0], self.reciprocal_lattice_vectors[1]))
+        proj_02 = abs(dot(self.reciprocal_lattice_vectors[0], self.reciprocal_lattice_vectors[2]))
+        proj_03 = abs(dot(self.reciprocal_lattice_vectors[1], self.reciprocal_lattice_vectors[2]))
+        max_proj = max(proj_01, proj_02, proj_03)
+
+        if max_difference < epsilon and max_proj < epsilon:
+            return "SQUARE"
+        elif max_difference > epsilon and max_proj < epsilon:
+            return "RECTANGULAR"
+        elif max_proj > epsilon:
+            return "OBLIQUE"
+        else:
+            raise NotImplementedError
+
+"""
+    def _key_symmetry_points_2d(self):
         keySymmetryPoints = []
         keySymmetryNames = []
-        T1 = self.reciprocalLatticeVectors[0]
-        T2 = self.reciprocalLatticeVectors[1]
+        T1 = self.reciprocal_lattice_vectors[0]
+        T2 = self.reciprocal_lattice_vectors[1]
 
         if self.crystalType == "SQUARE":
             keySymmetryNames = ["X", "G", "M"];
@@ -117,3 +140,4 @@ class Crystal:
             raise NotImplementedError;
 
         return (keySymmetryPoints, keySymmetryNames);
+"""
