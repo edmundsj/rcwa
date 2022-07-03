@@ -21,7 +21,7 @@ When you're done, submit a pull request and I will check it out. I'll let you kn
 
 ### Tests
 
-I've written a comprehensive test suite and you can run it to assure the stability of the code, just try `python rcwa/test/fullRunner.py`. This runs the same test suite that runs on the build server. If you're adding a new functionality please write a test for it.
+I've written a comprehensive test suite and you can run it to assure the stability of the code, just try `pytest` in the package folder. This runs the same test suite that runs on the build server. This package aims to be production-ready, so any new features *must* be thoroughly tested before being merged. If you are working on a new feature (first, awesome :D) please write unit and integration tests for it.
 
 ### Documentation
 
