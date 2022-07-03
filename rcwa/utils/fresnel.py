@@ -37,7 +37,7 @@ def rTM(source, layer1, layer2):
 
     return (er1 * kz2 - er2 * kz1) / (er1 * kz2 + er2 * kz1);
 
-
+# TODO: TEST MORE VIGOROUSLY
 def tTM(source, layer1, layer2):
     er1 = layer1.er
     er2 = layer2.er
@@ -46,4 +46,4 @@ def tTM(source, layer1, layer2):
 
     eta_1 = sqrt(ur1 / er1);
     eta_2 = sqrt(ur2 / er2);
-    return eta_2 / eta_1 * (1 - rTM(source, layer1, layer2));
+    return eta_2 / eta_1 * (1 + rTM(source, layer1, layer2));

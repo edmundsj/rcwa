@@ -47,6 +47,12 @@ def test_rTM_transparent(angled_source, transparent_stack):
     assert_equal(actual_rTM, desired_rTM)
 
 
+def test_tTM_transparent(angled_source, transparent_stack):
+    desired_tTM = (1 + 0)
+    actual_tTM = tTM(angled_source, transparent_stack.incident_layer, transparent_stack.transmission_layer)
+    assert_equal(actual_tTM, desired_tTM)
+
+
 def test_rTM_opaque_pos(angled_source, opaque_stack_p):
     desired_rTM = 1
     actual_rTM = rTM(angled_source, opaque_stack_p.incident_layer, opaque_stack_p.transmission_layer)

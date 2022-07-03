@@ -43,24 +43,6 @@ def D_matrix_redheffer(SA, SB):
 def F_matrix(SA, SB):
     return SB[1,0] @ np.linalg.inv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
 
-def calculateOmegaSquaredMatrix(P, Q):
-    return P @ Q
-
-def calculateScatteringAMatrix(Wi, Wj, Vi, Vj):
-    return np.linalg.inv(Wi) @ Wj + inv(Vi) @ Vj;
-
-def calculateScatteringBMatrix(Wi, Wj, Vi, Vj):
-    return np.linalg.inv(Wi) @ Wj - inv(Vi) @ Vj;
-
-def calculateScatteringDMatrix(Ai, Bi, Xi):
-    AiInverse = np.linalg.inv(Ai);
-    return Ai - Xi @ Bi @ AiInverse @ Xi @ Bi;
-
-def calculateRedhefferDMatrix(SA, SB):
-    return SA[0,1] @ np.linalg.inv(complexIdentity(SA[0,0].shape[0]) - SB[0,0] @ SA[1,1])
-
-def calculateRedhefferFMatrix(SA, SB):
-    return SB[1,0] @ np.linalg.inv(complexIdentity(SA[0,0].shape[0]) - SA[1,1] @ SB[0,0])
 
 def calculateInternalSMatrixFromRaw(Ai, Bi, Xi, Di):
     AiInverse = np.linalg.inv(Ai)
