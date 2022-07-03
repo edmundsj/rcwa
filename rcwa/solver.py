@@ -1,6 +1,6 @@
 from rcwa.shorthand import *
 from rcwa.matrices import *
-from rcwa.harmonics import *
+from rcwa.harmonics import kx_matrix, ky_matrix
 from rcwa import Layer, LayerStack, Results
 from copy import deepcopy
 from progressbar import ProgressBar, Bar, Counter, ETA

@@ -1,18 +1,20 @@
 from rcwa.shorthand import *
 from autograd import numpy as np
+from numpy.typing import ArrayLike
+from typing import Union
 
-def s_incident(source, n_harmonics):
+def s_incident(source, n_harmonics: Union[int, ArrayLike]):
     totalNumberHarmonics = np.prod(n_harmonics)
     return np.hstack((source.pX * kroneckerDeltaVector(totalNumberHarmonics),
             source.pY * kroneckerDeltaVector(totalNumberHarmonics)))
 
-def S_matrix_transparent(matrixShape):
+def S_matrix_transparent(matrixShape: ArrayLike):
     STransparent = complexZeros((2, 2) + matrixShape);
     STransparent[0,1] = complexIdentity(matrixShape[0]);
     STransparent[1,0] = complexIdentity(matrixShape[0]);
     return STransparent;
 
-def redheffer_product(SA, SB):
+def redheffer_product(SA: ArrayLike, SB: ArrayLike):
     D = D_matrix_redheffer(SA, SB)
     F = F_matrix(SA, SB)
 
@@ -21,10 +23,10 @@ def redheffer_product(SA, SB):
     S21 = F @ SA[1, 0];
     S22 = SB[1, 1] + F @ SA[1, 1] @ SB[0, 1];
 
-    S =  np.array([[S11, S12], [S21, S22]])
+    S = np.array([[S11, S12], [S21, S22]])
     return S
 
-def omega_squared_matrix(P, Q):
+def omega_squared_matrix(P: ArrayLike, Q: ArrayLike):
     return P @ Q
 
 def A_matrix(Wi, Wj, Vi, Vj):
