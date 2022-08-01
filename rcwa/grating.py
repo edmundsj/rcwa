@@ -1,5 +1,7 @@
 from rcwa import Layer, Slicer, Crystal
 import numpy as np
+from typing import Union, Tuple
+from numpy.typing import ArrayLike
 
 
 class Grating(Layer):
@@ -7,7 +9,7 @@ class Grating(Layer):
     Base class that doesn't do much at all.
     """
 
-    def _set_eun(self, n, n_void, er, er_void, ur, ur_void):
+    def _set_eun(self, n: float, n_void: float, er: float, er_void: float, ur: float, ur_void: float):
         if n is not None:
             self._er = np.square(n)
             self._er_void = np.square(n_void)
@@ -48,9 +50,11 @@ class TriangularGrating(Grating):
     :param Nx: Number of slices along z to divide the grating into
     :param lattice_vector: Explicit lattice vector for grating. Overrides period.
     """
-    def __init__(self, period=1, er=2, ur=1, n=None, thickness=0.1,
-                 er_void=1, ur_void=1, n_void=1, Nx=500, Nz=10,
-                 lattice_vector=None):
+    def __init__(self, period: float = 1, er: float = 2, ur:float =1,
+                 n: Union[None, float] = None, thickness: float = 0.1,
+                 er_void: float = 1, ur_void: float = 1, n_void: float = 1,
+                 Nx: int = 500, Nz: int = 10,
+                 lattice_vector: Union[ArrayLike, None] = None):
         self.Nx = Nx
         self.Nz = Nz
         self.thickness = thickness
@@ -59,7 +63,7 @@ class TriangularGrating(Grating):
         self.set_lv_period(period=period, lattice_vector=lattice_vector)
         super().__init__(thickness=thickness)
 
-    def slice(self):
+    def slice(self) -> ArrayLike:
         er_slices, ur_slices = self._er_data()
         crystals = [Crystal(self.lattice_vector, er=er, ur=ur) \
                     for er, ur in zip(er_slices, ur_slices)]
@@ -67,7 +71,7 @@ class TriangularGrating(Grating):
 
         return self.layers
 
-    def _er_data(self):
+    def _er_data(self) -> Tuple[ArrayLike, ArrayLike]:
         def triangle_func_er(x, y, z):
             in_void = z >= self.thickness * x / self.period
             er = in_void * (self._er_void - self._er) + self._er
@@ -111,9 +115,9 @@ class RectangularGrating(Grating):
     :param nx: Number of points along x to divide the grating into
     :param lattice_vector: Explicit lattice vector for grating. Overrides period.
     """
-    def __init__(self, period=1, er=2, ur=1, n=None, thickness=0.1,
-                 er_void=1, ur_void=1, n_void=1,
-                 groove_width=0.5, nx=500, lattice_vector=None):
+    def __init__(self, period: float = 1, er: float = 2, ur: float = 1, n: Union[float, None] = None,
+                 thickness: float = 0.1, er_void: float = 1, ur_void: float = 1, n_void: float = 1,
+                 groove_width: float = 0.5, nx: int = 500, lattice_vector: Union[None, ArrayLike] = None):
 
         if groove_width > period:
             raise ValueError(f'Groove width {groove_width} must be larger than period {period}')
@@ -133,8 +137,9 @@ class RectangularGrating(Grating):
         crystal = Crystal(self.lattice_vector, er=er_data, ur=ur_data)
         super().__init__(thickness=thickness, crystal=crystal)
 
-    def _er_data(self, er=2, er_void=1, ur=1, ur_void=1, n=None, n_void=1, Nx=500,
-                              groove_fraction=0.5):
+    def _er_data(self, er: float = 2, er_void: float = 1, ur: float = 1, ur_void: float = 1,
+                 n: Union[None, float] = None, n_void: float = 1, Nx: int = 500,
+                 groove_fraction: float = 0.5) -> Tuple[ArrayLike, ArrayLike]:
         if n is not None:
             er_data = self._er_data_single(np.square(n_void), np.square(n), Nx, groove_fraction)
             ur_data = np.ones(er_data.shape)
@@ -144,7 +149,7 @@ class RectangularGrating(Grating):
 
         return er_data, ur_data
 
-    def _er_data_single(self, val1, val2, Nx, switch_fraction):
+    def _er_data_single(self, val1: float, val2: float, Nx: int, switch_fraction: float) -> ArrayLike:
         positions = np.linspace(1/Nx, 1, Nx)
         void_positions = positions <= switch_fraction
         return (val1 - val2) * void_positions + val2

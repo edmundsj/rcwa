@@ -5,6 +5,7 @@ from rcwa.shorthand import *
 from rcwa.testing import *
 from rcwa.matrices import *
 import numpy as np
+import pytest
 
 class TestSolver(unittest.TestCase):
 
@@ -15,6 +16,11 @@ class TestSolver(unittest.TestCase):
                             self.absoluteTolerance, self.relativeTolerance, "testSolver: kIncident")
 
     def testSetupKMatrices(self):
+        KzDesired = self.KzGapRegion
+        KzCalculated = self.solver.KzGapRegion
+        assert_almost_equal(KzCalculated, KzDesired,
+                            self.absoluteTolerance, self.relativeTolerance, "testSolver: KzGapRegion")
+
         KxActual = self.Kx
         KxCalculated = self.solver.Kx
         assert_almost_equal(KxActual, KxCalculated,
@@ -32,21 +38,17 @@ class TestSolver(unittest.TestCase):
 
         KzActual = self.KzTransmissionRegion
         KzCalculated = self.solver.KzTransmissionRegion
-        assert_almost_equal(KzActual, KzCalculated,
-                            self.absoluteTolerance, self.relativeTolerance, "testSolver: KzTransmissionRegion")
+        assert_almost_equal(KzActual, KzCalculated, self.absoluteTolerance)
 
-        KzActual = self.KzGapRegion
-        KzCalculated = self.solver.KzGapRegion
-        assert_almost_equal(KzActual, KzCalculated,
-                            self.absoluteTolerance, self.relativeTolerance, "testSolver: KzGapRegion")
 
-    def testEdgeSMatrices(self):
+    def test_reflection_S_matrix(self):
         self.solver.solve()
-        SActual = self.SReflectionRegion
+        SDesired = self.SReflectionRegion
         SCalculated = self.solver.SReflection
-        assert_almost_equal(SActual, SCalculated,
+        assert_almost_equal(SCalculated, SDesired,
                             self.absoluteTolerance, self.relativeTolerance, "testSolver: SReflection")
 
+    def test_transmission_S_matrix(self):
         self.solver.solve()
         SActual = self.STransmissionRegion
         SCalculated = self.solver.STransmission
@@ -65,6 +67,24 @@ class TestSolver(unittest.TestCase):
         SCalculated = self.solver.Si[1]
         assert_almost_equal(SActual, SCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "testSolver: Si[1]")
+
+    def testGlobalSMatrix(self):
+        self.solver.solve()
+        S11_global_desired = self.SGlobal11
+        S11_global_actual = self.solver.SGlobal[0,0]
+        assert_almost_equal(S11_global_actual, S11_global_desired, self.absoluteTolerance, self.relativeTolerance)
+
+        S12_global_desired = self.SGlobal12
+        S12_global_actual = self.solver.SGlobal[0,1]
+        assert_almost_equal(S12_global_actual, S12_global_desired, self.absoluteTolerance, self.relativeTolerance)
+
+        S21_global_desired = self.SGlobal21
+        S21_global_actual = self.solver.SGlobal[1,0]
+        assert_almost_equal(S21_global_actual, S21_global_desired, self.absoluteTolerance, self.relativeTolerance)
+
+        S22_global_desired = self.SGlobal22
+        S22_global_actual = self.solver.SGlobal[1,1]
+        assert_almost_equal(S22_global_actual, S22_global_desired, self.absoluteTolerance, self.relativeTolerance)
 
     def testrtAmplitudeCoefficients(self):
         self.solver.solve()
@@ -117,6 +137,7 @@ class TestSolver(unittest.TestCase):
                             self.absoluteTolerance, self.relativeTolerance, "testSolver: TTot")
         assert_almost_equal(CTotActual, CTotCalculated, 1e-7, 1e-7, "testSolver: Conservation Violated")
 
+    @pytest.mark.skip
     def testIntegrationMultiWavelength(self):
         testWavelengths = self.solver.source.wavelength*np.arange(0.2,2,0.01)
         self.solver.solve(wavelength=testWavelengths)

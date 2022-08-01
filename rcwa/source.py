@@ -1,5 +1,6 @@
 from rcwa.shorthand import *
-from rcwa import freeSpaceLayer
+from rcwa.utils import k_vector
+from rcwa import Layer
 
 
 class Source:
@@ -12,10 +13,10 @@ class Source:
     :param pTEM: Polarization vector for TE/TM polarization fraction (can be complex)
     :param layer: Layer source is located in
     """
-    def __init__(self, wavelength=2*pi, theta=0, phi=0, pTEM=[1, 1], layer=freeSpaceLayer):
-        self.freeSpaceWavelength = wavelength
+    def __init__(self, wavelength=2*pi, theta=0, phi=0, pTEM=[1, 1], layer=Layer(er=1, ur=1)):
+        self._free_space_wavelength = wavelength
         self.layer = layer
-        self.k0 = 2*pi / self.freeSpaceWavelength
+        self.k0 = 2*pi / self._free_space_wavelength
         self._phi = phi
         self._theta = theta
         self._set_k_incident()
@@ -28,50 +29,38 @@ class Source:
 
     def __eq__(self, other):
         if not isinstance(other, Source):
-            return NotImplemented
-        return self.freeSpaceWavelength == other.freeSpaceWavelength and \
+            raise ValueError(f'Cannot compare Source() and non-source object {type(other)}')
+        return self._free_space_wavelength == other._free_space_wavelength and \
                self.k0 == other.k0 and \
                self.theta == other.theta and \
                self.phi == other.phi and \
-               self.pTE == other.pTE and \
-               self.pTM == other.pTM and \
+               np.all(self.pTE == other.pTE) and \
+               np.all(self.pTM == other.pTM) and \
                self.pX == other.pX and \
                self.pY == other.pY and \
-               self.k_incident == other.k_incident and \
-               self.aTE == other.aTE and \
-               self.aTM == other.aTM
+               np.all(self.k_incident == other.k_incident) and \
+               np.all(self.aTE == other.aTE) and \
+               np.all(self.aTM == other.aTM)
 
     def __str__(self):
-        return f'wavelength: {self.freeSpaceWavelength:.3f}, (theta, phi) = ({self.theta:.4f}, {self.phi:.4f})\n' + \
+        return f'wavelength: {self._free_space_wavelength:.3f}, (theta, phi) = ({self.theta:.4f}, {self.phi:.4f})\n' + \
                 f'kIncident: {self.k_incident}, polarization: ({self.pTE:.3f}, {self.pTM:.3f})\n' + \
                 f'TEM vector: ({self.aTE}, {self.aTM})\n'
 
-    def __repr__(self):
-        return f'wavelength: {self.freeSpaceWavelength:.3f}, (theta, phi) = ({self.theta:.4f}, {self.phi:.4f})' + \
-                f'kIncident: {self.k_incident}, polarization: ({self.pTE:.3f}, {self.pTM:.3f})' + \
-                f'TEM vector: ({self.aTE}, {self.aTM})'
-
-    def getRepresentationVector(self):
-        return complexArray([self.wavelength, self.k0, self.theta, self.phi, self.pTE, self.pTM,
-                             self.pX, self.pY, self.k_incident[0], self.k_incident[1], self.k_incident[2],
-                             self.aTE[0], self.aTE[1], self.aTM[0], self.aTM[1]])
-
     @property
     def wavelength(self):
-        if isinstance(self.freeSpaceWavelength, np.ndarray):
-            return self.freeSpaceWavelength[0]
-        else:
-            return self.freeSpaceWavelength
+        return self._free_space_wavelength
 
     @wavelength.setter
     def wavelength(self, wavelength):
-        self.freeSpaceWavelength = wavelength
+        self._free_space_wavelength = wavelength
         self.k0 = 2 * pi / wavelength
         self._set_k_incident()
 
     def _set_tem_vectors(self):
         deviceNormalUnitVector = complexArray([0, 0, -1])
         epsilon = 1e-3
+
         k_norm = self.k_incident / np.linalg.norm(self.k_incident)
 
         if abs(k_norm[0]) < epsilon and abs(k_norm[0]) < epsilon:
@@ -99,8 +88,6 @@ class Source:
     @pTEM.setter
     def pTEM(self, pTEM):
         self._pTEM = pTEM / np.linalg.norm(pTEM)
-        self._set_k_incident()
-        self._set_tem_vectors()
 
     @property
     def phi(self):
@@ -125,10 +112,6 @@ class Source:
         return self._k_incident
 
     def _set_k_incident(self):
-        n = sqrt(self.layer.er*self.layer.ur);
-        kx = n * sin(self.theta) * cos(self.phi);
-        ky = n * sin(self.theta) * sin(self.phi);
-        kz = n * cos(self.theta);
-        self._k_incident = complexArray([kx, ky, kz])
+        self._k_incident = k_vector(self, self.layer, normalize=True)
 
 zeroSource = Source(float("inf"))

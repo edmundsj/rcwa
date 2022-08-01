@@ -1,5 +1,4 @@
 [run]
 omit = 
     */test*
-    *plotter.py
-    */utils/fresnel.py
+    */examples/*

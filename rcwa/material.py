@@ -8,6 +8,8 @@ import rcwa
 import os
 from rcwa.utils import CSVLoader, RIDatabaseLoader
 import warnings
+from numpy.typing import ArrayLike
+
 
 class Material:
     """
@@ -25,7 +27,7 @@ class Material:
 
     def __init__(self, name=None, er=1, ur=1, n=None, database_path=None, filename=None, source=None):
         self.name = ''
-        self.source=source
+        self.source = source
         self.dispersive = False
         self.loader = None
 
@@ -33,9 +35,6 @@ class Material:
             self.dispersive = True
             self._er_dispersive = er
             self._ur_dispersive = ur
-        else:
-            self._er = er
-            self._ur = ur
 
         if name is not None or database_path is not None:
             self.dispersive = True
@@ -43,6 +42,18 @@ class Material:
         elif filename is not None:
             self.dispersive = True
             self._load_from_nk_table(filename=filename)
+        elif callable(er) or callable(ur):
+            self.dispersive = True
+            self.dispersion_type = 'formula'
+            if callable(er):
+                self._er_dispersive = er
+            else:
+                self._er_dispersive = lambda x: er
+            if callable(ur):
+                self._ur_dispersive = ur
+            else:
+                self._ur_dispersive = lambda x: ur
+
         else:
             self.dispersive = False
             if n is None: # If the refractive index is not defined, go with the permittivity
@@ -67,13 +78,13 @@ class Material:
         if 'wavelength' in data_dict.keys():
             self.wavelengths = data_dict['wavelength']
 
-    def _load_from_nk_table(self, filename):
+    def _load_from_nk_table(self, filename: str):
         self.dispersion_type = 'tabulated'
         loader = CSVLoader(filename=filename)
         data_dict = loader.load()
         self._set_dispersive_nk(data_dict)
 
-    def _load_from_database(self, material_name, filename=None):
+    def _load_from_database(self, material_name: str, filename: str = None):
         """
         Parses data from a CSV or database YAML file into a set of numpy arrays.
 
@@ -97,40 +108,40 @@ class Material:
             return self.lookupParameter(self._n_dispersive)
 
     @n.setter
-    def n(self, n):
+    def n(self, n: float):
         self._er = np.square(n)
         self._ur = 1
 
     @property
-    def er(self):
+    def er(self) -> float:
         if not self.dispersive:
             return self._er
         else:
             return self.lookupParameter(self._er_dispersive)
 
     @er.setter
-    def er(self, er):
+    def er(self, er: complex):
         self._er = er
 
     @property
-    def ur(self):
-        if self.dispersive == False:
+    def ur(self) -> complex:
+        if not  self.dispersive:
             return self._ur
         else:
             return self.lookupParameter(self._ur_dispersive)
 
     @ur.setter
-    def ur(self, ur):
+    def ur(self, ur: complex):
         self._ur = ur
 
-    def lookupParameter(self, parameter):
+    def lookupParameter(self, parameter: ArrayLike) -> complex:
         if self.dispersion_type == 'tabulated':
             return self.lookupNumeric(parameter)
         elif self.dispersion_type == 'formula':
             wavelength = self.source.wavelength
             return parameter(wavelength)
 
-    def lookupNumeric(self, parameter):
+    def lookupNumeric(self, parameter: ArrayLike) -> complex:
         """
         Looks up a numeric value of a parameter
 

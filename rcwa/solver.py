@@ -1,7 +1,7 @@
 from rcwa.shorthand import *
 from rcwa.matrices import *
-from rcwa.harmonics import *
-from rcwa import Layer, LayerStack
+from rcwa.harmonics import kx_matrix, ky_matrix
+from rcwa import Layer, LayerStack, Results
 from copy import deepcopy
 from progressbar import ProgressBar, Bar, Counter, ETA
 from itertools import product
@@ -85,6 +85,47 @@ class Solver:
         self.results = self._package_results()
         return self.results
 
+    def fields(self, component='Ex', layer=None, x_min=0, x_max=0, y_min=0, y_max=0, z_min=0, z_max=0, N_x=1, N_y=1, N_z=1):
+        # First, we find the forward- and backward propagating waves in the incident region
+        V_inc, W_inc, L_inc, _ = self.layer_stack.incident_layer.VWLX_matrices()
+        c_incident = np.linalg.inv(W_inc) @ s_incident(self.source, self.n_harmonics)
+        c_reflected = self.SGlobal[0, 0] @ c_incident
+
+        if layer is self.layer_stack.incident_layer:
+            c_forward_target = c_incident
+            c_backward_target = c_reflected
+        elif layer is self.layer_stack.transmission_layer:
+            c_forward_target = self.SGlobal[1, 0] @ c_incident
+            c_backward_target = 0 * c_incident
+        else:
+            raise NotImplementedError
+
+        V_target, W_target, L_target, _ = self.layer_stack.incident_layer.VWLX_matrices()
+        z = z_min
+
+        if 'E' in component:
+            field_target = W_target @ matrixExponentiate(-1 * L_target * self.source.k0 * z) @ c_forward_target + \
+                           W_target @ matrixExponentiate(L_target * self.source.k0 * z) @ c_backward_target
+
+        return field_target
+
+    @property
+    def base_crystal(self):
+        return self.layer_stack.crystal
+
+    def grad(self, loss_func, obj, attribute):
+        """
+        Computes the gradient of a user-specified loss function with respect to an attribute
+        of an object in the simulation.
+
+        :param loss_func: The loss function you are trying to optimize. Should take a single argument
+        of the Solver Results object.
+        :param obj: The object whose attribute you want to tweak in order to do the optimization (i.e. layer3)
+        :param attribute: The attribute of the object you want to tweak (i.e. 'thickness' or 'er')
+        """
+        raise NotImplementedError
+
+
     def _increase_harmonics(self, factor=1):
         n_harmonics = np.array(self.n_harmonics)
         n_harmonics *= factor
@@ -149,6 +190,7 @@ class Solver:
 
     def _couple_source(self):
         self.source.layer = self.layer_stack.incident_layer
+        self.layer_stack.source = self.source
 
     def _rt_quantities(self):
         self.rx, self.ry, self.rz = calculateReflectionCoefficient(self.SGlobal, self.Kx, self.Ky,
@@ -188,6 +230,7 @@ class Solver:
         else:
             new_results = self.results[0]
 
+        new_results = Results(new_results)
         return new_results
 
     def _append_results(self):
@@ -203,6 +246,7 @@ class Solver:
         tempResults['crystal'] = deepcopy(self.base_crystal)
         tempResults['source'] = deepcopy(self.source)
         tempResults['S'] = deepcopy(self.SGlobal)
+        tempResults['Si'] = deepcopy(self.Si)
 
         if self.TMMSimulation:
             tempResults['rTE'] = self.rTEM[0]
@@ -234,9 +278,7 @@ class Solver:
         s_shape = (s_dim, s_dim)
         return s_shape
 
-    @property
-    def base_crystal(self):
-        return self.layer_stack.crystal
+
 
     def _k_matrices(self):
         """
@@ -245,37 +287,30 @@ class Solver:
         """
         self.Kx = kx_matrix(self.source, self.base_crystal, self.n_harmonics)
         self.Ky = ky_matrix(self.source, self.base_crystal, self.n_harmonics)
+        self.layer_stack.Kx = self.Kx
+        self.layer_stack.Ky = self.Ky
 
-        if self.TMMSimulation: # Ensure that Kz for the gap layer is 1
-            self.layer_stack.gapLayer = Layer(er=1 + sq(self.Kx) + sq(self.Ky), ur=1, thickness=0)
-
-        self.KzReflectionRegion = calculateKzBackward(self.Kx, self.Ky, self.layer_stack.incident_layer)
-        self.KzTransmissionRegion = calculateKzForward(self.Kx, self.Ky, self.layer_stack.transmission_layer)
-        self.KzGapRegion = calculateKzForward(self.Kx, self.Ky, self.layer_stack.gapLayer)
+        self.KzReflectionRegion = self.layer_stack.incident_layer.Kz_backward()
+        self.KzTransmissionRegion = self.layer_stack.transmission_layer.Kz_forward()
 
     def _outer_matrices(self):
         self.WReflectionRegion = complexIdentity(self._s_element_dimension)
         self.WTransmissionRegion = complexIdentity(self._s_element_dimension)
 
     def _gap_matrices(self):
-        self.WGap = complexIdentity(self._s_element_dimension)
-        QGap = calculateQMatrix(self.Kx, self.Ky, self.layer_stack.gapLayer)
-        LambdaGap = calculateLambdaMatrix(self.KzGapRegion)
-        self.VGap = QGap @ inv(LambdaGap)
+        self.layer_stack.set_gap_layer()
+        self.KzGapRegion = self.layer_stack.gapLayer.Kz_gap()
 
     def _inner_s_matrix(self):
-        for i in range(len(self.layer_stack.internal_layers)):
-            self.Si[i] = calculateInternalSMatrix(self.Kx, self.Ky, self.layer_stack.internal_layers[i],
-                                                  self.source, self.WGap, self.VGap)
-            self.SGlobal = calculateRedhefferProduct(self.SGlobal, self.Si[i])
+        for i, layer in enumerate(self.layer_stack.internal_layers):
+            self.Si[i] = layer.S_matrix()
+            self.SGlobal = redheffer_product(self.SGlobal, self.Si[i])
 
     def _global_s_matrix(self):
-        self.STransmission = calculateTransmissionRegionSMatrix(self.Kx, self.Ky, self.layer_stack,
-                                                                self.WGap, self.VGap)
-        self.SReflection = calculateReflectionRegionSMatrix(self.Kx, self.Ky, self.layer_stack,
-                                                            self.WGap, self.VGap)
-        self.SGlobal = calculateRedhefferProduct(self.SGlobal, self.STransmission)
-        self.SGlobal = calculateRedhefferProduct(self.SReflection, self.SGlobal)
+        self.STransmission = self.layer_stack.transmission_layer.S_matrix()
+        self.SReflection = self.layer_stack.incident_layer.S_matrix()
+        self.SGlobal = redheffer_product(self.SGlobal, self.STransmission)
+        self.SGlobal = redheffer_product(self.SReflection, self.SGlobal)
 
     def _initialize(self):
         if self.base_crystal is None:
@@ -283,7 +318,7 @@ class Solver:
         else:
             self.TMMSimulation = False
 
-        self.SGlobal = generateTransparentSMatrix(self._s_element_shape)
+        self.SGlobal = S_matrix_transparent(self._s_element_shape)
         self.rx, self.ry, self.rz = None, None, None
         self.tx, self.ty, self.tz = None, None, None
         self.R, self.T, self.RTot, self.TTot, self.CTot = None, None, None, None, None

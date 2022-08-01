@@ -23,11 +23,10 @@ def solve_system():
                 stepWavelength)
 
         results = TMMSolver.solve(wavelength=wavelengths)
-        #Plotter.plotEllipsometrySpectra(TMMSolver.results)
-        fig, ax = Plotter.plotRTSpectra(TMMSolver.results)
         return results
 
 
 if __name__ == '__main__':
         results = solve_system()
+        fig, ax = results.plot(x='wavelength', y=['RTot', 'TTot', 'conservation'])
         plt.show()

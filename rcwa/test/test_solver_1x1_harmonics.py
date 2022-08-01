@@ -65,6 +65,7 @@ class TestSolver1x1(unittest.TestCase):
         assert_almost_equal(SActual, SCalculated,
                             self.absoluteTolerance, self.relativeTolerance, "testSolver1x1: Si[1]")
 
+
     def testrtAmplitudeCoefficients(self):
         self.solver.solve()
         rxActual = self.rx

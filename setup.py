@@ -15,7 +15,7 @@ with open("README.md", "r") as fh:
 
 	setuptools.setup(
 		name="rcwa",
-		version="1.0." + str(int(os.environ['GITHUB_RUN_NUMBER'])-164),
+		version="1.0." + str(5 +  int(os.environ['GITHUB_RUN_NUMBER'])),
 		author="Jordan Edmunds",
 		author_email="jordan.e@berkeley.edu",
 		description="Python Implementation of Rigorous Coupled Wave Analysis",
@@ -34,13 +34,14 @@ with open("README.md", "r") as fh:
 		],
 		python_requires='>=3.6',
 		install_requires=[
-				'numpy>=1.14.5',
-				'matplotlib>=2.0.0',
-				'pandas>=0.24.0',
-				'scipy>=1.2.2',
-				'pyyaml>=5.0.0',
-                'pytest>6.2.2',
-                'progressbar2',
+			'numpy>=1.20.0',
+			'matplotlib>=2.0.0',
+			'pandas>=0.24.0',
+			'scipy>=1.2.2',
+			'pyyaml>=5.0.0',
+			'pytest>6.2.2',
+			'progressbar2',
+			'autograd',
 		],
 	license="MIT",
 	)

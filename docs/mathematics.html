@@ -1,0 +1,355 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Mathematics of RCWA &mdash; Rigorous Coupled Wave Analysis 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Materials in rcwa" href="material.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Rigorous Coupled Wave Analysis
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples using RCWA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">rcwa API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="material.html">Materials in rcwa</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Mathematics of RCWA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#definitions-and-conventions">Definitions and Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fields-and-field-coefficients">Fields and Field Coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#field-coefficients">Field Coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mode-coefficients">Mode Coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scattering-matrices-couple-mode-coefficients">Scattering Matrices couple Mode Coefficients</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#electric-field-coefficients">Electric Field Coefficients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#magnetic-field-coefficients">Magnetic Field Coefficients</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#finding-mode-coefficients-inside-an-arbitrary-layer">Finding Mode coefficients inside an arbitrary layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#find-e-h-coefficients-inside-an-arbitrary-layer">Find E/H Coefficients inside an arbitrary Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#finding-the-electric-and-magnetic-fields-inside-an-arbitrary-layer">Finding the electric and magnetic fields inside an arbitrary layer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#electric-fields">Electric Fields</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rigorous Coupled Wave Analysis</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Mathematics of RCWA</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/mathematics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="mathematics-of-rcwa">
+<h1>Mathematics of RCWA<a class="headerlink" href="#mathematics-of-rcwa" title="Permalink to this headline">¶</a></h1>
+<p>This section is for developers who want to understand the implementation of this package, for example, to implement their own manipulations on top of it or extend functionality. It follows the formulation laid out by <a class="reference external" href="https://empossible.net/wp-content/uploads/2019/08/Lecture-7a-RCWA-Formulation.pdf">Rumpf</a>. This is intended as a reference for developers with a fairly advanced electromagnetics and mathematics background, and assumes a knowledge of electromagnetic modes, vectors, matrices, matrix multiplication, and vectors and matrices composed of other vectors and matrices.</p>
+<section id="definitions-and-conventions">
+<h2>Definitions and Conventions<a class="headerlink" href="#definitions-and-conventions" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><span class="math notranslate nohighlight">\(N_{x}\)</span>: number of harmonics along x-direction</div>
+<div class="line"><span class="math notranslate nohighlight">\(N_y\)</span>: number of harmonics along y-direction.</div>
+<div class="line"><span class="math notranslate nohighlight">\(N_{tot} =  N_x * N_y\)</span>: Total number of harmonics</div>
+<div class="line"><span class="math notranslate nohighlight">\(n_x\)</span>: Used to index the x-harmonics. Ranges from negative to positive.</div>
+<div class="line"><span class="math notranslate nohighlight">\(n_y\)</span>: Used to index the y-harmonics. Ranges from negative to positive.</div>
+<div class="line"><span class="math notranslate nohighlight">\(E\)</span>: Electric Field</div>
+<div class="line"><span class="math notranslate nohighlight">\(H\)</span>: Magnetic Field</div>
+<div class="line"><span class="math notranslate nohighlight">\(s\)</span>: Electtric field (Fourier) coefficient</div>
+<div class="line"><span class="math notranslate nohighlight">\(u\)</span>: Magnetic field (Fourier) coefficient</div>
+<div class="line"><span class="math notranslate nohighlight">\(c\)</span>: Mode coefficient</div>
+<div class="line"><span class="math notranslate nohighlight">\(W\)</span>: Electric field coefficient mode matrix</div>
+<div class="line"><span class="math notranslate nohighlight">\(V\)</span>: Magnetic field coefficient mode matrix</div>
+</div>
+</div></blockquote>
+<p>Layer “0” is the incident layer. Layer “1” is the layer closest to the incident region.</p>
+</section>
+<section id="fields-and-field-coefficients">
+<h2>Fields and Field Coefficients<a class="headerlink" href="#fields-and-field-coefficients" title="Permalink to this headline">¶</a></h2>
+<p>The formulation of rigorous coupled wave analysis involves decomposing the electric and magnetic fields into their plane wave components. Rather than working with the electric field <span class="math notranslate nohighlight">\(E_x\)</span> directly,  we work instead with the field coefficients <span class="math notranslate nohighlight">\(s_x\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[E_x  (x, y, z) = \sum_{n_x = -\infty}^{\infty} \sum_{n_y= -\infty}^{\infty} s_x(n_x, n_y, z) * e^{-j \left(k_x(n_x, n_y)*x + k_y(n_x, n_y)*y \right)}\]</div>
+<p>Where</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}k_x(n_x, n_y) = k_{x, incident} - n_x * T_{1, x} - n_y * T_{2, x} \\
+k_y(n_x, n_y) = k_{y, incident} - n_x * T_{1, y} - n_y * T_{2, y}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(T_1\)</span> and <span class="math notranslate nohighlight">\(T_2\)</span> are the lattice parameters of the photonic crystal under study. If a 1D grating is used, <span class="math notranslate nohighlight">\(T_2 = 0\)</span>. For thin films, <span class="math notranslate nohighlight">\(T_1\)</span> is also zero, and only one harmonic needs to be represented - the incident harmonic.</p>
+<p>Note that the field coefficients are, in general, a function of z.</p>
+</section>
+<section id="field-coefficients">
+<h2>Field Coefficients<a class="headerlink" href="#field-coefficients" title="Permalink to this headline">¶</a></h2>
+<p>The electric (<span class="math notranslate nohighlight">\(s\)</span>) and magnetic (<span class="math notranslate nohighlight">\(u\)</span>) field coefficients are internally represented by vectors which have both x- and y-components, and these are different for each. Taking just electric field coefficient vector in the i-th layer:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}s_{i}(z)  = \begin{bmatrix}
+        s_{i, x}(z) \\
+         s_{i, y}(z)
+\end{bmatrix}\end{split}\]</div>
+<p>The length of the <span class="math notranslate nohighlight">\(s_{i,x}\)</span> and <span class="math notranslate nohighlight">\(s_{i,y}\)</span> vectors have length equal to <span class="math notranslate nohighlight">\(N_{tot}\)</span>, so the total length of the <span class="math notranslate nohighlight">\(s_{i}\)</span> vector is <span class="math notranslate nohighlight">\(N_{tot}*2\)</span>. These vectors are indexed <span class="math notranslate nohighlight">\((n_x, n_y)\)</span>. For a <span class="math notranslate nohighlight">\(N_x=3\)</span> and <span class="math notranslate nohighlight">\(N_y=3\)</span> setup, the vector looks like this:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}s_{i, x}  = \begin{bmatrix}
+s_{i, x}(1, 1) \\
+s_{i, x}(1, 2) \\
+s_{i, x}(1, 3) \\
+s_{i, x}(2, 1) \\
+s_{i, x}(2, 2) \\
+s_{i, x}(2, 3) \\
+s_{i, x}(3, 1) \\
+s_{i, x}(3, 2) \\
+s_{i, x}(3, 3) \\
+\end{bmatrix}\end{split}\]</div>
+<p>The x-component of the zero-order harmonic corresponds to the field coefficient <span class="math notranslate nohighlight">\(s_{i,x}(2, 2)\)</span>.</p>
+<p>These field coefficients are, in general, functions of the z-coordinate. This makes them  awkward to work with directly, which is why we typically work with <em>mode coefficients</em> instead.</p>
+</section>
+<section id="mode-coefficients">
+<h2>Mode Coefficients<a class="headerlink" href="#mode-coefficients" title="Permalink to this headline">¶</a></h2>
+<p>Internally, this package typically works with <em>mode coefficients</em>, referred to using the symbol <span class="math notranslate nohighlight">\(c\)</span>.  Forward-propagating mode coefficients inside the <span class="math notranslate nohighlight">\(i^{th}\)</span> layer are represented with the symbol <span class="math notranslate nohighlight">\(c_{i}^+\)</span> and backward-propagating mode coefficients inside the <span class="math notranslate nohighlight">\(i^{th}\)</span> layer are represented with the symbol <span class="math notranslate nohighlight">\(c_{i}^-\)</span>. Each mode has a single value of <span class="math notranslate nohighlight">\(k_z\)</span>, the propagation constant in the <span class="math notranslate nohighlight">\(z\)</span>-direction. You could say this is what <em>defines</em> a mode. For planar films, the modes are always plane waves. For 1D- and 2D-photonic crystals, they require several plane waves (harmonics) to represent.</p>
+<p>Just as with field coefficients, both the x- and y-components of the mode coefficients must be kept internally. As with the field coefficients, both forward- and backward-propagating mode coefficients are represented with the x-components followed by the y-components.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}c_{i}^+  = \begin{bmatrix}
+        c_{i, x}^+ \\
+         c_{i, y}^+
+\end{bmatrix}\end{split}\]</div>
+<p><span class="math notranslate nohighlight">\(c_{i,x}^+\)</span> and <span class="math notranslate nohighlight">\(c_{i,y}^+\)</span> are vectors with length equal to the total number of harmonics (i.e. for a 2D photonic crystal if <span class="math notranslate nohighlight">\(N_x = 3\)</span> and <span class="math notranslate nohighlight">\(N_y=3\)</span>, then <span class="math notranslate nohighlight">\(N_{tot} = N_x * N_y = 9\)</span>, and the length of the total vector <span class="math notranslate nohighlight">\(c_{i}^+\)</span> is 18.</p>
+</section>
+<section id="scattering-matrices-couple-mode-coefficients">
+<h2>Scattering Matrices couple Mode Coefficients<a class="headerlink" href="#scattering-matrices-couple-mode-coefficients" title="Permalink to this headline">¶</a></h2>
+<p>The scattering matrix for the <span class="math notranslate nohighlight">\(i^{th}\)</span> layer relates the forward- and backward propagating mode coefficients between the <span class="math notranslate nohighlight">\(i^{th}\)</span> and <span class="math notranslate nohighlight">\(i+1^{th}\)</span> layer in the following way:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+        c_{i}^- \\
+         c_{i+1}^+
+\end{bmatrix} = \begin{bmatrix}
+   S_{i,11} &amp; S_{i, 12}\\
+   S_{i, 21} &amp; S_{i, 22}
+\end{bmatrix} \begin{bmatrix}
+   c_{i}^+ \\
+   c_{i+1}^-
+\end{bmatrix}\end{split}\]</div>
+<p>This can be rearranged to solve for the <span class="math notranslate nohighlight">\(i+1^{th}\)</span> mode coefficients given the <span class="math notranslate nohighlight">\(i^{th}\)</span> mode coefficients.</p>
+<section id="electric-field-coefficients">
+<h3>Electric Field Coefficients<a class="headerlink" href="#electric-field-coefficients" title="Permalink to this headline">¶</a></h3>
+<p>The mode coefficients in the <span class="math notranslate nohighlight">\(i^{th}\)</span> layer can be related to directly to the x- and y-components of the electric fields (<span class="math notranslate nohighlight">\(s_x\)</span> and <span class="math notranslate nohighlight">\(s_y\)</span>) using the electric mode matrix, represented with the symbol <span class="math notranslate nohighlight">\(W\)</span>. This matrix takes the forward- and backward-traveling mode coefficients and converts them into the electric field coefficients. The values of <span class="math notranslate nohighlight">\(k_z\)</span> for each mode are also needed, which are assembled diagonally along the <span class="math notranslate nohighlight">\(\lambda\)</span> matrix.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+        s_{i,x} \\
+         s_{i,y}
+\end{bmatrix} = W . e^{- \lambda z} . c_{i}^+ + W . e^{- \lambda z} . c_{i}^-\end{split}\]</div>
+</section>
+<section id="magnetic-field-coefficients">
+<h3>Magnetic Field Coefficients<a class="headerlink" href="#magnetic-field-coefficients" title="Permalink to this headline">¶</a></h3>
+<p>Similarly, the mode coefficients in the <span class="math notranslate nohighlight">\(i^{th}\)</span> layer can be related to the x- and y-components of the magnetic field coefficients <span class="math notranslate nohighlight">\(u_x\)</span> and <span class="math notranslate nohighlight">\(u_y\)</span> using the magnetic mode matrix, represented with the symbol <span class="math notranslate nohighlight">\(V\)</span>, along with, as before, the <span class="math notranslate nohighlight">\(\lambda\)</span> matrix.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+        u_{i,x} \\
+         u_{i,y}
+\end{bmatrix} = - V . e^{- \lambda z} . c_{i}^+ + V . e^{- \lambda z} . c_{i}^-\end{split}\]</div>
+</section>
+</section>
+<section id="finding-mode-coefficients-inside-an-arbitrary-layer">
+<h2>Finding Mode coefficients inside an arbitrary layer<a class="headerlink" href="#finding-mode-coefficients-inside-an-arbitrary-layer" title="Permalink to this headline">¶</a></h2>
+<p>Once the scattering matrices for each layer <span class="math notranslate nohighlight">\(S_i\)</span> are known, the incident mode coefficients <span class="math notranslate nohighlight">\(s_0\)</span> are known and the global scattering matrix <span class="math notranslate nohighlight">\(S_{global}\)</span> is known, the mode coefficients in an arbitrary layer can be calculated.</p>
+<p>First, the mode coefficients in the incident region must be found. To do this, you can find the m. <span class="math notranslate nohighlight">\(c_0^+\)</span> using the <span class="math notranslate nohighlight">\(W_{incident}\)</span> matrix and <span class="math notranslate nohighlight">\(s_{incident}\)</span> vector (which contains the x- and y-components of the zero-order harmonic), and <span class="math notranslate nohighlight">\(c_0^-\)</span> can be calculated from the global scattering matrix. Note that <span class="math notranslate nohighlight">\(s_{incident}\)</span> is not the same as <span class="math notranslate nohighlight">\(s_0\)</span>, which also contains the reflected field coefficients.</p>
+<div class="math notranslate nohighlight">
+\[c_0^+ = W_{incident}^{-1} s_{incident}
+c_0^- = S_{global, 11} c_0^+\]</div>
+<p>Then, by applying the formula below as many times as is required, mode coefficients within the desired layer can be found:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}c_{i+1}^{-} = S_{i, 12}^{-1} c_i^{-} - S_{i, 12}^{-1} S_{i,11} c_i{+} \\
+c_{i+1}^{+} = S_{i, 21} c_{i}^{+1} + S_{i,22} c_{i+1}{-}\end{split}\]</div>
+</section>
+<section id="find-e-h-coefficients-inside-an-arbitrary-layer">
+<h2>Find E/H Coefficients inside an arbitrary Layer<a class="headerlink" href="#find-e-h-coefficients-inside-an-arbitrary-layer" title="Permalink to this headline">¶</a></h2>
+<p>Once the mode coefficients have been found, the electric and magnetic field coefficients can be found as described previously. Note that at this point, the field coefficients will still be a function of the z coordinate.</p>
+</section>
+<section id="finding-the-electric-and-magnetic-fields-inside-an-arbitrary-layer">
+<h2>Finding the electric and magnetic fields inside an arbitrary layer<a class="headerlink" href="#finding-the-electric-and-magnetic-fields-inside-an-arbitrary-layer" title="Permalink to this headline">¶</a></h2>
+<section id="electric-fields">
+<h3>Electric Fields<a class="headerlink" href="#electric-fields" title="Permalink to this headline">¶</a></h3>
+<p>Once the electric field coefficients are known, the electric fields can be calculated using the formula above for a certain value of <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>, as a function of <span class="math notranslate nohighlight">\(z\)</span>.</p>
+<p>First, the diagonal k-matrices <span class="math notranslate nohighlight">\(K_x\)</span> and <span class="math notranslate nohighlight">\(K_y\)</span> can be converted into vectors <span class="math notranslate nohighlight">\(k_x\)</span> and <span class="math notranslate nohighlight">\(k_y\)</span>. Then, the complex exponential can be evaluated element-wise directly:</p>
+<div class="math notranslate nohighlight">
+\[e_{vec} = e^{-j \left(k_x * x + k_y * y \right) }\]</div>
+<p>This is itself a vector with the same length as <span class="math notranslate nohighlight">\(s_x\)</span>. The dot product (NOT inner product, there is no complex conjugation) of this vector and the exponential vector <span class="math notranslate nohighlight">\(e_{vec}\)</span> finally yields the x-component of the electric field. This may be repeated for the y-component as well, by dotting with the <span class="math notranslate nohighlight">\(s_y\)</span> vector.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}E_x(x, y, z) = e_{vec} \cdot s_{x} \\\end{split}\]</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="material.html" class="btn btn-neutral float-left" title="Materials in rcwa" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Jordan Edmunds
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

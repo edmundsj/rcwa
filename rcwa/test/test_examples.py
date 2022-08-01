@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from rcwa import Results
 from numpy.testing import assert_allclose, assert_equal
 from rcwa.examples.bragg_mirror import solve_system as solve_bragg
 from rcwa.examples.diffraction_grating_1D import solve_system as solve_rectangular_1d
@@ -12,9 +13,11 @@ from rcwa.examples.triangular_photonic_crystal_2D import solve_system as solve_t
 from rcwa.examples.grating_sweep import solve_system as solve_grating_sweep
 from rcwa.examples.wavelength_angle_sweep import solve_system as wavelength_angle_sweep
 
+
+@pytest.mark.example
 def test_bragg_mirror():
     results = solve_bragg()
-    assert isinstance(results, dict)
+    assert isinstance(results, Results)
     assert 'wavelength' in results.keys()
     assert 'RTot' in results.keys()
     assert 'TTot' in results.keys()
@@ -25,6 +28,8 @@ def test_bragg_mirror():
     RTot_actual_subset = results['RTot'][0:len(RTot_desired_subset)]
     assert_allclose(RTot_actual_subset, RTot_desired_subset, atol=1e-7)
 
+
+@pytest.mark.example
 def test_rectangular_1d():
     results = solve_rectangular_1d()
     assert 'rx' in results.keys()
@@ -37,6 +42,8 @@ def test_rectangular_1d():
         0.01247477-0.01675098j])
     assert_allclose(rx_actual, rx_desired, atol=1e-7)
 
+
+@pytest.mark.example
 def test_triangular_1d():
     results = solve_triangular_1d()
     assert 'rx' in results.keys()
@@ -50,6 +57,8 @@ def test_triangular_1d():
         1.42429830e-06-1.31545273e-06j])
     assert_allclose(rx_actual, rx_desired, atol=1e-7)
 
+
+@pytest.mark.example
 def test_solve_si_dispersive():
     results = solve_si_dispersive()
     assert 'wavelength' in results.keys()
@@ -58,12 +67,16 @@ def test_solve_si_dispersive():
     wavelengths_subset_actual = results['wavelength'][0:len(wavelengths_subset_desired)]
     assert_equal(wavelengths_subset_actual, wavelengths_subset_desired)
 
+
+@pytest.mark.example
 def test_solve_si_ellipsometry():
     with pytest.warns(Warning):
         fig, ax = solve_si_ellipsometry()
         assert fig is not None
         assert ax is not None
 
+
+@pytest.mark.example
 def test_solve_siO2_dispersive():
     results = solve_siO2_dispersive()
     assert 'wavelength' in results.keys()
@@ -72,6 +85,8 @@ def test_solve_siO2_dispersive():
     wavelengths_subset_actual = results['wavelength'][0:len(wavelengths_subset_desired)]
     assert_equal(wavelengths_subset_actual, wavelengths_subset_desired)
 
+
+@pytest.mark.example
 def test_solve_thin_film_dispersive():
     with pytest.warns(Warning):
         results = solve_thin_film_dispersive()
@@ -81,10 +96,12 @@ def test_solve_thin_film_dispersive():
         wavelengths_subset_actual = results['wavelength'][0:len(wavelengths_subset_desired)]
         assert_equal(wavelengths_subset_actual, wavelengths_subset_desired)
 
+
+@pytest.mark.example
 def test_solve_triangular_pc():
     results = solve_triangular_photonic_crystal()
     for x in ['conservation', 'rx', 'RTot']:
-        assert x in results
+        assert x in results.keys()
     rx_desired = np.array([ 0.0194899 +0.01175673j, -0.05570714+0.03010019j,
        -0.03797483-0.03124727j, -0.03920141+0.01425774j,
         0.20357306-0.00134404j, -0.01196725-0.02682893j,
@@ -96,11 +113,15 @@ def test_solve_triangular_pc():
     assert_allclose(results['TTot'], 0.844064519091769)
     assert_allclose(results['rx'], rx_desired, atol=1e-8, rtol=1e-5)
 
+
+@pytest.mark.example
 def test_grating_sweep():
     results = solve_grating_sweep()
     assert 'thickness' in results.keys()
     assert len(np.unique(results['RTot'])) == len(results['thickness'])
 
+
+@pytest.mark.example
 def test_wavelength_angle():
     results = wavelength_angle_sweep()
     assert 'theta' in results.keys()

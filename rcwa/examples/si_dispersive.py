@@ -31,10 +31,10 @@ def solve_system():
         wavelengths = np.arange(startWavelength, stopWavelength + stepWavelength,
                 stepWavelength)
         results = TMMSolver.solve(wavelength=wavelengths)
-        Plotter.plotRTSpectra(TMMSolver.results)
-
         return results
+
 
 if __name__ == '__main__':
         results = solve_system()
+        results.plot(x='wavelength', y=['RTot', 'TTot', 'conservation'])
         plt.show()
