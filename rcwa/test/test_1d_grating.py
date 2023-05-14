@@ -7,7 +7,7 @@ from rcwa.testing import *
 from rcwa.matrices import *
 from rcwa.shorthand import *
 from rcwa.testing import assert_almost_equal
-from rcwa import Source, Layer, LayerStack, Crystal
+from rcwa import Source, Layer, LayerStack, Crystal, Solver, RectangularGrating
 
 class Test1DGrating(unittest.TestCase):
 
@@ -283,6 +283,29 @@ class Test1DGrating(unittest.TestCase):
             [self.S11TransmissionRegion, self.S12TransmissionRegion],
             [self.S21TransmissionRegion, self.S22TransmissionRegion]])
         
+
+def test_unitlen_consistency():
+    def get_kz(unitlen):
+        reflection_layer = Layer(er=1.0, ur=1.0)
+        transmission_layer = Layer(er=1.0, ur=1.0)
+        layer_stack = LayerStack(
+            RectangularGrating(
+                period=2 * unitlen,
+                groove_width=1 * unitlen,
+                thickness=0.5 * unitlen,
+                n=2,
+                n_void=1,
+                nx=128),
+            incident_layer=reflection_layer,
+            transmission_layer=transmission_layer,
+        )
+        source = Source(wavelength=0.5 * unitlen, theta=1)
+        solver = Solver(layer_stack, source, 11)
+        return [solver.KzReflectionRegion, solver.KzTransmissionRegion]
+
+    kz1 = get_kz(1)
+    kz2 = get_kz(1000)
+    assert_almost_equal(kz1, kz2)
 
 
 if __name__ == '__main__':
