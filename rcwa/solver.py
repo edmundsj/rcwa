@@ -56,7 +56,7 @@ class Solver:
         self.sweep_objects, self.sweep_vars, self.sweep_vals = self._sweeps(*sweep_args, **sweep_kw)
         n_sweeps = len(self.sweep_vals)
 
-        bar = ProgressBar(widgets=[Counter(), f'/{n_sweeps} ', Bar(), ETA()], max_value=n_sweeps).start()
+        bar = ProgressBar(widgets=[Counter(), f'/{n_sweeps} ', Bar(), ETA()], maxval=n_sweeps).start()
 
         for i, sweep in enumerate(self.sweep_vals):
 
