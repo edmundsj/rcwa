@@ -56,7 +56,7 @@ class RIDatabaseLoader:
     def extract_material_database(self):
         database_filename = os.path.join(nk_location, 'library.yml')
         self.materials = {}
-        with open(database_filename) as database_file:
+        with open(database_filename, encoding='utf-8') as database_file:
             database_list = yaml.load(database_file, Loader=yaml.FullLoader)
 
         main_content = database_list[0]['content']
@@ -74,7 +74,7 @@ class RIDatabaseLoader:
                         break
 
     def load(self, filename):
-        with open(filename) as fn:
+        with open(filename, encoding='utf-8') as fn:
             material_file = yaml.load(fn, Loader=yaml.FullLoader)
             material_data = material_file['DATA'][0]
             if material_data['type'] == 'tabulated nk':
