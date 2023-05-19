@@ -26,3 +26,7 @@ pipenv = "*"
 
 [requires]
 python_version = "3.9"
+
+[scripts]
+test = "python3 -m pytest -s --cov=./rcwa --cov-report xml --cov-config=.coveragerc"
+build = "python3 setup.py sdist bdist_wheel"
