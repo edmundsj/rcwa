@@ -103,7 +103,7 @@ def _k_matrix_1D(source: Source, crystal: Crystal,
     matrixSize = np.prod(n_harmonics)
     matrixShape = (matrixSize, matrixSize)
     KMatrix = complexZeros(matrixShape)
-    T1 = crystal.reciprocal_lattice_vectors[0]
+    T1 = crystal.reciprocal_lattice_vectors[0] / source.k0
 
     if component == 'x':
         (incidentWaveVectorxy, T1xy) = x_components(source.k_incident, T1)
